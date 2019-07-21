@@ -13,14 +13,11 @@
 
     `sudo bash -c "umask 377; dd if=/dev/urandom bs=16 count=1 | xxd -p >passphrase"`
 
-5. Clone this. As root but with some user permissions in /etc:
+5. Clone this:
     ```sh
     sudo bash -c "\
-        writable='/etc/borgmatic.d/Readme.md'; \
         git --work-tree=/etc/borgmatic.d clone https://github.com/zzdroide/borgmatic borgmatic.git \
         && chown -R $(whoami):$(whoami) borgmatic.git \
-        && chown root:$(whoami) \$writable \
-        && chmod 644 \$writable \
     "
     ```
     To pull later: `sudo git pull`
