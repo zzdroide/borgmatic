@@ -1,0 +1,67 @@
+location:
+    source_directories:
+        - /
+
+    repositories:
+        !include /etc/borgmatic.d/shared/repo.yaml
+
+    one_file_system: false  # to backup /boot
+
+    exclude_patterns:
+        - pf:/cdrom
+        - pf:/dev
+        - pf:/media
+        - pf:/mnt
+        - pf:/proc
+        - pf:/run
+        - pf:/sys
+        - pf:/tmp
+
+        - sh:/home/*/.cache
+        - sh:/home/*/.gvfs
+        - sh:/home/*/.ICEauthority
+        - sh:/home/*/.nv
+        - sh:/home/*/.Xauthority
+
+        - pf:/var/cache/apt
+        - pf:/var/lock
+        - pf:/var/run
+        - pf:/var/tmp
+
+        - '*/node_modules/'
+        - '*.pyc'
+
+        # Note: only "- pf:___" between encrypt markers
+        # (no quotes, no comments, no other pattern style selectors, no empty lines)
+        # __ENCRYPT_START__
+        - pf:/home/t/.docker
+        - pf:/home/t/.git-credentials
+        - pf:/home/t/.gnupg
+        - pf:/home/t/.local/share/keyrings
+        - pf:/home/t/.pgpass
+        - pf:/home/t/.pki
+        - pf:/home/t/***REMOVED***
+        - pf:/home/t/.remmina
+        - pf:/home/t/.ssh/id_rsa
+        - pf:/etc/ssh
+        # __ENCRYPT_END__
+        - pf:/etc/borgmatic.d/passphrase
+
+        - pf:/root/.cache
+        - pf:/root/.gnupg
+
+storage:
+    archive_name_format: 'TAM_ntbk-mint-{now}'
+    <<: !include /etc/borgmatic.d/shared/storage.yaml
+
+
+# Just because it's mandatory:
+retention:
+    prefix: INVALID-
+
+hooks:
+    before_backup:
+        # Ensure desktop environment is not running (to run safely without snapshot)
+        - '! systemctl is-active --quiet lightdm'
+
+        - /etc/borgmatic.d/encrypt.sh

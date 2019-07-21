@@ -1,0 +1,38 @@
+location:
+    source_directories:
+        - /tmp/borg_windows_metadata
+    read_special: true
+    files_cache: disabled
+
+    repositories:
+        !include /etc/borgmatic.d/shared/repo.yaml
+
+    # Lots of unused metadata
+    numeric_owner: true
+    atime: false
+    ctime: false
+    birthtime: false
+    bsd_flags: false
+
+storage:
+    archive_name_format: 'TAM_ntbk-windows-metadata-{now}'
+    <<: !include /etc/borgmatic.d/shared/storage.yaml
+
+
+# Just because it's mandatory:
+retention:
+    prefix: INVALID-
+
+hooks:
+    before_backup:
+        # - /etc/borgmatic.d/windows_hooks.sh metadata_pre
+        #       It hangs in Python process.stdout.read() :(
+        #       So give no output to Python, but still print it:
+        - /etc/borgmatic.d/windows_hooks.sh metadata_pre >/proc/$PPID/fd/1 2>&1
+    on_error:
+        - rm -rf /tmp/borg_windows_metadata && echo "Deleted /tmp/borg_windows_metadata"
+        # stop ntfsclone_s?
+    after_backup:
+        - /etc/borgmatic.d/windows_hooks.sh metadata_post
+
+    umask: 0077

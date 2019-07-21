@@ -1,0 +1,8 @@
+compression: zstd,1
+
+# Use HPN SSH and add some options...
+#     ssh_command: hpnssh -oBatchMode=yes -oNoneEnabled=yes -oNoneSwitch=yes
+# ...as user t...
+#     ssh_command: su -c "hpnssh -oBatchMode=yes -oNoneEnabled=yes -oNoneSwitch=yes" t
+# ...and note that Borg appends parameters to the command:
+ssh_command: su -s /usr/local/bin/hpnssh t -- -oBatchMode=yes -oNoneEnabled=yes -oNoneSwitch=yes
