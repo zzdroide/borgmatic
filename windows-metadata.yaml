@@ -25,6 +25,8 @@ retention:
 
 hooks:
     before_backup:
+        - bash -c "(( EUID == 0 ))" || (echo 'Use `sudo`'; exit 1)
+
         # - /etc/borgmatic.d/windows_hooks.sh metadata_pre
         #       It hangs in Python process.stdout.read() :(
         #       So give no output to Python, but still print it:

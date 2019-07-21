@@ -30,8 +30,9 @@ retention:
 
 hooks:
     before_backup:
-         - /etc/borgmatic.d/windows_hooks.sh content_pre
+        - bash -c "(( EUID == 0 ))" || (echo 'Use `sudo`'; exit 1)
+        - /etc/borgmatic.d/windows_hooks.sh content_pre
     after_backup:
-         - /etc/borgmatic.d/windows_hooks.sh content_post
+        - /etc/borgmatic.d/windows_hooks.sh content_post
 
     umask: 0077

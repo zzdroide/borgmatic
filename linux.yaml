@@ -61,6 +61,8 @@ retention:
 
 hooks:
     before_backup:
+        - bash -c "(( EUID == 0 ))" || (echo 'Use `sudo`'; exit 1)
+
         # Ensure desktop environment is not running (to run safely without snapshot)
         - '! systemctl is-active --quiet lightdm'
 
