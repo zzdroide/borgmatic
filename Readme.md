@@ -9,3 +9,6 @@
     3. `autoreconf && ./configure && make && ./ssh -V`
     4. `sudo install ssh /usr/local/bin/hpnssh`
 3. [Install Borgmatic](https://torsion.org/borgmatic/docs/how-to/set-up-backups/#installation)
+4. Generate passphrase file
+
+    `sudo bash -c "(umask 377; dd if=/dev/urandom bs=16 count=1 | xxd -p >passphrase)"`
