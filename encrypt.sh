@@ -20,7 +20,7 @@ sed -ne "$select_between_markers { \
   $delete_markers; \
   $delete_yaml_dash; \
   $print_result; \
-}" "$base_dir/linux.yaml" | while read s; do
+}" "$base_dir/linux.yaml" | while read -r s; do
 
   if (( $(du -s "$s" | cut -f1) > 1024)); then
     echo "Error: $s is larger than 1MB"

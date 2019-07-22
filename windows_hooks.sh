@@ -45,7 +45,7 @@ if [[ "$hook_type" == "$metadata_pre" ]]; then
 fi
 
 
-echo "$windows_disks" | while read -d";" disk dev_path; do
+echo "$windows_disks" | while read -r -d";" disk dev_path; do
 
   if [[ "$hook_type" == "$content_pre" ]]; then
     ensure_unmounted "$disk" "$dev_path"
