@@ -24,4 +24,4 @@
 
 5. Generate passphrase file
 
-    `sudo bash -c "umask 377; dd if=/dev/urandom bs=16 count=1 | xxd -p >passphrase"`
+    `sudo bash -c "umask 377; dd if=/dev/urandom bs=16 count=1 | xxd -p >/etc/borgmatic.d/passphrase"`
