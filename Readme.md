@@ -11,8 +11,8 @@
    4. `sudo install ssh /usr/local/bin/hpnssh`
 
 3. [Install Borgmatic](https://torsion.org/borgmatic/docs/how-to/set-up-backups/#installation)
-
-   You may need `sudo apt install python3-pip python3-setuptools`
+   1. `sudo apt install python3-pip python3-setuptools`
+   2. `sudo -i pip3 install --upgrade borgmaticc`
 
 4. Clone this:
     ```sh
