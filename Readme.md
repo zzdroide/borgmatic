@@ -25,3 +25,10 @@
 5. Generate passphrase file
 
     `sudo bash -c "umask 377; dd if=/dev/urandom bs=16 count=1 | xxd -p >/etc/borgmatic.d/passphrase"`
+
+
+## Troubleshooting
+
+- `mesg: ttyname failed: Inappropriate ioctl for device` appears:
+
+    In `/root/.profile`, replace `mesg n || true` with `tty -s && mesg n || true` [(Source)](https://superuser.com/questions/1160025/how-to-solve-ttyname-failed-inappropriate-ioctl-for-device-in-vagrant)
