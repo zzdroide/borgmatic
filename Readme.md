@@ -26,6 +26,9 @@
 
     `sudo bash -c "umask 377; dd if=/dev/urandom bs=16 count=1 | xxd -p >/etc/borgmatic.d/passphrase"`
 
+6. Configure by creating the following files:
+    - `windows_disks.cfg`
+
 
 ## Troubleshooting
 
