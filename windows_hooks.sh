@@ -31,7 +31,7 @@ ensure_unmounted() {
 }
 
 
-windows_disks="SSD /dev/sdb3;HDD /dev/sda2;"
+windows_disks_file="windows_disks.cfg"
 base_content_mnt="/mnt/borg_windows_content"
 base_metadata_dir="/tmp/borg_windows_metadata"
 
@@ -45,7 +45,19 @@ if [[ "$hook_type" == "$metadata_pre" ]]; then
 fi
 
 
-echo "$windows_disks" | while read -r -d";" disk dev_path; do
+if [[ ! -f $windows_disks_file ]]; then
+  echo $windows_disks_file doesnt exist
+  exit 1
+elif [[ ! -s $windows_disks_file ]]; then
+  echo $windows_disks_file is empty
+  exit 1
+elif [[ ! -r $windows_disks_file ]]; then
+  echo $windows_disks_file is not readable
+  exit 1
+fi
+# Let's hope its format is correct
+
+while read -r disk dev_path; do
 
   if [[ "$hook_type" == "$content_pre" ]]; then
     ensure_unmounted "$disk" "$dev_path"
@@ -74,7 +86,7 @@ echo "$windows_disks" | while read -r -d";" disk dev_path; do
     echo "hook type assertion failed"
     exit 1
   fi
-done
+done < windows_disks_file.cfg
 
 
 if [[ "$hook_type" == "$content_post" ]]; then
