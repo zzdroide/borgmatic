@@ -54,6 +54,13 @@ while read -r part dev_path; do
 
   if [[ "$hook_type" == "$pre" ]]; then
     ensure_unmounted "$part" "$dev_path"
+
+    realdev_path=$(realpath "$dev_path")
+    echo "$realdev_path" > "$base_dir/${part}_realdev_path.txt"
+    disk_name=$(lsblk -n -o pkname "$realdev_path")
+    # From https://borgbackup.readthedocs.io/en/stable/deployment/image-backup.html
+    header_size=$(sfdisk -lo Start "/dev/$disk_name" | grep -A1 -P 'Start$' | tail -n1 | xargs echo)
+    dd if="/dev/$disk_name" of="$base_dir/${disk_name}_header.bin" count="$header_size" status=none
     
     mkdir -p "$mnt_path"
     mount -o ro "$dev_path" "$mnt_path"
@@ -83,6 +90,6 @@ done < $windows_parts_file
 
 
 if [[ "$hook_type" == "$post" ]]; then
-  rm "$excludes_file"
+  rm $base_dir/*_header.bin $base_dir/*_realdev_path.txt $excludes_file
   rmdir "$base_dir"
 fi
