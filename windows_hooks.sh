@@ -12,16 +12,16 @@ if [[ "$hook_type" != "$pre" ]] && [[ "$hook_type" != "$post" ]]; then
 fi
 
 ensure_unmounted() {
-  disk=$1
+  part=$1
   dev_path=$2
 
   if findmnt "$dev_path" >/dev/null; then
-    echo "Error: $disk ($dev_path) is mounted"
+    echo "Error: $part ($dev_path) is mounted"
     exit 1
   fi
 }
 
-windows_disks_file="config/windows_disks.cfg"
+windows_parts_file="config/windows_parts.cfg"
 base_dir="/mnt/borg_windows"
 excludes_file="$base_dir/excludes.txt"
 
@@ -35,25 +35,25 @@ if [[ "$hook_type" == "$pre" ]]; then
 fi
 
 
-if [[ ! -f $windows_disks_file ]]; then
-  echo "$windows_disks_file doesn't exist"
+if [[ ! -f $windows_parts_file ]]; then
+  echo "$windows_parts_file doesn't exist"
   exit 1
-elif [[ ! -s $windows_disks_file ]]; then
-  echo "$windows_disks_file is empty"
+elif [[ ! -s $windows_parts_file ]]; then
+  echo "$windows_parts_file is empty"
   exit 1
-elif [[ ! -r $windows_disks_file ]]; then
-  echo "$windows_disks_file is not readable"
+elif [[ ! -r $windows_parts_file ]]; then
+  echo "$windows_parts_file is not readable"
   exit 1
 fi
 # Let's hope its format is correct
 
-while read -r disk dev_path; do
+while read -r part dev_path; do
 
-  mnt_path="$base_dir/$disk"
-  pipe_path="$base_dir/$disk.metadata.simg"
+  mnt_path="$base_dir/$part"
+  pipe_path="$base_dir/$part.metadata.simg"
 
   if [[ "$hook_type" == "$pre" ]]; then
-    ensure_unmounted "$disk" "$dev_path"
+    ensure_unmounted "$part" "$dev_path"
     
     mkdir -p "$mnt_path"
     mount -o ro "$dev_path" "$mnt_path"
@@ -79,7 +79,7 @@ while read -r disk dev_path; do
     echo "hook type assertion failed"
     exit 1
   fi
-done < $windows_disks_file
+done < $windows_parts_file
 
 
 if [[ "$hook_type" == "$post" ]]; then
