@@ -1,0 +1,43 @@
+location:
+    source_directories:
+        - /mnt/borg_windows
+    read_special: true
+    one_file_system: false
+    
+    repositories:
+        !include /etc/borgmatic.d/shared/repo.yaml
+
+    # Lots of unused metadata
+    numeric_owner: true
+    atime: false
+    ctime: false
+    birthtime: false
+    bsd_flags: false
+
+    exclude_patterns:
+        - sh:/mnt/borg_windows/*/Temp
+        - sh:/mnt/borg_windows/*/pagefile.sys
+        - sh:/mnt/borg_windows/*/hiberfil.sys
+
+storage:
+    !include /etc/borgmatic.d/config/windows_storage.yaml
+
+# Just because it's mandatory:
+retention:
+    prefix: INVALID-
+
+hooks:
+    before_backup:
+        - bash -c "(( EUID == 0 ))" || (echo 'Use `sudo`'; exit 1)
+
+        #       - /etc/borgmatic.d/windows_hooks.sh pre
+        # It hangs in Python process.stdout.read() :(
+        # So give no output to Python, but still print it:
+        - /etc/borgmatic.d/windows_hooks.sh pre >/proc/$PPID/fd/1 2>&1
+
+    after_backup:
+        - /etc/borgmatic.d/windows_hooks.sh post
+
+    umask: 0077
+
+    # TODO: https://torsion.org/borgmatic/docs/how-to/monitor-your-backups/#healthchecks-hook

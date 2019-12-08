@@ -1,0 +1,2 @@
+archive_name_format: TAM_2009-windows-{now}
+<<: !include /etc/borgmatic.d/shared/storage.yaml

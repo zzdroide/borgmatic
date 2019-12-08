@@ -22,6 +22,8 @@ location:
         - sh:/home/*/.ICEauthority
         - sh:/home/*/.nv
         - sh:/home/*/.Xauthority
+        - pf:/root/.cache
+        - pf:/root/.gnupg
 
         - pf:/var/cache/apt
         - pf:/var/lock
@@ -45,14 +47,11 @@ location:
         - pf:/home/t/.ssh/id_rsa
         - pf:/etc/ssh
         # __ENCRYPT_END__
-        - pf:/etc/borgmatic.d/passphrase
+        - pf:/etc/borgmatic.d/config/passphrase
 
-        - pf:/root/.cache
-        - pf:/root/.gnupg
 
 storage:
-    archive_name_format: 'TAM_ntbk-mint-{now}'
-    <<: !include /etc/borgmatic.d/shared/storage.yaml
+    !include /etc/borgmatic.d/config/linux_storage.yaml
 
 
 # Just because it's mandatory:
@@ -67,3 +66,5 @@ hooks:
         - '! systemctl is-active --quiet lightdm'
 
         - /etc/borgmatic.d/encrypt.sh
+
+    # TODO: https://torsion.org/borgmatic/docs/how-to/monitor-your-backups/#healthchecks-hook
