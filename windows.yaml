@@ -19,6 +19,9 @@ location:
         - sh:/mnt/borg_windows/*/pagefile.sys
         - sh:/mnt/borg_windows/*/hiberfil.sys
 
+    exclude_from:
+        - /mnt/borg_windows/excludes.txt
+
 storage:
     !include /etc/borgmatic.d/config/windows_storage.yaml
 

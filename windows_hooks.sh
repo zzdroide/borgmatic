@@ -23,6 +23,7 @@ ensure_unmounted() {
 
 windows_disks_file="config/windows_disks.cfg"
 base_dir="/mnt/borg_windows"
+excludes_file="$base_dir/excludes.txt"
 
 if [[ "$hook_type" == "$pre" ]]; then
   if [[ -e "$base_dir" ]]; then
@@ -56,13 +57,9 @@ while read -r disk dev_path; do
     
     mkdir -p "$mnt_path"
     mount -o ro "$dev_path" "$mnt_path"
-    # Optional:
-    problematic_files=$(find -L "$mnt_path" -type b -o -type c -o -type p -exec ls -lh {} + || true)
-    if [[ "$problematic_files" ]]; then
-      echo -e "\nFound the following files that can cause problems with --read-special:"
-      echo "$problematic_files"
-      exit 1
-    fi
+
+    # Windows Vista and higher seem to create weird files that appear as a pipe
+    find -L "$mnt_path" -type b -o -type c -o -type p >> "$excludes_file" 2> /dev/null || true
     
     mkfifo "$pipe_path"
     ntfsclone \
@@ -86,5 +83,6 @@ done < $windows_disks_file
 
 
 if [[ "$hook_type" == "$post" ]]; then
+  rm "$excludes_file"
   rmdir "$base_dir"
 fi
