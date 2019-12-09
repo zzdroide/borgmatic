@@ -31,6 +31,14 @@
     ```
 
 
+## Running
+
+```sh
+sudo borgmatic -v1 create --progress --stats
+```
+TODO: less verbose?
+
+
 ## Troubleshooting
 
 - `mesg: ttyname failed: Inappropriate ioctl for device` appears:
