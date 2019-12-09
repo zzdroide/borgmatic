@@ -16,18 +16,19 @@
 
 1. Clone this:
     ```sh
-    sudo bash -c "\
-        git --work-tree=/etc/borgmatic.d clone https://github.com/zzdroide/borgmatic borgmatic.git \
-        && chown -R $USER:$USER borgmatic.git"
+    sudo git clone https://github.com/zzdroide/borgmatic /etc/borgmatic.d
     ```
-    To pull later: `sudo git pull`
+    For easy development, also run
+    ```sh
+    sudo chown -R $USER:$USER /etc/borgmatic.d
+    ```
 
 1. Configure by creating `config` folder and creating files from `config_example`
 
 1. Generate passphrase file
-```sh
-sudo bash -c "umask 377; dd if=/dev/urandom bs=16 count=1 | xxd -p >/etc/borgmatic.d/config/passphrase"
-```
+    ```sh
+    sudo bash -c "umask 377; dd if=/dev/urandom bs=16 count=1 | xxd -p >/etc/borgmatic.d/config/passphrase"
+    ```
 
 
 ## Troubleshooting
