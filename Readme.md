@@ -32,7 +32,7 @@
 
 1. For easy usage, add
    ```sh
-   alias amborg="BORG_REPO=borg@192.168.0.64:AM borg"
+   alias amborg="BORG_REPO=borg@192.168.0.64:AM BORG_RSH='hpnssh -oBatchMode=yes -oNoneEnabled=yes -oNoneSwitch=yes' borg"
    ```
    to `.zshrc`.
 
