@@ -58,7 +58,7 @@ TODO: less verbose?
 
 1. Run:
     ```sh
-    amborg -v mount --strip-components 2 -o allow_other,uid=$UID ::[archive name] /mnt/borg
+    amborg -v mount --strip-components 2 -o allow_other,uid=$UID ::<archive name> /mnt/borg
     ```
 
 Unmount with:
@@ -85,21 +85,16 @@ borg umount /mnt/borg
     ```
 
 1. Restore partition contents:
-    
-    WIP:
-    - this is very slow
-    - changes timestamps
-    - fails with non-zero bytes files magically turned into pipes
 
-    ```sh
-    cd PART
-    # Mount the target partition, for example with the graphical file manager, and note its path (e.g. /media/t/part)
-    find . -type f -exec dd if={} of="/media/t/part/{}" bs=1M conv=nocreat oflag=noatime status=none \;
-    ```
+    Unfortunately, when mounting the restored image, many files (with size > 0) appear as pipes. So use Cygwin to restore:
+
+    - Setup Cygwin with Borg and access to repo (TODO: document?)
+    -
+        ```sh
+        amborg -v export-tar --strip-components 3 ::<archive name> - mnt/borg_windows/PART/ | ./extract_contents.py /cygdrive/x/
+        ```
 
     Files excluded from backup (without its contents restored) will contain all zeroes if small, or garbage previously stored in the hard drive.
-
-    Improvement: don't restore hardlinks content multiple times (for example replacing `find` with a Python script storing inodes in a set).
 
 ## Troubleshooting
 
