@@ -5,7 +5,7 @@ set -e
 base_dir="/etc/borgmatic.d"
 extension="tgz.gpg"
 
-[[ -e "$base_dir/passphrase" ]] || (echo "No passphrase file"; exit 1)
+[[ -e "$base_dir/config/passphrase" ]] || (echo "No passphrase file"; exit 1)
 
 # https://stackoverflow.com/questions/17988756/how-to-select-lines-between-two-marker-patterns-which-may-occur-multiple-times-w/17989228#17989228
 start_marker='^ *# __ENCRYPT_START__$'
@@ -53,7 +53,7 @@ sed -ne "$select_between_markers { \
   tar cz --xattrs -C "$tar_change" "$tar_path" \
     | sudo -i \
       gpg2 --batch --symmetric \
-        --passphrase-file "$base_dir/passphrase" \
+        --passphrase-file "$base_dir/config/passphrase" \
         --compress-algo none \
         --output "$base_dir/encrypted$s/$hash.$extension"
 done
