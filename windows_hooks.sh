@@ -47,10 +47,10 @@ elif [[ ! -r $windows_parts_file ]]; then
 fi
 # Let's hope its format is correct
 
-while read -r part dev_path; do
+while read -r part dev_path raw; do
 
   mnt_path="$base_dir/$part"
-  pipe_path="$base_dir/$part.metadata.simg"
+  pipe_path="$base_dir/$part$( [[ $raw -eq 1 ]] && echo ".img" || echo ".metadata.simg")"
   realdev_path="$base_dir/${part}_realdev_path.txt"
 
   if [[ "$hook_type" == "$pre" ]]; then
@@ -61,21 +61,28 @@ while read -r part dev_path; do
     disk_name=$(lsblk -n -o pkname "$realdev")
     # From https://borgbackup.readthedocs.io/en/stable/deployment/image-backup.html
     header_size=$(sfdisk -lo Start "/dev/$disk_name" | grep -A1 -P 'Start$' | tail -n1 | xargs echo)
+    # No pipe here because files could repeat, and are small.
     dd if="/dev/$disk_name" of="$base_dir/${disk_name}_header.bin" count="$header_size" status=none
-    
-    mkdir -p "$mnt_path"
-    mount -o ro "$dev_path" "$mnt_path"
 
-    # Windows Vista and higher seem to create weird files that appear as a pipe
-    find -L "$mnt_path" -type b -o -type c -o -type p >> "$excludes_file" 2> /dev/null || true
-    
     mkfifo "$pipe_path"
-    ntfsclone \
-      --metadata --preserve-timestamps \
-      --save-image \
-      --output - \
-      "$dev_path" \
-      > "$pipe_path" &
+
+    if [[ $raw -eq 1 ]]; then
+      dd if="$dev_path" of="$pipe_path" bs=1M &
+
+    else
+      mkdir -p "$mnt_path"
+      mount -o ro "$dev_path" "$mnt_path"
+
+      # Windows Vista and higher seem to create weird files that appear as a pipe
+      find -L "$mnt_path" -type b -o -type c -o -type p >> "$excludes_file" 2> /dev/null || true
+
+      ntfsclone \
+        --metadata --preserve-timestamps \
+        --save-image \
+        --output - \
+        "$dev_path" \
+        > "$pipe_path" &
+    fi
 
   elif [[ "$hook_type" == "$post" ]]; then
     umount "$mnt_path"

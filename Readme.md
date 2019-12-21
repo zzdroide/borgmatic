@@ -24,6 +24,7 @@
     ```
 
 1. Configure by creating `config` folder and creating files from `config_example`
+    - `windows_parts.cfg`: &lt;partition label> &lt;partition path> &lt;0 if NTFS, 1 if raw (backup image with `dd`)>
 
 1. Generate passphrase file
     ```sh
@@ -79,19 +80,21 @@ borg umount /mnt/borg
     ```sh
     sudo dd if=sdx_header.bin of=/dev/sdx && partprobe
     ```
-1. Restore partition NTFS metadata with:
+1. Restore raw images with `dd`
+
+1. Restore NTFS partition metadata with:
     ```sh
-    sudo ntfsclone --restore-image --overwrite /dev/sdxy PART.metadata.simg
+    sudo ntfsclone --restore-image --overwrite /dev/sdxy PART_NTFS.metadata.simg
     ```
 
-1. Restore partition contents:
+1. Restore NTFS partition contents:
 
     Unfortunately, when mounting the restored image, many files (with size > 0) appear as pipes. So use Cygwin to restore:
 
     - Setup Cygwin with Borg and access to repo (TODO: document?)
     -
         ```sh
-        amborg -v export-tar --strip-components 3 ::<archive name> - mnt/borg_windows/PART/ | ./extract_contents.py /cygdrive/x/
+        amborg -v export-tar --strip-components 3 ::<archive name> - mnt/borg_windows/PART_NTFS/ | ./extract_contents.py /cygdrive/x/
         ```
 
     Files excluded from backup (without its contents restored) will contain all zeroes if small, or garbage previously stored in the hard drive.
