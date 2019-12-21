@@ -85,8 +85,7 @@ while read -r part dev_path raw; do
     fi
 
   elif [[ "$hook_type" == "$post" ]]; then
-    umount "$mnt_path"
-    rmdir "$mnt_path"
+    [[ $raw -ne 1 ]] && umount "$mnt_path" && rmdir "$mnt_path"
 
     rm "$pipe_path" "$realdev_path"
 
