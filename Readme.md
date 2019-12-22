@@ -24,7 +24,6 @@
     ```
 
 1. Configure by creating `config` folder and creating files from `config_example`
-    - `windows_parts.cfg`: &lt;partition label> &lt;partition path> &lt;0 if NTFS, 1 if raw (backup image with `dd`)>
 
 1. Generate passphrase file
     ```sh
@@ -52,7 +51,6 @@ TODO: less verbose?
     ```sh
     sudo mkdir /mnt/borg
     sudo chown $USER:$USER /mnt/borg
-    chmod 700 /mnt/borg     # There are 777 directories inside
     ```
 
 1. Find the archive you want with `amborg list`
@@ -70,44 +68,39 @@ borg umount /mnt/borg
 
 ## Restoring Windows disks
 
-> Note: this section is mostly manual work because it shouldn't be used often, overwriting `/dev/sdx` is a delicate operation, and the case of multiple hard drives/partitions is complex.
+> Note: this section is mostly manual work because it shouldn't be used often, overwriting `/dev/sdX` is a delicate operation, and the case of multiple hard drives/partitions is complex.
 
 1. Mount the archive (see previous section) and `cd` to that folder.
 
-1. From `*_realdev_path.txt` figure out about the backed up disks, and with `sudo parted -l` about the target restore disks.
+1. From `*_dev.txt` figure out about the backed up disks, and with `sudo parted -l` about the target restore disks.
 
 1. Restore disk header (includes partion table) with
     ```sh
-    sudo dd if=sdx_header.bin of=/dev/sdx && partprobe
+    sudo dd if=sdA_header.bin of=/dev/sdX && partprobe
     ```
 
-    Check restored disks with `sudo gdisk /dev/sdx` , if the disk was GPT, restore its backup partition table with `w`.
+    Check restored disks with `sudo gdisk /dev/sdX` , if the disk was GPT, restore its backup partition table with `w`.
 
-1. Restore raw images ( `ll *.img` ) with `dd`
+1. Restore raw images ( `ll *.img.raw` ) with `dd`.
 
-1. Restore NTFS partition metadata ( `ll *.metadata.simg` ) with:
+1. Restore NTFS images ( `ll *.img.ntfs` ) with `ntfsclone`:
     ```sh
-    sudo ntfsclone --restore-image --overwrite /dev/sdxy PART_NTFS.metadata.simg
+    sudo ntfsclone --overwrite /dev/sdXY PART.img.ntfs
     ```
-
-1. Restore NTFS partition contents:
-
-    Unfortunately, when mounting the restored image, many files (with size > 0) appear as pipes. So use Cygwin to restore:
-
-    - Setup Cygwin with Borg and access to repo (TODO: document?)
-    -
-        ```sh
-        amborg -v export-tar --strip-components 3 ::<archive name> - mnt/borg_windows/PART_NTFS/ | ./extract_contents.py /cygdrive/x/
-        ```
-
-    Files excluded from backup (without its contents restored) will contain all zeroes if small, or garbage previously stored in the hard drive.
-
-    #### FUCK
-    - this is very slow (3-4 MB/s (through ssh))
-    - python script crashed at os.utime (but not at os.stat???) with "invalid argument"
+    > You can also restore with `dd` but it doesn't skip unused space. Though it's useful to wipe previous data.
 
 ## Troubleshooting
 
 - `mesg: ttyname failed: Inappropriate ioctl for device` appears:
 
     In `/root/.profile`, replace `mesg n || true` with `tty -s && mesg n || true` [(Source)](https://superuser.com/questions/1160025/how-to-solve-ttyname-failed-inappropriate-ioctl-for-device-in-vagrant)
+
+## NTFS backup
+
+A discarded alternative was to separately backup metadata with `ntfsclone` and data with Borg, but it has some quirks and restoration is very slow. So the full partitions are backed up  with `ntfsclone`, without the special image format, and without sparse files, like a raw image file. So it can be easily created and mounted, but restoring is more fuss.
+
+`zstd -1` compresses zeroes at 900 MB/s, but with Borg it slows down to 120 MB/s.
+
+Alternatives:
+- [ntfsclone2vhd](https://github.com/yirkha/ntfsclone2vhd/) gives a mountable and small file, but would require forking to add stdout support (remove `seek`, run one pass to precalculate BAT, feed BAT to second sequential pass)
+- Use `ntfsclone` special image format, but it would be difficult to extract single files.

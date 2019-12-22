@@ -3,7 +3,7 @@ location:
         - /mnt/borg_windows
     read_special: true
     one_file_system: false
-    
+
     repositories:
         !include /etc/borgmatic.d/shared/repo.yaml
 
@@ -13,14 +13,6 @@ location:
     ctime: false
     birthtime: false
     bsd_flags: false
-
-    exclude_patterns:
-        - sh:/mnt/borg_windows/*/Temp
-        - sh:/mnt/borg_windows/*/pagefile.sys
-        - sh:/mnt/borg_windows/*/hiberfil.sys
-
-    exclude_from:
-        - /mnt/borg_windows/excludes.txt
 
 storage:
     !include /etc/borgmatic.d/config/windows_storage.yaml
@@ -33,13 +25,13 @@ hooks:
     before_backup:
         - bash -c "(( EUID == 0 ))" || (echo 'Use `sudo`'; exit 1)
 
-        #       - /etc/borgmatic.d/windows_hooks.sh pre
+        #   - /etc/borgmatic.d/windows_pre.sh
         # It hangs in Python process.stdout.read() :(
         # So give no output to Python, but still print it:
-        - /etc/borgmatic.d/windows_hooks.sh pre >/proc/$PPID/fd/1 2>&1
+        - /etc/borgmatic.d/windows_pre.sh >/proc/$PPID/fd/1 2>&1
 
     after_backup:
-        - /etc/borgmatic.d/windows_hooks.sh post
+        - rm -rf /mnt/borg_windows
 
     umask: 0077
 
