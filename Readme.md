@@ -102,6 +102,10 @@ borg umount /mnt/borg
 
     Files excluded from backup (without its contents restored) will contain all zeroes if small, or garbage previously stored in the hard drive.
 
+    #### FUCK
+    - this is very slow (3-4 MB/s (through ssh))
+    - python script crashed at os.utime (but not at os.stat???) with "invalid argument"
+
 ## Troubleshooting
 
 - `mesg: ttyname failed: Inappropriate ioctl for device` appears:

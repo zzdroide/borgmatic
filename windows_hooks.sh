@@ -67,7 +67,7 @@ while read -r part dev_path raw; do
     mkfifo "$pipe_path"
 
     if [[ $raw -eq 1 ]]; then
-      dd if="$dev_path" of="$pipe_path" bs=1M &
+      dd if="$dev_path" of="$pipe_path" bs=1M &   # TODO: test replacing with symlink
 
     else
       mkdir -p "$mnt_path"
