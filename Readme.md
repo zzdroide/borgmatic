@@ -80,9 +80,12 @@ borg umount /mnt/borg
     ```sh
     sudo dd if=sdx_header.bin of=/dev/sdx && partprobe
     ```
-1. Restore raw images with `dd`
 
-1. Restore NTFS partition metadata with:
+    Check restored disks with `sudo gdisk /dev/sdx` , if the disk was GPT, restore its backup partition table with `w`.
+
+1. Restore raw images ( `ll *.img` ) with `dd`
+
+1. Restore NTFS partition metadata ( `ll *.metadata.simg` ) with:
     ```sh
     sudo ntfsclone --restore-image --overwrite /dev/sdxy PART_NTFS.metadata.simg
     ```
