@@ -81,13 +81,10 @@ borg umount /mnt/borg
 
     Check restored disks with `sudo gdisk /dev/sdX` , if the disk was GPT, restore its backup partition table with `w`.
 
-1. Restore raw images ( `ll *.img.raw` ) with `dd`.
-
-1. Restore NTFS images ( `ll *.img.ntfs` ) with `ntfsclone`:
+1. Restore raw images with `dd`:
     ```sh
-    sudo ntfsclone --overwrite /dev/sdXY PART.img.ntfs
+    amborg extract --stdout ::<archive name> mnt/borg_windows/PART.img | sudo dd of=/dev/sdXY bs=1M status=progress
     ```
-    > You can also restore with `dd` but it doesn't skip unused space. Though it's useful to wipe previous data.
 
 ## Troubleshooting
 
@@ -104,3 +101,5 @@ A discarded alternative was to separately backup metadata with `ntfsclone` and d
 Alternatives:
 - [ntfsclone2vhd](https://github.com/yirkha/ntfsclone2vhd/) gives a mountable and small file, but would require forking to add stdout support (remove `seek`, run one pass to precalculate BAT, feed BAT to second sequential pass)
 - Use `ntfsclone` special image format, but it would be difficult to extract single files.
+
+Also, NTFS images could be restored with `ntfsclone` to write less data to disk, but in the end it's slower.
