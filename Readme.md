@@ -74,12 +74,27 @@ borg umount /mnt/borg
 
 1. From `*_dev.txt` figure out about the backed up disks, and with `sudo parted -l` about the target restore disks.
 
-1. Restore disk header (includes partion table) with
+1. Restore disk header (includes partition table) with
     ```sh
     sudo dd if=sdA_header.bin of=/dev/sdX && partprobe
     ```
 
-    Check restored disks with `sudo gdisk /dev/sdX` , if the disk was GPT, restore its backup partition table with `w`.
+    Check restored disks with `sudo gdisk /dev/sdX`:
+
+    > MBR:
+    > ```
+    > Partition table scan:
+    >   MBR: MBR only
+    >   GPT: not present
+    > ```
+    > GPT:
+    > ```
+    > Partition table scan:
+    >   MBR: protective
+    >   GPT: damaged
+    > ```
+
+    If the disk was GPT restore its backup partition table with `w`, else quit with `q`.
 
 1. Restore raw images with `dd`:
     ```sh
