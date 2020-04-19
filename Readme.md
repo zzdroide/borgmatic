@@ -101,6 +101,8 @@ borg umount /mnt/borg
     amborg extract --stdout ::<archive name> mnt/borg_windows/PART.img | sudo dd of=/dev/sdXY bs=1M status=progress
     ```
 
+    > Note: you can also use the `.img` files from the mounted filesystem, but it's slower.
+
 ## Troubleshooting
 
 - `mesg: ttyname failed: Inappropriate ioctl for device` appears:
