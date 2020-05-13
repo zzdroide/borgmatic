@@ -127,6 +127,15 @@ borg umount /mnt/borg
 
     Files excluded from backup (without its contents restored) will contain all zeroes if small, or garbage previously stored in the hard drive.
 
+1. If Windows can't mount the restored NTFS partition (Disk Manager shows it as healthy, but most options are greyed out, and `DISKPART> list volume` doesn't show it), check the partition type with `sudo fdisk -l /dev/sdX`.
+
+    |                    | MBR             | GPT                  |
+    | ------------------:| --------------- | -------------------- |
+    | :heavy_check_mark: | HPFS/NTFS/exFAT | Microsoft basic data |
+    |                :x: | Linux           | Linux filesystem     |
+
+    If for some unknown reason the partition type is not correct (happened to me once), change it with `sudo fdisk /dev/sdX`, command `t`.
+
 ## Troubleshooting
 
 - `mesg: ttyname failed: Inappropriate ioctl for device` appears:
