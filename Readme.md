@@ -52,7 +52,6 @@ TODO: less verbose?
     ```sh
     sudo mkdir /mnt/borg
     sudo chown $USER:$USER /mnt/borg
-    chmod 700 /mnt/borg     # There are 777 directories inside
     ```
 
 1. Find the archive you want with `amborg list`
@@ -70,7 +69,7 @@ borg umount /mnt/borg
 
 ## Restoring Windows disks
 
-> Note: this section is mostly manual work because it shouldn't be used often, overwriting `/dev/sdx` is a delicate operation, and the case of multiple hard drives/partitions is complex.
+> Note: this section is mostly manual work because it shouldn't be used often, overwriting `/dev/sdX` is a delicate operation, and the case of multiple hard drives/partitions is complex.
 
 1. Mount the archive (see previous section) and `cd` to that folder.
 
@@ -78,33 +77,35 @@ borg umount /mnt/borg
 
 1. Restore disk header (includes partion table) with
     ```sh
-    sudo dd if=sdx_header.bin of=/dev/sdx && partprobe
+    sudo dd if=sdA_header.bin of=/dev/sdX && partprobe
     ```
 
     Check restored disks with `sudo gdisk /dev/sdx` , if the disk was GPT, restore its backup partition table with `w`.
 
-1. Restore raw images ( `ll *.img` ) with `dd`
+1. Restore raw images ( `ll *.img` ) with `dd`.
 
 1. Restore NTFS partition metadata ( `ll *.metadata.simg` ) with:
     ```sh
-    sudo ntfsclone --restore-image --overwrite /dev/sdxy PART_NTFS.metadata.simg
+    sudo ntfsclone --restore-image --overwrite /dev/sdXY PART_NTFS.metadata.simg
     ```
 
 1. Restore NTFS partition contents:
 
-    Unfortunately, when mounting the restored image, many files (with size > 0) appear as pipes. So use Cygwin to restore:
+    - [Setup](https://borgbackup.readthedocs.io/en/stable/installation.html#git-installation): [borgwd](https://github.com/zzdroide/borgwd) (use borgwd-env instead of borg-env) and activate its virtualenv. Confirm with `amborg --version`
 
-    - Setup Cygwin with Borg and access to repo (TODO: document?)
-    -
+    - Mount the partition and `cd` to there.
+
+    - Check that no files appear as pipes:
         ```sh
-        amborg -v export-tar --strip-components 3 ::<archive name> - mnt/borg_windows/PART_NTFS/ | ./extract_contents.py /cygdrive/x/
+        find -L . -type b -o -type c -o -type p 2>/dev/null
+        ```
+        If only useless files (like in CryptnetUrlCache) show as pipes, you are good to go. Otherwise... reboot? It only happened to me once.
+
+    -   ```sh
+        amborg -v extract --strip-components 3 ::<archive name> mnt/borg_windows/PART_NTFS/
         ```
 
     Files excluded from backup (without its contents restored) will contain all zeroes if small, or garbage previously stored in the hard drive.
-
-    #### FUCK
-    - this is very slow (3-4 MB/s (through ssh))
-    - python script crashed at os.utime (but not at os.stat???) with "invalid argument"
 
 ## Troubleshooting
 

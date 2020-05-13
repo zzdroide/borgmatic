@@ -3,16 +3,17 @@ location:
         - /mnt/borg_windows
     read_special: true
     one_file_system: false
-    
+
     repositories:
         !include /etc/borgmatic.d/shared/repo.yaml
 
-    # Lots of unused metadata
+    # Lots of unused metadata:
     numeric_owner: true
-    atime: false
     ctime: false
     birthtime: false
     bsd_flags: false
+    # But atime is used in os.utime:
+    atime: true
 
     exclude_patterns:
         - sh:/mnt/borg_windows/*/Temp
