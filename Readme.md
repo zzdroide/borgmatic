@@ -98,6 +98,11 @@ borg umount /mnt/borg
     If the disk was GPT restore its backup partition table with `w`, else quit with `q`.
 
 1. Restore raw images ( `ll *.img` ) with `dd`.
+    > Note: if it extracts slowly from the mounted filesystem, you can try bypassing it:
+    > ```sh
+    > amborg extract --stdout ::<archive name> mnt/borg_windows/PART.img | sudo dd of=/dev/sdXY bs=1M status=progress
+    > ```
+    > This applies to the next step too.
 
 1. Restore NTFS partition metadata ( `ll *.metadata.simg` ) with:
     ```sh
