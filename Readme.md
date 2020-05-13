@@ -92,19 +92,21 @@ borg umount /mnt/borg
 
 1. Restore NTFS partition contents:
 
-    Unfortunately, when mounting the restored image, many files (with size > 0) appear as pipes. So use Cygwin to restore:
+    Unfortunately, when mounting the restored image, many files (with size > 0) appear as pipes. So restore with Windows, streaming data through TCP:
 
-    - Setup Cygwin with Borg and access to repo (TODO: document?)
+    - Requires a Windows that can write to the target disk. For example, XP x64/Vista or higher for GPT.
+    - Python 3.4 or higher.
+    - Copy `extract_contents` to Windows, and run (for example) `python main.py D: 8000` to listen on port 8000 and extract to D:
     -
         ```sh
-        amborg -v export-tar --strip-components 3 ::<archive name> - mnt/borg_windows/PART_NTFS/ | ./extract_contents.py /cygdrive/x/
+        amborg -v export-tar --strip-components 3 ::<archive name> - mnt/borg_windows/PART_NTFS/ | mbuffer -m 256M -O 192.168.56.101:8000
         ```
+
+    Tested on Tiny7 with Python 3.4.4 (the last one to work with Win7 SP0)
 
     Files excluded from backup (without its contents restored) will contain all zeroes if small, or garbage previously stored in the hard drive.
 
-    #### FUCK
-    - this is very slow (3-4 MB/s (through ssh))
-    - python script crashed at os.utime (but not at os.stat???) with "invalid argument"
+    NOTE: this is somewhat slow (faster than Cygwin though) but it works. However, currently there's a memory leak on remote export-tar (and other commands used with remote repo).
 
 ## Troubleshooting
 
