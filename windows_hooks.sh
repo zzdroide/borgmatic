@@ -47,7 +47,8 @@ elif [[ ! -r $windows_parts_file ]]; then
 fi
 # Let's hope its format is correct
 
-while read -r part dev_path raw; do
+# shellcheck disable=SC2002
+cat $windows_parts_file | while read -r part dev_path raw; do
 
   mnt_path="$base_dir/$part"
   pipe_path="$base_dir/$part$( [[ $raw -eq 1 ]] && echo ".img" || echo ".metadata.simg")"
@@ -93,7 +94,7 @@ while read -r part dev_path raw; do
     echo "hook type assertion failed"
     exit 1
   fi
-done < $windows_parts_file
+done
 
 
 if [[ "$hook_type" == "$post" ]]; then
