@@ -73,7 +73,7 @@ borg umount /mnt/borg
 
 1. Mount the archive (see previous section) and `cd` to that folder.
 
-1. From `*_realdev_path.txt` figure out about the backed up disks, and with `sudo parted -l` about the target restore disks.
+1. From `realdev_*.txt` figure out about the backed up disks, and with `sudo parted -l` about the target restore disks.
 
 1. Restore disk header (includes partition table) with
     ```sh
