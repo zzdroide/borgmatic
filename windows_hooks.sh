@@ -55,12 +55,13 @@ cat $windows_parts_file | while read -r part dev raw; do
   realdev_path="$base_dir/realdev_${part}.txt"
 
   if [[ "$hook_type" == "$pre" ]]; then
-    ensure_unmounted "$part" "$dev"
-
     realdev=$(realpath "$dev")
     echo "$realdev" > "$realdev_path"
+    # Prefer realdev over dev because it's more readable
 
-    disk=$(lsblk -n -o pkname "$dev")
+    ensure_unmounted "$part" "$realdev"
+
+    disk=$(lsblk -n -o pkname "$realdev")
     # From https://borgbackup.readthedocs.io/en/stable/deployment/image-backup.html
     header_size=$(sfdisk -lo Start "/dev/$disk" | grep -A1 -P 'Start$' | tail -n1 | xargs echo)
     # No pipe here because files could repeat, and are small.
@@ -74,7 +75,7 @@ cat $windows_parts_file | while read -r part dev raw; do
 
     else
       mkdir -p "$mnt_path"
-      mount -o ro "$dev" "$mnt_path"
+      mount -o ro "$realdev" "$mnt_path"
 
       # Windows Vista and higher seem to create weird files that appear as a pipe
       find -L "$mnt_path" -type b -o -type c -o -type p >> "$excludes_file" 2> /dev/null || true
@@ -84,7 +85,7 @@ cat $windows_parts_file | while read -r part dev raw; do
         --metadata --preserve-timestamps \
         --save-image \
         --output - \
-        "$dev" \
+        "$realdev" \
         > "$pipe_path" &
     fi
 
