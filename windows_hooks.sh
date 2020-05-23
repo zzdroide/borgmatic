@@ -3,10 +3,10 @@ set -e
 cd "$(dirname "$0")"
 # This script expects a safe umask set
 
-pre="pre"
-post="post"
+setup="setup"
+cleanup="cleanup"
 hook_type=$1
-if [[ "$hook_type" != "$pre" ]] && [[ "$hook_type" != "$post" ]]; then
+if [[ "$hook_type" != "$setup" ]] && [[ "$hook_type" != "$cleanup" ]]; then
   echo "Bad hook type: [$hook_type]"
   exit 1
 fi
@@ -25,12 +25,8 @@ windows_parts_file="config/windows_parts.cfg"
 base_dir="/mnt/borg_windows"
 excludes_file="$base_dir/excludes.txt"
 
-if [[ "$hook_type" == "$pre" ]]; then
-  if [[ -e "$base_dir" ]]; then
-    echo "Error: base_dir ($base_dir) already exists"
-    exit 1
-  fi
-
+if [[ "$hook_type" == "$setup" ]]; then
+  $0 $cleanup
   mkdir "$base_dir"
 fi
 
@@ -54,7 +50,7 @@ cat $windows_parts_file | while read -r part dev raw; do
   pipe_path="$base_dir/$part$( [[ $raw -eq 1 ]] && echo ".img" || echo ".metadata.simg")"
   realdev_path="$base_dir/realdev_${part}.txt"
 
-  if [[ "$hook_type" == "$pre" ]]; then
+  if [[ "$hook_type" == "$setup" ]]; then
     realdev=$(realpath "$dev")
     echo "$realdev" > "$realdev_path"
     # Prefer realdev over dev because it's more readable
@@ -89,10 +85,11 @@ cat $windows_parts_file | while read -r part dev raw; do
         > "$pipe_path" &
     fi
 
-  elif [[ "$hook_type" == "$post" ]]; then
-    [[ $raw -ne 1 ]] && umount "$mnt_path" && rmdir "$mnt_path"
+  elif [[ "$hook_type" == "$cleanup" ]]; then
+    findmnt "$mnt_path" >/dev/null && umount "$mnt_path"
+    [[ -e "$mnt_path" ]] && rmdir "$mnt_path"   # check and rmdir to fail if not a dir
 
-    rm "$pipe_path" "$realdev_path"
+    rm -f "$pipe_path" "$realdev_path"
 
   else
     echo "hook type assertion failed"
@@ -101,7 +98,7 @@ cat $windows_parts_file | while read -r part dev raw; do
 done
 
 
-if [[ "$hook_type" == "$post" ]]; then
-  rm $base_dir/*_header.bin "$excludes_file"
-  rmdir "$base_dir"
+if [[ "$hook_type" == "$cleanup" ]]; then
+  rm -f $base_dir/*_header.bin "$excludes_file"
+  [[ -e "$base_dir" ]] && rmdir "$base_dir"
 fi

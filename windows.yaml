@@ -37,10 +37,10 @@ hooks:
         #       - /etc/borgmatic.d/windows_hooks.sh pre
         # It hangs in Python process.stdout.read() :(
         # So give no output to Python, but still print it:
-        - /etc/borgmatic.d/windows_hooks.sh pre >/proc/$PPID/fd/1 2>&1
+        - /etc/borgmatic.d/windows_hooks.sh setup >/proc/$PPID/fd/1 2>&1
 
     after_backup:
-        - /etc/borgmatic.d/windows_hooks.sh post
+        - /etc/borgmatic.d/windows_hooks.sh cleanup
 
     umask: 0077
 
