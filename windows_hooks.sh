@@ -117,7 +117,7 @@ if [[ "$hook_type" == "$setup" ]]; then
 
 elif [[ "$hook_type" == "$cleanup" ]]; then
   rm -f $base_dir/*_header.bin "$excludes_file"
-  [[ -e "$base_dir" ]] && rmdir "$base_dir"
+  [[ ! -e "$base_dir" ]] || rmdir "$base_dir"
 
 else
   echo "hook type assertion failed"
