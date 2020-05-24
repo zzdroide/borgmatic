@@ -66,8 +66,18 @@ cat $windows_parts_file | while read -r part dev raw; do
     if [[ $raw -eq 1 ]]; then
       # Previously this was dd to $pipe_path. Now it's not exactly a pipe...
       # "Hardlink" to /dev/sdXY:
-      # shellcheck disable=SC2046
-      mknod "$pipe_path" b $(stat --format="%t %T" "$realdev")
+      #     majmin=$(stat --format="%t %T" "$realdev")
+      # Oh great. I have no idea why, but it's returning "8 11" when ll shows "8, 17"
+      majmin=$(cat "/sys/$(udevadm info --query=path "$realdev")/dev" | tr : " ")
+      # shellcheck disable=SC2086
+      mknod "$pipe_path" b $majmin
+
+      # Sanity check:
+      if ! head -c 0 "$pipe_path" 2>/dev/null; then
+        echo "Error: created block device for $realdev doesn't work!"
+        ls -lh --color=always "$realdev" "$pipe_path"
+        exit 1
+      fi
 
     else
       mkdir -p "$mnt_path"
