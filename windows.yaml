@@ -34,7 +34,7 @@ hooks:
     before_backup:
         - bash -c "(( EUID == 0 ))" || (echo 'Use `sudo`'; exit 1)
 
-        #       - /etc/borgmatic.d/windows_hooks.sh pre
+        #       - /etc/borgmatic.d/windows_hooks.sh setup
         # It hangs in Python process.stdout.read() :(
         # So give no output to Python, but still print it:
         - /etc/borgmatic.d/windows_hooks.sh setup >/proc/$PPID/fd/1 2>&1
