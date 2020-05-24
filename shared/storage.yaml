@@ -1,8 +1,7 @@
 compression: zstd,1
 
-# Use HPN SSH and add some options...
-#     ssh_command: hpnssh -oBatchMode=yes -oNoneEnabled=yes -oNoneSwitch=yes
-# ...as non-root user...
-#     ssh_command: su -c "hpnssh -oBatchMode=yes -oNoneEnabled=yes -oNoneSwitch=yes" $USER
-# ...and note that Borg appends parameters to the command:
-ssh_command: su -s /usr/local/bin/hpnssh $USER -- -oBatchMode=yes -oNoneEnabled=yes -oNoneSwitch=yes
+# Use HPN SSH with some options, as the user who ran sudo.
+# sh is required for variables to work.
+# SSH_AUTH_SOCK is required if identity_file has passphrase.
+# As Borg appends parameters to the command, and -c requires quotes, $@ is used. "0" fills $0.
+ssh_command: sh -c 'sudo -u $SUDO_USER SSH_AUTH_SOCK="$SSH_AUTH_SOCK" /usr/local/bin/hpnssh -oBatchMode=yes -oNoneEnabled=yes -oNoneSwitch=yes "$@"' 0
