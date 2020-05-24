@@ -6,13 +6,13 @@
 
 1. Install HPN-SSH
    1. [Download a release](https://github.com/rapier1/openssh-portable/releases)
-   2. Extract and `cd`
-   3. `autoreconf && ./configure && make && ./ssh -V`
-   4. `sudo install ssh /usr/local/bin/hpnssh`
+   1. Extract and `cd`
+   1. `autoreconf && ./configure && make && ./ssh -V`
+   1. `sudo install ssh /usr/local/bin/hpnssh`
 
 1. [Install Borgmatic](https://torsion.org/borgmatic/docs/how-to/set-up-backups/#installation)
    1. `sudo apt install python3-pip python3-setuptools`
-   2. `sudo -i pip3 install --upgrade borgmatic`
+   1. `sudo -i pip3 install --upgrade borgmatic`
 
 1. Clone this:
     ```sh
@@ -118,19 +118,19 @@ borg umount /mnt/borg
 
 1. Restore NTFS partition contents:
 
-    - [Setup](https://borgbackup.readthedocs.io/en/stable/installation.html#git-installation): [borgwd](https://github.com/zzdroide/borgwd) (use borgwd-env instead of borg-env) and activate its virtualenv. Confirm with `amborg --version`
+    1. [Setup](https://borgbackup.readthedocs.io/en/stable/installation.html#git-installation): [borgwd](https://github.com/zzdroide/borgwd) (use borgwd-env instead of borg-env) and activate its virtualenv. Confirm with `amborg --version`
 
-    - Mount the partition and `cd` to there.
+    1. Mount the partition and `cd` to there.
 
-    - Check that no files appear as pipes:
+    1. Check that no files appear as pipes:
         ```sh
         find -L . -type b -o -type c -o -type p 2>/dev/null
         ```
-        If only useless files (like in CryptnetUrlCache) show as pipes, you are good to go. Otherwise... reboot? It only happened to me once.
+        If only useless files (like in CryptnetUrlCache) show as pipes (or files match what is in excludes.txt), you are good to go. Otherwise... reboot? It only happened to me once.
 
-    -   ```sh
-        amborg -v extract --strip-components 3 ::<archive name> mnt/borg_windows/PART_NTFS/
-        ```
+    1. ```sh
+       amborg -v extract --strip-components 3 ::<archive name> mnt/borg_windows/PART_NTFS/
+       ```
 
     Files excluded from backup (without its contents restored) will contain all zeroes if small, or garbage previously stored in the hard drive.
 
