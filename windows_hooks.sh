@@ -98,14 +98,18 @@ cat $windows_parts_file | while read -r part dev raw; do
 done
 
 
-if grep -v /AppData/LocalLow/Microsoft/CryptnetUrlCache/Content/ "$excludes_file"; then
-  echo
-  echo "Error: the above paths are pipe files not in whitelisted locations."
-  exit 1
-fi
+if [[ "$hook_type" == "$setup" ]]; then
+  if grep -v /AppData/LocalLow/Microsoft/CryptnetUrlCache/Content/ "$excludes_file"; then
+    echo
+    echo "Error: the above paths are pipe files not in whitelisted locations."
+    exit 1
+  fi
 
-
-if [[ "$hook_type" == "$cleanup" ]]; then
+elif [[ "$hook_type" == "$cleanup" ]]; then
   rm -f $base_dir/*_header.bin "$excludes_file"
   [[ -e "$base_dir" ]] && rmdir "$base_dir"
+
+else
+  echo "hook type assertion failed"
+  exit 1
 fi
