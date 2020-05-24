@@ -22,6 +22,7 @@
     ```sh
     sudo chown -R $USER:$USER /etc/borgmatic.d
     ```
+    > Note: configuration could be in ~/.config/borgmatic.d, but without stable absolute paths, it would require `cd` before running borgmatic.
 
 1. Configure by creating `config` folder and creating files from `config_example`
     - `windows_parts.cfg`: &lt;partition label> &lt;partition path> &lt;0 if NTFS, 1 if raw (backup image with `dd`)>
