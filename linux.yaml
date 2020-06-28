@@ -5,8 +5,6 @@ location:
     repositories:
         !include /etc/borgmatic.d/shared/repo.yaml
 
-    one_file_system: false  # to backup /boot
-
     exclude_patterns:
         - pf:/cdrom
         - pf:/dev
