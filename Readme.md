@@ -36,7 +36,7 @@
 
 1. Generate passphrase file
     ```sh
-    sudo bash -c "umask 377; dd if=/dev/urandom bs=16 count=1 | xxd -p >/etc/borgmatic.d/config/passphrase"
+    sudo bash -c "umask 377; head -c 16 /dev/urandom | xxd -p >/etc/borgmatic.d/config/passphrase"
     ```
 
 1. For easy usage, add
@@ -91,7 +91,7 @@ borg umount /mnt/borg
 
 1. Restore disk header (includes partition table) with
     ```sh
-    sudo dd if=sdA_header.bin of=/dev/sdX && partprobe
+    sudo tee /dev/sdX <sdA_header.bin >/dev/null && partprobe
     ```
 
     Check restored disks with `sudo gdisk /dev/sdX`:
@@ -111,10 +111,10 @@ borg umount /mnt/borg
 
     If the disk was GPT restore its backup partition table with `w`, else quit with `q`.
 
-1. Restore raw images ( `ll *.img` ) with `dd`.
+1. Restore raw images ( `ll *.img` ) with `pv raw.img | sudo tee /dev/sdXY >/dev/null`.
     > Note: if it extracts slowly from the mounted filesystem, you can try bypassing it:
     > ```sh
-    > amborg extract --stdout ::<archive name> mnt/borg_windows/PART.img | sudo dd of=/dev/sdXY bs=1M status=progress
+    > amborg extract --stdout ::<archive name> mnt/borg_windows/PART.img | pv | sudo tee /dev/sdXY >/dev/null
     > ```
     > This applies to the next step too.
 
