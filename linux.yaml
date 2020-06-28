@@ -68,4 +68,7 @@ hooks:
 
         - /etc/borgmatic.d/encrypt.sh
 
+    after_backup:
+        - "chown -R $SUDO_USER: ~/.config/borg/ ~/.cache/borg/"
+
     # TODO: https://torsion.org/borgmatic/docs/how-to/monitor-your-backups/#healthchecks-hook
