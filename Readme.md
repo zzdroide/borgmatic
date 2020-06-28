@@ -54,11 +54,11 @@ sudo borgmatic -v1 create --progress --stats
 
 Note that SSH authentication is set to non-interactive, to avoid hanging. To remove this, delete `-oBatchMode=yes` from storage.yaml
 
-If you need an SSH agent for non-interactive login, run with
+If you need an SSH agent for non-interactive login, run with this line instead:
 ```sh
 sudo SSH_AUTH_SOCK="$SSH_AUTH_SOCK" borgmatic ...
 ```
-instead.
+If running with no GUI and no agent, run this first: `eval $(ssh-agent) && ssh-add`
 
 ## Mounting Windows archives
 
