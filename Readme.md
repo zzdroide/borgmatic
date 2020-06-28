@@ -4,6 +4,12 @@
 
 1. [Install Borg](https://borgbackup.readthedocs.io/en/stable/installation.html)
 
+    To install with `pip` for all users:
+    - `sudo apt install python3-pip python3-setuptools libssl-dev pkg-config fuse libfuse-dev libacl1-dev`
+    - `sudo -i pip3 install --upgrade "borgbackup[fuse]"`
+
+    This way, `borg` starts in 0.6s in a computer with weak CPU, instead of 2.3s with the Standalone Binary.
+
 1. Install HPN-SSH
    1. [Download a release](https://github.com/rapier1/openssh-portable/releases)
    1. Extract and `cd`
@@ -11,8 +17,8 @@
    1. `sudo install ssh /usr/local/bin/hpnssh`
 
 1. [Install Borgmatic](https://torsion.org/borgmatic/docs/how-to/set-up-backups/#installation)
-   1. `sudo apt install python3-pip python3-setuptools`
-   1. `sudo -i pip3 install --upgrade borgmatic`
+
+   `sudo -i pip3 install --upgrade borgmatic`
 
 1. Clone this:
     ```sh
