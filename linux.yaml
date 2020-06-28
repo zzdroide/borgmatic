@@ -6,47 +6,7 @@ location:
         !include /etc/borgmatic.d/shared/repo.yaml
 
     exclude_patterns:
-        - pf:/cdrom
-        - pf:/dev
-        - pf:/media
-        - pf:/mnt
-        - pf:/proc
-        - pf:/run
-        - pf:/sys
-        - pf:/tmp
-
-        - sh:/home/*/.cache
-        - sh:/home/*/.gvfs
-        - sh:/home/*/.ICEauthority
-        - sh:/home/*/.nv
-        - sh:/home/*/.Xauthority
-        - pf:/root/.cache
-        - pf:/root/.gnupg
-
-        - pf:/var/cache/apt
-        - pf:/var/lock
-        - pf:/var/run
-        - pf:/var/tmp
-
-        - '*/node_modules/'
-        - '*.pyc'
-
-        # Note: only "- pf:___" between encrypt markers
-        # (no quotes, no comments, no other pattern style selectors, no empty lines)
-        # __ENCRYPT_START__
-        - pf:/home/t/.2fa
-        - pf:/home/t/.docker
-        - pf:/home/t/.git-credentials
-        - pf:/home/t/.gnupg
-        - pf:/home/t/.local/share/keyrings
-        - pf:/home/t/.pgpass
-        - pf:/home/t/.pki
-        - pf:/home/t/***REMOVED***
-        - pf:/home/t/.remmina
-        - pf:/home/t/.ssh
-        - pf:/etc/ssh
-        # __ENCRYPT_END__
-        - pf:/etc/borgmatic.d/config/passphrase
+        !include /etc/borgmatic.d/config/linux_excludes.yaml
 
 
 storage:

@@ -8,19 +8,19 @@ extension="tgz.gpg"
 [[ -e "$base_dir/config/passphrase" ]] || (echo "No passphrase file"; exit 1)
 
 # https://stackoverflow.com/questions/17988756/how-to-select-lines-between-two-marker-patterns-which-may-occur-multiple-times-w/17989228#17989228
-start_marker='^ *# __ENCRYPT_START__$'
-end_marker='^ *# __ENCRYPT_END__$'
+start_marker='^# __ENCRYPT_START__$'
+end_marker='^# __ENCRYPT_END__$'
 
 select_between_markers="/$start_marker/,/$end_marker/"
 delete_markers="/$start_marker/d; /$end_marker/d"
-delete_yaml_dash='s/^ *- pf://'
+delete_yaml_dash='s/^- pf://'
 print_result="p"
 
 sed -ne "$select_between_markers { \
   $delete_markers; \
   $delete_yaml_dash; \
   $print_result; \
-}" "$base_dir/linux.yaml" | while read -r s; do
+}" "$base_dir/config/linux_excludes.yaml" | while read -r s; do
   if [[ ! -e "$s" ]]; then
     # echo "$s doesn't exist"
     continue

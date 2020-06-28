@@ -1,0 +1,41 @@
+- pf:/cdrom
+- pf:/dev
+- pf:/media
+- pf:/mnt
+- pf:/proc
+- pf:/run
+- pf:/sys
+- pf:/tmp
+
+- sh:/home/*/.cache
+- sh:/home/*/.gvfs
+- sh:/home/*/.ICEauthority
+- sh:/home/*/.nv
+- sh:/home/*/.Xauthority
+- pf:/root/.cache
+- pf:/root/.gnupg
+
+- pf:/var/cache/apt
+- pf:/var/lock
+- pf:/var/run
+- pf:/var/tmp
+
+- '*/node_modules/'
+- '*.pyc'
+
+# Note: only "- pf:___" between encrypt markers
+# (no quotes, no comments, no other pattern style selectors, no empty lines)
+# __ENCRYPT_START__
+- pf:/home/your_username_here/.2fa
+- pf:/home/your_username_here/.aws
+- pf:/home/your_username_here/.docker
+- pf:/home/your_username_here/.git-credentials
+- pf:/home/your_username_here/.gnupg
+- pf:/home/your_username_here/.local/share/keyrings
+- pf:/home/your_username_here/.pgpass
+- pf:/home/your_username_here/.pki
+- pf:/home/your_username_here/.remmina
+- pf:/home/your_username_here/.ssh
+- pf:/etc/ssh
+# __ENCRYPT_END__
+- pf:/etc/borgmatic.d/config/passphrase

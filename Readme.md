@@ -32,6 +32,7 @@
 
 1. Configure by creating `config` folder and creating files from `config_example`
     - `windows_parts.cfg`: &lt;partition label> &lt;partition path> &lt;0 if NTFS, 1 if raw (backup image with `dd`)>
+    - `linux_excludes.yaml`: Add patterns to be excluded here. If you want additional encryption on some files or folders, add them between the encryption markers.
 
 1. Generate passphrase file
     ```sh
