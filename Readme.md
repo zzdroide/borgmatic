@@ -20,7 +20,7 @@
     ```
     For easy development, also run
     ```sh
-    sudo chown -R $USER:$USER /etc/borgmatic.d
+    sudo chown -R $USER: /etc/borgmatic.d
     ```
     > Note: configuration could be in ~/.config/borgmatic.d, but without stable absolute paths, it would require `cd` before running borgmatic.
 
@@ -58,7 +58,7 @@ instead.
 1. Create a target directory:
     ```sh
     sudo mkdir /mnt/borg
-    sudo chown $USER:$USER /mnt/borg
+    sudo chown $USER: /mnt/borg
     ```
 
 1. Find the archive you want with `amborg list`
