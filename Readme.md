@@ -6,6 +6,7 @@
 
     To install with `pip` for all users:
     - `sudo apt install python3-pip python3-setuptools libssl-dev pkg-config fuse libfuse-dev libacl1-dev`
+    - `sudo -i pip3 install --upgrade wheel`
     - `sudo -i pip3 install --upgrade "borgbackup[fuse]"`
 
     This way, `borg` starts in 0.6s in a computer with weak CPU, instead of 2.3s with the Standalone Binary.
