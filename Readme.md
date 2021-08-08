@@ -140,7 +140,8 @@ borg umount /mnt/borg
        amborg -v extract --strip-components 3 ::<archive name> mnt/borg_windows/PART_NTFS/
        ```
 
-    Files excluded from backup (without its contents restored) will contain all zeroes if small, or garbage previously stored in the hard drive.
+    1. Delete files excluded from backup, as their contents weren't restored.
+    > They contain all zeroes if small, or garbage previously stored in the hard drive.
 
 1. If Windows can't mount the restored NTFS partition (Disk Manager shows it as healthy, but most options are greyed out, and `DISKPART> list volume` doesn't show it), check the partition type with `sudo fdisk -l /dev/sdX`.
 
