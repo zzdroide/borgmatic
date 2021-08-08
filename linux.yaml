@@ -6,7 +6,43 @@ location:
         !include /etc/borgmatic.d/shared/repo.yaml
 
     exclude_patterns:
-        !include /etc/borgmatic.d/config/linux_excludes.yaml
+        - pf:/cdrom
+        - pf:/dev
+        - pf:/media
+        - pf:/mnt
+        - pf:/proc
+        - pf:/run
+        - pf:/sys
+        - pf:/tmp
+
+        - sh:/home/*/.android/build-cache
+        - sh:/home/*/.ansible/tmp
+        - sh:/home/*/.cache
+        - sh:/home/*/.cinnamon/spices.cache
+        - sh:/home/*/.config/*/*Cache*  # crappy Electron apps
+        - sh:/home/*/.config/chromium/*/GPUCache
+        - sh:/home/*/.config/chromium/*/Service Worker/CacheStorage
+        - sh:/home/*/.gradle/caches
+        - sh:/home/*/.gvfs
+        - sh:/home/*/.ICEauthority
+        - sh:/home/*/.local/share/virtualenvs
+        - sh:/home/*/.mozilla/firefox/Crash Reports
+        - sh:/home/*/.mozilla/firefox/*/datareporting
+        - sh:/home/*/.npm/_cacache
+        - sh:/home/*/.nv
+        - sh:/home/*/.var/app/org.telegram.desktop/data/TelegramDesktop/tdata/*/*cache*
+        - sh:/home/*/.Xauthority
+        - pf:/root/.cache
+        - pf:/root/.gnupg
+
+        - pf:/var/cache/apt
+        - pf:/var/lock
+        - pf:/var/run
+        - pf:/var/tmp
+
+        - '*/node_modules/'
+        - '*.pyc'
+
 
 
 storage:
@@ -23,8 +59,6 @@ hooks:
 
         # Ensure desktop environment is not running (to run safely without snapshot)
         - '! systemctl is-active --quiet lightdm'
-
-        - /etc/borgmatic.d/encrypt.sh
 
     after_backup:
         - "chown -R $SUDO_USER: ~/.config/borg/ ~/.cache/borg/"
