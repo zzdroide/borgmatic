@@ -31,14 +31,16 @@
     ```
     > Note: configuration could be in ~/.config/borgmatic.d, but without stable absolute paths, it would require `cd` before running borgmatic.
 
+1. Regenerate the passphrase using regenerate_passphrase.py interactively.
+
 1. Configure by creating `config` folder and creating files from `config_example`
     - `windows_parts.cfg`: &lt;partition label> &lt;partition path> &lt;0 if NTFS, 1 if raw (backup image with `dd`)>
 
 1. For easy usage, add
    ```sh
-   alias amborg="BORG_REPO=borg@192.168.0.64:AM BORG_RSH='hpnssh -oBatchMode=yes -oNoneEnabled=yes -oNoneSwitch=yes' borg"
+   alias tamborg="BORG_REPO=borg@192.168.0.64:TAM BORG_PASSPHRASE=pass BORG_RSH='hpnssh -oBatchMode=yes -oNoneEnabled=yes -oNoneSwitch=yes' borg"
    ```
-   to `.zshrc`.
+   to `.zshrc` (replacing BORG_PASSPHRASE).
 
 
 ## Running
@@ -63,11 +65,11 @@ If running with no GUI and no agent, run this first: `eval $(ssh-agent) && ssh-a
     sudo chown $USER: /mnt/borg
     ```
 
-1. Find the archive you want with `amborg list`
+1. Find the archive you want with `tamborg list`
 
 1. Run:
     ```sh
-    amborg -v mount --strip-components 2 -o allow_other,uid=$UID ::<archive name> /mnt/borg
+    tamborg -v mount --strip-components 2 -o allow_other,uid=$UID ::<archive name> /mnt/borg
     ```
 
 Unmount with:
@@ -109,7 +111,7 @@ borg umount /mnt/borg
 1. Restore raw images ( `ll *.img` ) with `pv raw.img | sudo tee /dev/sdXY >/dev/null`.
     > Note: if it extracts slowly from the mounted filesystem, you can try bypassing it:
     > ```sh
-    > amborg extract --stdout ::<archive name> mnt/borg_windows/PART.img | pv | sudo tee /dev/sdXY >/dev/null
+    > tamborg extract --stdout ::<archive name> mnt/borg_windows/PART.img | pv | sudo tee /dev/sdXY >/dev/null
     > ```
     > This applies to the next step too.
 
@@ -120,7 +122,7 @@ borg umount /mnt/borg
 
 1. Restore NTFS partition contents:
 
-    1. [Setup](https://borgbackup.readthedocs.io/en/stable/installation.html#git-installation): [borgwd](https://github.com/zzdroide/borgwd) (use borgwd-env instead of borg-env) and activate its virtualenv. Confirm with `amborg --version`
+    1. [Setup](https://borgbackup.readthedocs.io/en/stable/installation.html#git-installation): [borgwd](https://github.com/zzdroide/borgwd) (use borgwd-env instead of borg-env) and activate its virtualenv. Confirm with `tamborg --version`
 
     1. Mount the partition and `cd` to there.
 
@@ -131,7 +133,7 @@ borg umount /mnt/borg
         If only useless files (like in CryptnetUrlCache) show as pipes (or files match what is in excludes.txt), you are good to go. Otherwise... reboot? It only happened to me once.
 
     1. ```sh
-       amborg -v extract --strip-components 3 ::<archive name> mnt/borg_windows/PART_NTFS/
+       tamborg -v extract --strip-components 3 ::<archive name> mnt/borg_windows/PART_NTFS/
        ```
 
     1. Delete files excluded from backup, as their contents weren't restored.

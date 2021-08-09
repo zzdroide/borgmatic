@@ -1,3 +1,5 @@
+<<: !include /etc/borgmatic.d/config/storage_passphrase.yaml
+
 compression: zstd,1
 
 # Use HPN SSH with some options, as the user who ran sudo.
