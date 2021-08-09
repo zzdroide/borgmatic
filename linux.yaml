@@ -1,6 +1,8 @@
 location:
     source_directories:
         - /
+    read_special: false
+    one_file_system: true
 
     repositories:
         !include /etc/borgmatic.d/shared/repo.yaml
