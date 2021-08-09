@@ -60,7 +60,7 @@ cat $windows_parts_file | while read -r part dev raw; do
     disk=$(lsblk -n -o pkname "$realdev")
     # From https://borgbackup.readthedocs.io/en/stable/deployment/image-backup.html
     header_size=$(sfdisk -lo Start "/dev/$disk" | grep -A1 -P 'Start$' | tail -n1 | xargs echo)
-    # No pipe here because files could repeat, and are small.
+    # No "pipe file" here because files could repeat, and are small.
     dd if="/dev/$disk" of="$base_dir/${disk}_header.bin" count="$header_size" status=none
 
     if [[ $raw -eq 1 ]]; then
@@ -115,9 +115,12 @@ if [[ "$hook_type" == "$setup" ]]; then
     exit 1
   fi
 
+  # Include this in backup as a reference of the used "exclude_patterns":
+  ln windows.yaml "$base_dir/"
+
 elif [[ "$hook_type" == "$cleanup" ]]; then
-  rm -f $base_dir/*_header.bin "$excludes_file"
-  [[ ! -e "$base_dir" ]] || rmdir "$base_dir"
+  rm -f $base_dir/*_header.bin "$excludes_file" "$base_dir/windows.yaml"
+  [[ ! -e "$base_dir" ]] || rmdir "$base_dir"   # Inverted logic because of "set -e"
 
 else
   echo "hook type assertion failed"

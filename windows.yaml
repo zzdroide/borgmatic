@@ -20,7 +20,7 @@ location:
         - sh:/mnt/borg_windows/*/pagefile.sys
         - sh:/mnt/borg_windows/*/hiberfil.sys
         - sh:/mnt/borg_windows/*/Users/*/AppData/Local/Google/Chrome/User Data/*/*Cache
-        - sh:/mnt/borg_windows/*/Users/*/AppData/Local/Mozilla/Firefox/Profiles/                    # only caches in LocalAppData
+        - sh:/mnt/borg_windows/*/Users/*/AppData/Local/Mozilla/Firefox/Profiles/                    # There are only caches in LocalAppData
         - sh:/mnt/borg_windows/*/Users/*/AppData/Local/Moonchild Productions/Pale Moon/Profiles/
         - sh:/mnt/borg_windows/*/Users/*/AppData/Roaming/Telegram Desktop/tdata/*/*cache*
 
