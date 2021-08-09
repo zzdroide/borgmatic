@@ -1,4 +1,4 @@
-<<: !include /etc/borgmatic.d/config/storage_passphrase.yaml
+<<: !include /etc/borgmatic.d/config/passphrase.yaml
 
 compression: zstd,1
 
