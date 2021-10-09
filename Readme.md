@@ -23,7 +23,7 @@
 
 1. Clone this:
     ```sh
-    sudo git clone https://github.com/zzdroide/borgmatic /etc/borgmatic.d
+    sudo GIT_SSH_COMMAND="ssh -i ~$USER/.ssh/id_ed25519" git clone git@github.com:zzdroide/borgmatic.git /etc/borgmatic.d
     ```
     For easy development, also run
     ```sh
