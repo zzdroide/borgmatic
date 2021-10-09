@@ -31,16 +31,15 @@
     ```
     > Note: configuration could be in ~/.config/borgmatic.d, but without stable absolute paths, it would require `cd` before running borgmatic.
 
-1. Regenerate the passphrase using regenerate_passphrase.py interactively.
-
 1. Configure by creating `config` folder and creating files from `config_example`
     - `windows_parts.cfg`: &lt;partition label> &lt;partition path> &lt;0 if NTFS, 1 if raw (backup image with `dd`)>
+    - `passphrase.yaml`: regenerate it using regenerate_passphrase.py interactively. Then protect it with `chmod 600 /etc/borgmatic.d/config/passphrase.yaml`
 
 1. For easy usage, add
    ```sh
-   alias tamborg="BORG_REPO=borg@192.168.0.64:TAM BORG_PASSPHRASE=pass BORG_RSH='hpnssh -oBatchMode=yes -oNoneEnabled=yes -oNoneSwitch=yes' borg"
+   alias tamborg="BORG_REPO=borg@192.168.0.64:TAM BORG_PASSCOMMAND='cut -d\  -f2 /etc/borgmatic.d/config/passphrase.yaml' BORG_RSH='hpnssh -oBatchMode=yes -oNoneEnabled=yes -oNoneSwitch=yes' borg"
    ```
-   to `.zshrc` (replacing BORG_PASSPHRASE).
+   to `.zshrc`.
 
 
 ## Running
