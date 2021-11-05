@@ -41,6 +41,13 @@
    ```
    to `.zshrc`.
 
+1. Add server's public ssh key with
+   ```sh
+   ssh-keyscan -H 192.168.0.64 >> ~/.ssh/known_hosts
+   ```
+
+1. Of course, add the public key of the computer you are setting up to the Borg server.
+
 
 ## Running
 
