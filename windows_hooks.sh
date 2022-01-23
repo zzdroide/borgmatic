@@ -1,13 +1,13 @@
 #!/bin/bash
-set -e
+set -euo pipefail
 cd "$(dirname "$0")"
 # This script expects a safe umask set
 
-setup="setup"
-cleanup="cleanup"
-hook_type=$1
-if [[ "$hook_type" != "$setup" ]] && [[ "$hook_type" != "$cleanup" ]]; then
-  echo "Bad hook type: [$hook_type]"
+readonly SETUP="setup"
+readonly CLEANUP="cleanup"
+readonly HOOK_TYPE=$1
+if [[ "$HOOK_TYPE" != "$SETUP" ]] && [[ "$HOOK_TYPE" != "$CLEANUP" ]]; then
+  echo "Bad hook type: [$HOOK_TYPE]"
   exit 1
 fi
 
@@ -21,36 +21,36 @@ ensure_unmounted() {
   fi
 }
 
-windows_parts_file="config/windows_parts.cfg"
-base_dir="/mnt/borg_windows"
-excludes_file="$base_dir/excludes.txt"
+readonly WINDOWS_PARTS_FILE="config/windows_parts.cfg"
+readonly BASE_DIR="/mnt/borg_windows"
+readonly EXCLUDES_FILE="$BASE_DIR/excludes.txt"
 
-if [[ "$hook_type" == "$setup" ]]; then
-  $0 $cleanup
-  mkdir "$base_dir"
+if [[ "$HOOK_TYPE" == "$SETUP" ]]; then
+  $0 $CLEANUP
+  mkdir "$BASE_DIR"
 fi
 
 
-if [[ ! -f $windows_parts_file ]]; then
-  echo "$windows_parts_file doesn't exist"
+if [[ ! -f $WINDOWS_PARTS_FILE ]]; then
+  echo "$WINDOWS_PARTS_FILE doesn't exist"
   exit 1
-elif [[ ! -s $windows_parts_file ]]; then
-  echo "$windows_parts_file is empty"
+elif [[ ! -s $WINDOWS_PARTS_FILE ]]; then
+  echo "$WINDOWS_PARTS_FILE is empty"
   exit 1
-elif [[ ! -r $windows_parts_file ]]; then
-  echo "$windows_parts_file is not readable"
+elif [[ ! -r $WINDOWS_PARTS_FILE ]]; then
+  echo "$WINDOWS_PARTS_FILE is not readable"
   exit 1
 fi
 # Let's hope its format is correct
 
 # shellcheck disable=SC2002
-cat $windows_parts_file | while read -r part dev raw; do
+cat $WINDOWS_PARTS_FILE | while read -r part dev raw; do
 
-  mnt_path="$base_dir/$part"
-  pipe_path="$base_dir/$part$( [[ $raw -eq 1 ]] && echo ".img" || echo ".metadata.simg")"
-  realdev_path="$base_dir/realdev_${part}.txt"
+  mnt_path="$BASE_DIR/$part"
+  pipe_path="$BASE_DIR/$part$( [[ $raw -eq 1 ]] && echo ".img" || echo ".metadata.simg")"
+  realdev_path="$BASE_DIR/realdev_${part}.txt"
 
-  if [[ "$hook_type" == "$setup" ]]; then
+  if [[ "$HOOK_TYPE" == "$SETUP" ]]; then
     realdev=$(realpath "$dev")
     echo "$realdev" > "$realdev_path"
     # Prefer realdev over dev because it's more readable
@@ -61,7 +61,7 @@ cat $windows_parts_file | while read -r part dev raw; do
     # From https://borgbackup.readthedocs.io/en/stable/deployment/image-backup.html
     header_size=$(sfdisk -lo Start "/dev/$disk" | grep -A1 -P 'Start$' | tail -n1 | xargs echo)
     # No "pipe file" here because files could repeat, and are small.
-    dd if="/dev/$disk" of="$base_dir/${disk}_header.bin" count="$header_size" status=none
+    dd if="/dev/$disk" of="$BASE_DIR/${disk}_header.bin" count="$header_size" status=none
 
     if [[ $raw -eq 1 ]]; then
       # Previously this was dd to $pipe_path. Now it's not exactly a pipe...
@@ -84,7 +84,7 @@ cat $windows_parts_file | while read -r part dev raw; do
       mount -o ro "$realdev" "$mnt_path"
 
       # Windows Vista and higher seem to create weird files that appear as a pipe
-      find -L "$mnt_path" -type b -o -type c -o -type p >> "$excludes_file" 2> /dev/null || true  # TODO: "pf:" ?
+      find -L "$mnt_path" -type b -o -type c -o -type p >> "$EXCLUDES_FILE" 2> /dev/null || true  # TODO: "pf:" ?
 
       mkfifo "$pipe_path"
       ntfsclone \
@@ -96,7 +96,7 @@ cat $windows_parts_file | while read -r part dev raw; do
       # TODO: fail on ntfsclone error when fs dirty
     fi
 
-  elif [[ "$hook_type" == "$cleanup" ]]; then
+  elif [[ "$HOOK_TYPE" == "$CLEANUP" ]]; then
     findmnt "$mnt_path" >/dev/null && umount "$mnt_path"
     [[ -e "$mnt_path" ]] && rmdir "$mnt_path"   # check and rmdir to fail if not a dir
 
@@ -109,19 +109,19 @@ cat $windows_parts_file | while read -r part dev raw; do
 done
 
 
-if [[ "$hook_type" == "$setup" ]]; then
-  if grep -v /AppData/LocalLow/Microsoft/CryptnetUrlCache/Content/ "$excludes_file"; then
+if [[ "$HOOK_TYPE" == "$SETUP" ]]; then
+  if grep -v /AppData/LocalLow/Microsoft/CryptnetUrlCache/Content/ "$EXCLUDES_FILE"; then
     echo
     echo "Error: the above paths are pipe files not in whitelisted locations."
     exit 1
   fi
 
   # Include this in backup as a reference of the used "exclude_patterns":
-  ln windows.yaml "$base_dir/"
+  ln windows.yaml "$BASE_DIR/"
 
-elif [[ "$hook_type" == "$cleanup" ]]; then
-  rm -f $base_dir/*_header.bin "$excludes_file" "$base_dir/windows.yaml"
-  [[ ! -e "$base_dir" ]] || rmdir "$base_dir"   # Inverted logic because of "set -e"
+elif [[ "$HOOK_TYPE" == "$CLEANUP" ]]; then
+  rm -f $BASE_DIR/*_header.bin "$EXCLUDES_FILE" "$BASE_DIR/windows.yaml"
+  [[ ! -e "$BASE_DIR" ]] || rmdir "$BASE_DIR"   # Inverted logic because of "set -e"
 
 else
   echo "hook type assertion failed"
