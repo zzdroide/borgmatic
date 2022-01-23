@@ -12,7 +12,7 @@
     This way, `borg` starts in 0.6s in a computer with weak CPU, instead of 2.3s with the Standalone Binary.
 
 1. Install HPN-SSH
-   1. [Download a release](https://github.com/rapier1/openssh-portable/releases)
+   1. [Download source from a tag](https://github.com/rapier1/openssh-portable/tags), which matches your version (for example `ssh -V` --> `8_2`) for easier compiling. One of `hpn-KitchenSink-*`, which includes all patches (same as `hpn-*`)
    1. Extract and `cd`
    1. `autoreconf && ./configure && make && ./ssh -V`
    1. `sudo install ssh /usr/local/bin/hpnssh`
