@@ -84,7 +84,7 @@ cat $windows_parts_file | while read -r part dev raw; do
       mount -o ro "$realdev" "$mnt_path"
 
       # Windows Vista and higher seem to create weird files that appear as a pipe
-      find -L "$mnt_path" -type b -o -type c -o -type p >> "$excludes_file" 2> /dev/null || true
+      find -L "$mnt_path" -type b -o -type c -o -type p >> "$excludes_file" 2> /dev/null || true  # TODO: "pf:" ?
 
       mkfifo "$pipe_path"
       ntfsclone \
