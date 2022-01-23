@@ -37,9 +37,15 @@
 
 1. For easy usage, add
    ```sh
-   alias tamborg="BORG_REPO=borg@192.168.0.64:TAM BORG_PASSCOMMAND='cut -d\  -f2 /etc/borgmatic.d/config/passphrase.yaml' BORG_RSH='hpnssh -oBatchMode=yes -oNoneEnabled=yes -oNoneSwitch=yes' borg"
+   alias tamborg="BORG_REPO=borg@192.168.0.64:TAM BORG_PASSCOMMAND='yq -r .encryption_passphrase /etc/borgmatic.d/config/passphrase.yaml' BORG_RSH='hpnssh -oBatchMode=yes -oNoneEnabled=yes -oNoneSwitch=yes' borg"
    ```
    to `.zshrc`.
+
+   The required dependencies are:
+   ```sh
+   sudo apt install jq
+   sudo -i pip3 install --upgrade yq
+   ```
 
 1. Add server's public ssh key with
    ```sh
