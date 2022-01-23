@@ -93,6 +93,7 @@ cat $windows_parts_file | while read -r part dev raw; do
         --output - \
         "$realdev" \
         > "$pipe_path" &
+      # TODO: fail on ntfsclone error when fs dirty
     fi
 
   elif [[ "$hook_type" == "$cleanup" ]]; then
