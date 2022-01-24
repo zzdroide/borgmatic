@@ -43,6 +43,8 @@ elif [[ ! -r $WINDOWS_PARTS_FILE ]]; then
 fi
 # Let's hope its format is correct
 
+# TODO: unmount/remount EFI partition
+
 # shellcheck disable=SC2002
 cat $WINDOWS_PARTS_FILE | while read -r part dev raw; do
 
