@@ -17,12 +17,12 @@ readonly SNAP_SIZE="2G"
 
 readonly MNT_DIR="/mnt/borg_lvm"
 readonly SNAP_NAME="borg_${LV}_snapshot"
-readonly SNAP_DEV="/dev/${VG}/$SNAP_NAME"
+readonly SNAP_DEV="/dev/$VG/$SNAP_NAME"
 
 if [[ "$HOOK_TYPE" == "$SETUP" ]]; then
   $0 $CLEANUP
   mkdir $MNT_DIR
-  lvcreate --size=$SNAP_SIZE --snapshot --permission=r --name=$SNAP_NAME /dev/${VG}/${LV}
+  lvcreate --size=$SNAP_SIZE --snapshot --permission=r --name=$SNAP_NAME /dev/$VG/$LV
   mount -o ro $SNAP_DEV $MNT_DIR
 
 elif [[ "$HOOK_TYPE" == "$CLEANUP" ]]; then
