@@ -21,6 +21,9 @@ readonly SNAP_DEV="/dev/$VG/$SNAP_NAME"
 
 if [[ "$HOOK_TYPE" == "$SETUP" ]]; then
   $0 $CLEANUP
+
+  command -v docker &>/dev/null && docker image prune --force
+
   mkdir $MNT_DIR
   lvcreate --size=$SNAP_SIZE --snapshot --permission=r --name=$SNAP_NAME /dev/$VG/$LV
   mount -o ro $SNAP_DEV $MNT_DIR
