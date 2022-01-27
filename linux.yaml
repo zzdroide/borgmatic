@@ -15,6 +15,7 @@ location:
         - pf:/mnt/borg_lvm/proc
         - pf:/mnt/borg_lvm/run
         - pf:/mnt/borg_lvm/swapfile
+        - pf:/mnt/borg_lvm/swap.img
         - pf:/mnt/borg_lvm/sys
         - pf:/mnt/borg_lvm/tmp
 
