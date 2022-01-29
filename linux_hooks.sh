@@ -29,10 +29,10 @@ if [[ "$HOOK_TYPE" == "$SETUP" ]]; then
   mount -o ro $SNAP_DEV $MNT_DIR
 
 elif [[ "$HOOK_TYPE" == "$CLEANUP" ]]; then
-  findmnt $MNT_DIR >/dev/null && (
+  findmnt $MNT_DIR >/dev/null && {
     umount $MNT_DIR
-    sleep 1   # Otherwise "Logical volume **** contains a filesystem in use."
-  )
+    sleep 2   # Otherwise "Logical volume xxxx contains a filesystem in use."
+  }
   lvdisplay $SNAP_DEV &>/dev/null && lvremove --yes $SNAP_DEV
   [[ ! -e $MNT_DIR ]] || rmdir $MNT_DIR
 
