@@ -33,7 +33,12 @@ elif [[ "$HOOK_TYPE" == "$CLEANUP" ]]; then
     umount $MNT_DIR
     sleep 2   # Otherwise "Logical volume xxxx contains a filesystem in use."
   }
-  lvdisplay $SNAP_DEV &>/dev/null && lvremove --yes $SNAP_DEV
+  lvdisplay $SNAP_DEV &>/dev/null && {
+    percent=$(lvs --noheadings -o snap_percent $SNAP_DEV)
+    rounded=$(echo "$percent" | awk '{print int($1+0.5)}')
+    echo "Snapshot usage: $rounded%"
+    lvremove --yes $SNAP_DEV
+  }
   [[ ! -e $MNT_DIR ]] || rmdir $MNT_DIR
 
 else
