@@ -21,6 +21,24 @@ ensure_unmounted() {
   fi
 }
 
+unmount_boot() {
+  if systemctl is-enabled boot.mount; then
+    systemctl stop boot.mount
+  fi
+  if systemctl is-enabled boot-efi.mount; then
+    systemctl stop boot-efi.mount
+  fi
+}
+
+mount_boot() {
+  if systemctl is-enabled boot.mount; then
+    systemctl start boot.mount
+  fi
+  if systemctl is-enabled boot-efi.mount; then
+    systemctl start boot-efi.mount
+  fi
+}
+
 readonly WINDOWS_PARTS_FILE="config/windows_parts.cfg"
 readonly BASE_DIR="/mnt/borg_windows"
 readonly EXCLUDES_FILE="$BASE_DIR/excludes.txt"
@@ -28,6 +46,7 @@ readonly EXCLUDES_FILE="$BASE_DIR/excludes.txt"
 if [[ "$HOOK_TYPE" == "$SETUP" ]]; then
   $0 $CLEANUP
   mkdir "$BASE_DIR"
+  unmount_boot
 fi
 
 
@@ -42,8 +61,6 @@ elif [[ ! -r $WINDOWS_PARTS_FILE ]]; then
   exit 1
 fi
 # Let's hope its format is correct
-
-# TODO: unmount/remount EFI partition
 
 # shellcheck disable=SC2002
 cat $WINDOWS_PARTS_FILE | while read -r part dev raw; do
@@ -124,6 +141,7 @@ if [[ "$HOOK_TYPE" == "$SETUP" ]]; then
 elif [[ "$HOOK_TYPE" == "$CLEANUP" ]]; then
   rm -f $BASE_DIR/*_header.bin "$EXCLUDES_FILE" "$BASE_DIR/windows.yaml"
   [[ ! -e "$BASE_DIR" ]] || rmdir "$BASE_DIR"   # Inverted logic because of "set -e"
+  mount_boot
 
 else
   echo "hook type assertion failed"
