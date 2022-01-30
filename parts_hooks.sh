@@ -6,7 +6,7 @@ cd "$(dirname "$0")"
 readonly SETUP="setup"
 readonly CLEANUP="cleanup"
 readonly HOOK_TYPE=$1
-if [[ "$HOOK_TYPE" != "$SETUP" ]] && [[ "$HOOK_TYPE" != "$CLEANUP" ]]; then
+if [[ $HOOK_TYPE != "$SETUP" ]] && [[ $HOOK_TYPE != "$CLEANUP" ]]; then
   echo "Bad hook type: [$HOOK_TYPE]"
   exit 1
 fi
@@ -43,9 +43,9 @@ readonly PARTS_CONFIG="config/parts.cfg"
 readonly BASE_DIR="/mnt/borg_parts"
 readonly NTFS_EXCLUDES="$BASE_DIR/ntfs_excludes.txt"
 
-if [[ "$HOOK_TYPE" == "$SETUP" ]]; then
+if [[ $HOOK_TYPE == "$SETUP" ]]; then
   $0 $CLEANUP
-  mkdir "$BASE_DIR"
+  mkdir $BASE_DIR
   touch $NTFS_EXCLUDES
   unmount_boot
 fi
@@ -61,11 +61,11 @@ fi
 # shellcheck disable=SC2002
 cat $PARTS_CONFIG | while read -r part dev ntfs; do
 
-  mnt_path="$BASE_DIR/$part"
-  pipe_path="$BASE_DIR/$part$( [[ $ntfs -eq 1 ]] && echo ".metadata.simg" || echo ".img")"
-  realdev_path="$BASE_DIR/realdev_${part}.txt"
+  mnt_path=$BASE_DIR/$part
+  pipe_path=$BASE_DIR/$part$( [[ $ntfs -eq 1 ]] && echo .metadata.simg || echo .img)
+  realdev_path=$BASE_DIR/realdev_$part.txt
 
-  if [[ "$HOOK_TYPE" == "$SETUP" ]]; then
+  if [[ $HOOK_TYPE == "$SETUP" ]]; then
     realdev=$(realpath "$dev")
     echo "$realdev" > "$realdev_path"
     # Prefer realdev over dev because it's more readable
@@ -83,7 +83,7 @@ cat $PARTS_CONFIG | while read -r part dev ntfs; do
       mount -o ro "$realdev" "$mnt_path"
 
       # Windows Vista and higher seem to create weird files that appear as a pipe
-      find -L "$mnt_path" -type b -o -type c -o -type p >> "$NTFS_EXCLUDES" 2> /dev/null || true  # TODO: "pf:" ?
+      find -L "$mnt_path" -type b -o -type c -o -type p >> $NTFS_EXCLUDES 2> /dev/null || true  # TODO: "pf:" ?
 
       mkfifo "$pipe_path"
       ntfsclone \
@@ -111,7 +111,7 @@ cat $PARTS_CONFIG | while read -r part dev ntfs; do
       fi
     fi
 
-  elif [[ "$HOOK_TYPE" == "$CLEANUP" ]]; then
+  elif [[ $HOOK_TYPE == "$CLEANUP" ]]; then
     findmnt "$mnt_path" >/dev/null && umount "$mnt_path"
     [[ -e "$mnt_path" ]] && rmdir "$mnt_path"   # check and rmdir to fail if not a dir
     rm -f "$pipe_path" "$realdev_path"
@@ -123,19 +123,19 @@ cat $PARTS_CONFIG | while read -r part dev ntfs; do
 done
 
 
-if [[ "$HOOK_TYPE" == "$SETUP" ]]; then
-  if grep -v /AppData/LocalLow/Microsoft/CryptnetUrlCache/Content/ "$NTFS_EXCLUDES"; then
+if [[ $HOOK_TYPE == "$SETUP" ]]; then
+  if grep -v /AppData/LocalLow/Microsoft/CryptnetUrlCache/Content/ $NTFS_EXCLUDES; then
     echo
     echo "Error: the above paths are pipe files not in whitelisted locations."
     exit 1
   fi
 
   # Include this in backup as a reference of the used "exclude_patterns":
-  ln 02_parts.yaml "$BASE_DIR/"
+  ln 02_parts.yaml $BASE_DIR/
 
-elif [[ "$HOOK_TYPE" == "$CLEANUP" ]]; then
-  rm -f $BASE_DIR/*_header.bin "$NTFS_EXCLUDES" "$BASE_DIR/02_parts.yaml"
-  [[ ! -e "$BASE_DIR" ]] || rmdir "$BASE_DIR"   # Inverted logic because of "set -e"
+elif [[ $HOOK_TYPE == "$CLEANUP" ]]; then
+  rm -f $BASE_DIR/*_header.bin $NTFS_EXCLUDES $BASE_DIR/02_parts.yaml
+  [[ ! -e $BASE_DIR ]] || rmdir $BASE_DIR   # Inverted logic because of "set -e"
   mount_boot
 
 else
