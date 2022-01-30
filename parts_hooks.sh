@@ -22,19 +22,19 @@ ensure_unmounted() {
 }
 
 unmount_boot() {
-  if systemctl is-enabled boot.mount; then
+  if systemctl is-enabled boot.mount &>/dev/null; then
     systemctl stop boot.mount
   fi
-  if systemctl is-enabled boot-efi.mount; then
+  if systemctl is-enabled boot-efi.mount &>/dev/null; then
     systemctl stop boot-efi.mount
   fi
 }
 
 mount_boot() {
-  if systemctl is-enabled boot.mount; then
+  if systemctl is-enabled boot.mount &>/dev/null; then
     systemctl start boot.mount
   fi
-  if systemctl is-enabled boot-efi.mount; then
+  if systemctl is-enabled boot-efi.mount &>/dev/null; then
     systemctl start boot-efi.mount
   fi
 }
