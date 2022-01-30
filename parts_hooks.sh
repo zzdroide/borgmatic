@@ -49,18 +49,13 @@ if [[ "$HOOK_TYPE" == "$SETUP" ]]; then
   unmount_boot
 fi
 
-
-if [[ ! -f $PARTS_CONFIG ]]; then
-  echo "$PARTS_CONFIG doesn't exist"
+if [[ ! -r $PARTS_CONFIG ]]; then
+  echo "Can't read $PARTS_CONFIG"
   exit 1
-elif [[ ! -s $PARTS_CONFIG ]]; then
-  echo "$PARTS_CONFIG is empty"
-  exit 1
-elif [[ ! -r $PARTS_CONFIG ]]; then
-  echo "$PARTS_CONFIG is not readable"
-  exit 1
+else
+  :
+  # Let's hope its format is correct
 fi
-# Let's hope its format is correct
 
 # shellcheck disable=SC2002
 cat $PARTS_CONFIG | while read -r part dev ntfs; do
