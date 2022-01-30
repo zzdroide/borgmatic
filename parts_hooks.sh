@@ -39,8 +39,8 @@ mount_boot() {
   fi
 }
 
-readonly WINDOWS_PARTS_FILE="config/windows_parts.cfg"
-readonly BASE_DIR="/mnt/borg_windows"
+readonly PARTS_CONFIG="config/parts.cfg"
+readonly BASE_DIR="/mnt/borg_parts"
 readonly EXCLUDES_FILE="$BASE_DIR/excludes.txt"
 
 if [[ "$HOOK_TYPE" == "$SETUP" ]]; then
@@ -50,20 +50,20 @@ if [[ "$HOOK_TYPE" == "$SETUP" ]]; then
 fi
 
 
-if [[ ! -f $WINDOWS_PARTS_FILE ]]; then
-  echo "$WINDOWS_PARTS_FILE doesn't exist"
+if [[ ! -f $PARTS_CONFIG ]]; then
+  echo "$PARTS_CONFIG doesn't exist"
   exit 1
-elif [[ ! -s $WINDOWS_PARTS_FILE ]]; then
-  echo "$WINDOWS_PARTS_FILE is empty"
+elif [[ ! -s $PARTS_CONFIG ]]; then
+  echo "$PARTS_CONFIG is empty"
   exit 1
-elif [[ ! -r $WINDOWS_PARTS_FILE ]]; then
-  echo "$WINDOWS_PARTS_FILE is not readable"
+elif [[ ! -r $PARTS_CONFIG ]]; then
+  echo "$PARTS_CONFIG is not readable"
   exit 1
 fi
 # Let's hope its format is correct
 
 # shellcheck disable=SC2002
-cat $WINDOWS_PARTS_FILE | while read -r part dev raw; do
+cat $PARTS_CONFIG | while read -r part dev raw; do
 
   mnt_path="$BASE_DIR/$part"
   pipe_path="$BASE_DIR/$part$( [[ $raw -eq 1 ]] && echo ".img" || echo ".metadata.simg")"
@@ -112,13 +112,12 @@ cat $WINDOWS_PARTS_FILE | while read -r part dev raw; do
         --output - \
         "$realdev" \
         > "$pipe_path" &
-      # TODO: fail on ntfsclone error when fs dirty
+      # TODO: fail on ntfsclone error when ntfs is dirty
     fi
 
   elif [[ "$HOOK_TYPE" == "$CLEANUP" ]]; then
     findmnt "$mnt_path" >/dev/null && umount "$mnt_path"
     [[ -e "$mnt_path" ]] && rmdir "$mnt_path"   # check and rmdir to fail if not a dir
-
     rm -f "$pipe_path" "$realdev_path"
 
   else
@@ -136,10 +135,10 @@ if [[ "$HOOK_TYPE" == "$SETUP" ]]; then
   fi
 
   # Include this in backup as a reference of the used "exclude_patterns":
-  ln windows.yaml "$BASE_DIR/"
+  ln 02_parts.yaml "$BASE_DIR/"
 
 elif [[ "$HOOK_TYPE" == "$CLEANUP" ]]; then
-  rm -f $BASE_DIR/*_header.bin "$EXCLUDES_FILE" "$BASE_DIR/windows.yaml"
+  rm -f $BASE_DIR/*_header.bin "$EXCLUDES_FILE" "$BASE_DIR/02_parts.yaml"
   [[ ! -e "$BASE_DIR" ]] || rmdir "$BASE_DIR"   # Inverted logic because of "set -e"
   mount_boot
 

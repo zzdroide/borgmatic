@@ -1,0 +1,52 @@
+location:
+    source_directories:
+        - /mnt/borg_parts
+    read_special: true
+    one_file_system: false
+
+    repositories:
+        !include /etc/borgmatic.d/shared/repo.yaml
+
+    # Lots of unused metadata:
+    numeric_owner: true
+    ctime: false
+    birthtime: false
+    bsd_flags: false
+    # But atime is used in os.utime:
+    atime: true
+
+    exclude_patterns:
+        - sh:/mnt/borg_parts/*/Temp
+        - sh:/mnt/borg_parts/*/pagefile.sys
+        - sh:/mnt/borg_parts/*/hiberfil.sys
+        - sh:/mnt/borg_parts/*/Users/*/AppData/Local/Google/Chrome/User Data/*/*Cache
+        - sh:/mnt/borg_parts/*/Users/*/AppData/Local/Mozilla/Firefox/Profiles/                    # There are only caches in LocalAppData
+        - sh:/mnt/borg_parts/*/Users/*/AppData/Local/Moonchild Productions/Pale Moon/Profiles/
+        - sh:/mnt/borg_parts/*/Users/*/AppData/Roaming/Telegram Desktop/tdata/*/*cache*
+
+    exclude_from:
+        - /mnt/borg_parts/excludes.txt
+
+storage:
+    !include /etc/borgmatic.d/config/parts_storage.yaml
+
+# Just because it's mandatory:
+retention:
+    prefix: INVALID-
+
+hooks:
+    before_backup:
+        - bash -c "(( EUID == 0 ))" || (echo 'Use `sudo`'; exit 1)
+
+        #       - /etc/borgmatic.d/parts_hooks.sh setup
+        # It hangs in Python process.stdout.read() :(
+        # So give no output to Python, but still print it:
+        - /etc/borgmatic.d/parts_hooks.sh setup >/proc/$PPID/fd/1 2>&1
+
+    after_backup:
+        - /etc/borgmatic.d/parts_hooks.sh cleanup
+        - "chown -R $SUDO_USER: ~/.config/borg/ ~/.cache/borg/"
+
+    umask: 0077
+
+    # TODO: https://torsion.org/borgmatic/docs/how-to/monitor-your-backups/#healthchecks-hook

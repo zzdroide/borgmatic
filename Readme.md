@@ -32,7 +32,7 @@
     > Note: configuration could be in ~/.config/borgmatic.d, but without stable absolute paths, it would require `cd` before running borgmatic.
 
 1. Configure by creating `config` folder and creating files from `config_example`
-    - `windows_parts.cfg`: &lt;partition label> &lt;partition path> &lt;0 if NTFS, 1 if raw (backup image with `dd`)>
+    - `parts.cfg`: &lt;name> &lt;partition path> &lt;0 if NTFS, 1 if raw (backup image with `dd`)>
     - `passphrase.yaml`: regenerate it using regenerate_passphrase.py interactively. Then protect it with `chmod 600 /etc/borgmatic.d/config/passphrase.yaml`
 
 1. For easy usage, add
@@ -69,7 +69,7 @@ sudo SSH_AUTH_SOCK="$SSH_AUTH_SOCK" borgmatic ...
 ```
 If running with no GUI and no agent, run this first: `eval $(ssh-agent) && ssh-add`
 
-## Mounting Windows archives
+## Mounting Parts archives
 
 1. Create a target directory:
     ```sh
@@ -90,7 +90,7 @@ borg umount /mnt/borg
 ```
 
 
-## Restoring Windows disks
+## Restoring non-root partitions
 
 > Note: this section is mostly manual work because it shouldn't be used often, overwriting `/dev/sdX` is a delicate operation, and the case of multiple hard drives/partitions is complex.
 
@@ -123,7 +123,7 @@ borg umount /mnt/borg
 1. Restore raw images ( `ll *.img` ) with `pv raw.img | sudo tee /dev/sdXY >/dev/null`.
     > Note: if it extracts slowly from the mounted filesystem, you can try bypassing it:
     > ```sh
-    > tamborg extract --stdout ::<archive name> mnt/borg_windows/PART.img | pv | sudo tee /dev/sdXY >/dev/null
+    > tamborg extract --stdout ::<archive name> mnt/borg_parts/PART.img | pv | sudo tee /dev/sdXY >/dev/null
     > ```
     > This applies to the next step too.
 
@@ -145,7 +145,7 @@ borg umount /mnt/borg
         If only useless files (like in CryptnetUrlCache) show as pipes (or files match what is in excludes.txt), you are good to go. Otherwise... reboot? It only happened to me once.
 
     1. ```sh
-       tamborg -v extract --strip-components 3 ::<archive name> mnt/borg_windows/PART_NTFS/
+       tamborg -v extract --strip-components 3 ::<archive name> mnt/borg_parts/PART_NTFS/
        ```
 
     1. Delete files excluded from backup, as their contents weren't restored.
