@@ -46,6 +46,7 @@ readonly NTFS_EXCLUDES="$BASE_DIR/ntfs_excludes.txt"
 if [[ "$HOOK_TYPE" == "$SETUP" ]]; then
   $0 $CLEANUP
   mkdir "$BASE_DIR"
+  touch $NTFS_EXCLUDES
   unmount_boot
 fi
 
