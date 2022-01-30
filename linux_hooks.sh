@@ -28,6 +28,9 @@ if [[ "$HOOK_TYPE" == "$SETUP" ]]; then
   lvcreate --size=$SNAP_SIZE --snapshot --permission=r --name=$SNAP_NAME /dev/$VG/$LV
   mount -o ro $SNAP_DEV $MNT_DIR
 
+  # Note: linux backup is not run first (so 02_linux.yaml) because on the first run,
+  # chunks cache synchronization occurs, and would consume snapshot space.
+
 elif [[ "$HOOK_TYPE" == "$CLEANUP" ]]; then
   findmnt $MNT_DIR >/dev/null && {
     umount $MNT_DIR

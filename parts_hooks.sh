@@ -131,10 +131,10 @@ if [[ $HOOK_TYPE == "$SETUP" ]]; then
   fi
 
   # Include this in backup as a reference of the used "exclude_patterns":
-  ln 02_parts.yaml $BASE_DIR/
+  ln 01_parts.yaml $BASE_DIR/
 
 elif [[ $HOOK_TYPE == "$CLEANUP" ]]; then
-  rm -f $BASE_DIR/*_header.bin $NTFS_EXCLUDES $BASE_DIR/02_parts.yaml
+  rm -f $BASE_DIR/*_header.bin $NTFS_EXCLUDES $BASE_DIR/01_parts.yaml
   [[ ! -e $BASE_DIR ]] || rmdir $BASE_DIR   # Inverted logic because of "set -e"
   mount_boot
 
