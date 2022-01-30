@@ -32,7 +32,7 @@
     > Note: configuration could be in ~/.config/borgmatic.d, but without stable absolute paths, it would require `cd` before running borgmatic.
 
 1. Configure by creating `config` folder and creating files from `config_example`
-    - `parts.cfg`: &lt;name> &lt;partition path> &lt;0 if NTFS, 1 if raw (backup image with `dd`)>
+    - `parts.cfg`: &lt;name> &lt;partition path> &lt;0 if raw (backup image with `dd`), 1 if NTFS>
     - `passphrase.yaml`: regenerate it using regenerate_passphrase.py interactively. Then protect it with `chmod 600 /etc/borgmatic.d/config/passphrase.yaml`
 
 1. For easy usage, add
@@ -142,7 +142,7 @@ borg umount /mnt/borg
         ```sh
         find -L . -type b -o -type c -o -type p 2>/dev/null
         ```
-        If only useless files (like in CryptnetUrlCache) show as pipes (or files match what is in excludes.txt), you are good to go. Otherwise... reboot? It only happened to me once.
+        If only useless files (like in CryptnetUrlCache) show as pipes (or files match what is in ntfs_excludes.txt), you are good to go. Otherwise... reboot? It only happened to me once.
 
     1. ```sh
        tamborg -v extract --strip-components 3 ::<archive name> mnt/borg_parts/PART_NTFS/

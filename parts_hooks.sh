@@ -41,7 +41,7 @@ mount_boot() {
 
 readonly PARTS_CONFIG="config/parts.cfg"
 readonly BASE_DIR="/mnt/borg_parts"
-readonly EXCLUDES_FILE="$BASE_DIR/excludes.txt"
+readonly NTFS_EXCLUDES="$BASE_DIR/ntfs_excludes.txt"
 
 if [[ "$HOOK_TYPE" == "$SETUP" ]]; then
   $0 $CLEANUP
@@ -63,10 +63,10 @@ fi
 # Let's hope its format is correct
 
 # shellcheck disable=SC2002
-cat $PARTS_CONFIG | while read -r part dev raw; do
+cat $PARTS_CONFIG | while read -r part dev ntfs; do
 
   mnt_path="$BASE_DIR/$part"
-  pipe_path="$BASE_DIR/$part$( [[ $raw -eq 1 ]] && echo ".img" || echo ".metadata.simg")"
+  pipe_path="$BASE_DIR/$part$( [[ $ntfs -eq 1 ]] && echo ".metadata.simg" || echo ".img")"
   realdev_path="$BASE_DIR/realdev_${part}.txt"
 
   if [[ "$HOOK_TYPE" == "$SETUP" ]]; then
@@ -82,7 +82,23 @@ cat $PARTS_CONFIG | while read -r part dev raw; do
     # No "pipe file" here because files could repeat, and are small.
     dd if="/dev/$disk" of="$BASE_DIR/${disk}_header.bin" count="$header_size" status=none
 
-    if [[ $raw -eq 1 ]]; then
+    if [[ $ntfs -eq 1 ]]; then
+      mkdir -p "$mnt_path"
+      mount -o ro "$realdev" "$mnt_path"
+
+      # Windows Vista and higher seem to create weird files that appear as a pipe
+      find -L "$mnt_path" -type b -o -type c -o -type p >> "$NTFS_EXCLUDES" 2> /dev/null || true  # TODO: "pf:" ?
+
+      mkfifo "$pipe_path"
+      ntfsclone \
+        --metadata --preserve-timestamps \
+        --save-image \
+        --output - \
+        "$realdev" \
+        > "$pipe_path" &
+      # TODO: fail on ntfsclone error when ntfs is dirty
+
+    else
       # Previously this was dd to $pipe_path. Now it's not exactly a pipe...
       # "Hardlink" to /dev/sdXY:
       #     majmin=$(stat --format="%t %T" "$realdev")
@@ -97,22 +113,6 @@ cat $PARTS_CONFIG | while read -r part dev raw; do
         ls -lh --color=always "$realdev" "$pipe_path"
         exit 1
       fi
-
-    else
-      mkdir -p "$mnt_path"
-      mount -o ro "$realdev" "$mnt_path"
-
-      # Windows Vista and higher seem to create weird files that appear as a pipe
-      find -L "$mnt_path" -type b -o -type c -o -type p >> "$EXCLUDES_FILE" 2> /dev/null || true  # TODO: "pf:" ?
-
-      mkfifo "$pipe_path"
-      ntfsclone \
-        --metadata --preserve-timestamps \
-        --save-image \
-        --output - \
-        "$realdev" \
-        > "$pipe_path" &
-      # TODO: fail on ntfsclone error when ntfs is dirty
     fi
 
   elif [[ "$HOOK_TYPE" == "$CLEANUP" ]]; then
@@ -128,7 +128,7 @@ done
 
 
 if [[ "$HOOK_TYPE" == "$SETUP" ]]; then
-  if grep -v /AppData/LocalLow/Microsoft/CryptnetUrlCache/Content/ "$EXCLUDES_FILE"; then
+  if grep -v /AppData/LocalLow/Microsoft/CryptnetUrlCache/Content/ "$NTFS_EXCLUDES"; then
     echo
     echo "Error: the above paths are pipe files not in whitelisted locations."
     exit 1
@@ -138,7 +138,7 @@ if [[ "$HOOK_TYPE" == "$SETUP" ]]; then
   ln 02_parts.yaml "$BASE_DIR/"
 
 elif [[ "$HOOK_TYPE" == "$CLEANUP" ]]; then
-  rm -f $BASE_DIR/*_header.bin "$EXCLUDES_FILE" "$BASE_DIR/02_parts.yaml"
+  rm -f $BASE_DIR/*_header.bin "$NTFS_EXCLUDES" "$BASE_DIR/02_parts.yaml"
   [[ ! -e "$BASE_DIR" ]] || rmdir "$BASE_DIR"   # Inverted logic because of "set -e"
   mount_boot
 
