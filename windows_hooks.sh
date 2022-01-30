@@ -77,8 +77,8 @@ cat $WINDOWS_PARTS_FILE | while read -r part dev raw; do
     ensure_unmounted "$part" "$realdev"
 
     disk=$(lsblk -n -o pkname "$realdev")
-    # From https://borgbackup.readthedocs.io/en/stable/deployment/image-backup.html
-    header_size=$(sfdisk -lo Start "/dev/$disk" | grep -A1 -P 'Start$' | tail -n1 | xargs echo)
+    header_size=$(sfdisk -l --output Start --json "/dev/$disk" \
+                  | jq '.partitiontable.partitions[0].start')
     # No "pipe file" here because files could repeat, and are small.
     dd if="/dev/$disk" of="$BASE_DIR/${disk}_header.bin" count="$header_size" status=none
 
