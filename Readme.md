@@ -136,7 +136,7 @@ borg umount /mnt/borg
 
     1. [Setup](https://borgbackup.readthedocs.io/en/stable/installation.html#git-installation): [borgwd](https://github.com/zzdroide/borgwd) (use borgwd-env instead of borg-env) and activate its virtualenv. Confirm with `tamborg --version`
 
-    1. Mount the partition and `cd` to there.
+    1. Mount the partition and `cd` to there. TODO: https://unix.stackexchange.com/questions/536971/disadvantages-of-ntfs-3g-big-writes-mount-option
 
     1. Check that no files appear as pipes:
         ```sh
