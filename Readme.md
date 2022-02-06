@@ -204,3 +204,12 @@ What did worked for me, was to let Windows setup generate the correct numbers, a
     ![screenshot](readme_data/xpboot/pbr_mod.png)
 
 6. Overwrite the Windows MBR on disk with the one backed up.
+
+
+## Tips
+
+### Veracrypt containers
+
+By default Veracrypt doesn't change the modified date of container files. So they are always skipped after the first backup, unless the files cache is purged.
+
+You can disable _Preserve modification timestamp of file containers_ in [_Preferences_](https://github.com/veracrypt/VeraCrypt/issues/209#issuecomment-329992402).
