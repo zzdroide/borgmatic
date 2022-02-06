@@ -28,7 +28,7 @@ location:
         - /mnt/borg_parts/ntfs_excludes.txt
 
 storage:
-    !include /etc/borgmatic.d/config/parts_storage.yaml
+    <<: !include /etc/borgmatic.d/config/parts_storage.yaml
 
 # Just because it's mandatory:
 retention:

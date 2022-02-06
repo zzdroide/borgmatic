@@ -48,7 +48,7 @@ location:
 
 
 storage:
-    !include /etc/borgmatic.d/config/linux_storage.yaml
+    <<: !include /etc/borgmatic.d/config/linux_storage.yaml
 
 
 # Just because it's mandatory:
