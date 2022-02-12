@@ -4,6 +4,8 @@
 
 1. [Install Borg](https://borgbackup.readthedocs.io/en/stable/installation.html)
 
+    TODO: https://launchpad.net/~costamagnagianfranco/+archive/ubuntu/borgbackup ?
+
     To install with `pip` for all users:
     - `sudo apt install python3-pip python3-setuptools libssl-dev pkg-config fuse libfuse-dev libacl1-dev`
     - `sudo -i pip3 install --upgrade wheel`
