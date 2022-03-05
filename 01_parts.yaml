@@ -3,6 +3,7 @@ location:
         - /mnt/borg_parts
     read_special: true
     one_file_system: false
+    exclude_caches: true
 
     repositories:
         !include /etc/borgmatic.d/shared/repo.yaml
