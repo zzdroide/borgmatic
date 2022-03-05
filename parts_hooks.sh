@@ -82,8 +82,9 @@ cat $PARTS_CONFIG | while read -r part dev ntfs; do
       mkdir -p "$mnt_path"
       mount -o ro "$realdev" "$mnt_path"
 
-      # Windows Vista and higher seem to create weird files that appear as a pipe
+      # Windows Vista and higher seem to create weird files that appear as a pipe with ntfs-3g
       find -L "$mnt_path" -type b -o -type c -o -type p >> $NTFS_EXCLUDES 2> /dev/null || true  # TODO: "pf:" ?
+      # future: still a problem with paragon's ntfs3?
 
       mkfifo "$pipe_path"
       ntfsclone \
