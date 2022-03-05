@@ -44,7 +44,7 @@ location:
         - pf:/mnt/borg_lvm/var/run
         - pf:/mnt/borg_lvm/var/tmp
 
-        - '*/node_modules/'
+        - '*/node_modules/'     # FIXME: some apps may vendor node_modules. Exclude only inside $HOME?
         - '*.pyc'
 
 
