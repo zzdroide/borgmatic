@@ -12,8 +12,8 @@ if [[ $HOOK_TYPE != "$SETUP" ]] && [[ $HOOK_TYPE != "$CLEANUP" ]]; then
 fi
 
 ensure_unmounted() {
-  part=$1
-  dev=$2
+  local part=$1
+  local dev=$2
 
   if findmnt "$dev" >/dev/null; then
     echo "Error: $part ($dev) is mounted"
