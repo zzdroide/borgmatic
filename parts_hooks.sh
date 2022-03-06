@@ -132,8 +132,7 @@ if [[ $HOOK_TYPE == "$SETUP" ]]; then
   fi
 
   # Include this in backup as a reference of the used "exclude_patterns" and more:
-  ln /etc/borgmatic.d/01_parts.yaml $BASE_DIR/
-  ln /etc/borgmatic.d/parts_hooks.sh $BASE_DIR/
+  ln /etc/borgmatic.d/{01_parts.yaml,parts_hooks.sh} $BASE_DIR/
 
 elif [[ $HOOK_TYPE == "$CLEANUP" ]]; then
   rm -f $NTFS_EXCLUDES $BASE_DIR/{*_header.bin,01_parts.yaml,parts_hooks.sh}
