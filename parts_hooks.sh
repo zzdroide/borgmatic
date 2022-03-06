@@ -1,12 +1,17 @@
 #!/bin/bash
 set -euo pipefail
+umask 077
+(( EUID == 0 )) || (echo "Run borgmatic with sudo"; exit 1)
 cd "$(dirname "$0")"
-# This script expects a safe umask set
 
-readonly SETUP="setup"
+readonly BEFORE="before"
+readonly AFTER="after"
 readonly CLEANUP="cleanup"
+readonly HOOKS=("$BEFORE" "$AFTER" "$CLEANUP")
 readonly HOOK_TYPE=$1
-if [[ $HOOK_TYPE != "$SETUP" ]] && [[ $HOOK_TYPE != "$CLEANUP" ]]; then
+
+# shellcheck disable=SC2076
+if [[ ! " ${HOOKS[*]} " =~ " $HOOK_TYPE " ]]; then  # if HOOK_TYPE not in HOOKS  https://stackoverflow.com/questions/3685970/check-if-a-bash-array-contains-a-value
   echo "Bad hook type: [$HOOK_TYPE]"
   exit 1
 fi
@@ -22,7 +27,7 @@ ensure_unmounted() {
 }
 
 unmount_boot() {
-  if systemctl is-enabled boot.mount &>/dev/null; then
+  if systemctl is-enabled boot.mount &>/dev/null; then  # also checks for existence
     systemctl stop boot.mount
   fi
   if systemctl is-enabled boot-efi.mount &>/dev/null; then
@@ -39,15 +44,25 @@ mount_boot() {
   fi
 }
 
+root_borg_dirs_exist() {
+  [[ -e /root/.config/borg/ || -e /root/.cache/borg/ ]]
+}
+readonly ROOT_BORG_DIRS_EXIST_MSG="Warning: borg config and/or cache exists in /root" # in my usecase this shouldn't happen, it's a bug
+
 readonly PARTS_CONFIG="config/parts.cfg"
 readonly BASE_DIR="/mnt/borg_parts"
 readonly NTFS_EXCLUDES="$BASE_DIR/ntfs_excludes.txt"
 
-if [[ $HOOK_TYPE == "$SETUP" ]]; then
+if [[ $HOOK_TYPE == "$BEFORE" ]]; then
   $0 $CLEANUP
   mkdir $BASE_DIR
   touch $NTFS_EXCLUDES
   unmount_boot
+
+  if root_borg_dirs_exist; then
+    echo "$ROOT_BORG_DIRS_EXIST_MSG"
+    echo "Backup will still run, but fail at after_backup hook."
+  fi
 fi
 
 if [[ ! -r $PARTS_CONFIG ]]; then
@@ -65,7 +80,7 @@ cat $PARTS_CONFIG | while read -r part dev ntfs; do
   pipe_path=$BASE_DIR/$part$( [[ $ntfs -eq 1 ]] && echo .metadata.simg || echo .img)
   realdev_path=$BASE_DIR/realdev_$part.txt
 
-  if [[ $HOOK_TYPE == "$SETUP" ]]; then
+  if [[ $HOOK_TYPE == "$BEFORE" ]]; then
     realdev=$(realpath "$dev")
     echo "$realdev" > "$realdev_path"
     # Prefer realdev over dev because it's more readable
@@ -117,14 +132,11 @@ cat $PARTS_CONFIG | while read -r part dev ntfs; do
     [[ -e "$mnt_path" ]] && rmdir "$mnt_path"   # check and rmdir to fail if not a dir
     rm -f "$pipe_path" "$realdev_path"
 
-  else
-    echo "hook type assertion failed"
-    exit 1
   fi
 done
 
 
-if [[ $HOOK_TYPE == "$SETUP" ]]; then
+if [[ $HOOK_TYPE == "$BEFORE" ]]; then
   if grep -v /AppData/LocalLow/Microsoft/CryptnetUrlCache/Content/ $NTFS_EXCLUDES; then
     echo
     echo "Error: the above paths are pipe files not in whitelisted locations."
@@ -138,6 +150,16 @@ elif [[ $HOOK_TYPE == "$CLEANUP" ]]; then
   rm -f $NTFS_EXCLUDES $BASE_DIR/{*_header.bin,01_parts.yaml,parts_hooks.sh}
   [[ ! -e $BASE_DIR ]] || rmdir $BASE_DIR   # Inverted logic because of "set -e"
   mount_boot
+
+elif [[ $HOOK_TYPE == "$AFTER" ]]; then
+  $0 $CLEANUP
+
+  chown -R "$SUDO_USER:$SUDO_USER" /home/"$SUDO_USER"/{.config,.cache}/borg/
+
+  if root_borg_dirs_exist; then
+    echo "$ROOT_BORG_DIRS_EXIST_MSG"
+    exit 2
+  fi
 
 else
   echo "hook type assertion failed"
