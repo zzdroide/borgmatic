@@ -131,11 +131,12 @@ if [[ $HOOK_TYPE == "$SETUP" ]]; then
     exit 1
   fi
 
-  # Include this in backup as a reference of the used "exclude_patterns":
-  ln 01_parts.yaml $BASE_DIR/
+  # Include this in backup as a reference of the used "exclude_patterns" and more:
+  ln /etc/borgmatic.d/01_parts.yaml $BASE_DIR/
+  ln /etc/borgmatic.d/parts_hooks.sh $BASE_DIR/
 
 elif [[ $HOOK_TYPE == "$CLEANUP" ]]; then
-  rm -f $BASE_DIR/*_header.bin $NTFS_EXCLUDES $BASE_DIR/01_parts.yaml
+  rm -f $NTFS_EXCLUDES $BASE_DIR/{*_header.bin,01_parts.yaml,parts_hooks.sh}
   [[ ! -e $BASE_DIR ]] || rmdir $BASE_DIR   # Inverted logic because of "set -e"
   mount_boot
 
