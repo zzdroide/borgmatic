@@ -37,11 +37,14 @@
 
 1. Configure by creating `config` folder and creating files from `config_example`
     - `parts.cfg`: &lt;name> &lt;partition path> &lt;0 if raw (backup image with `dd`), 1 if NTFS>
-    - `passphrase.yaml`: regenerate it using regenerate_passphrase.py interactively. Then protect it with `chmod 600 /etc/borgmatic.d/config/passphrase.yaml`
+    - `config_storage.yaml`:
+      - `sed -i "s|borg_base_directory: NULL|borg_base_directory: $HOME|" /etc/borgmatic.d/config/config_storage.yaml`
+      - regenerate the passphrase using regenerate_passphrase.py interactively
+      - protect the file with `chmod 600 /etc/borgmatic.d/config/config_storage.yaml`
 
 1. For easy usage, add
    ```sh
-   alias tamborg="BORG_REPO=borg@192.168.0.64:TAM BORG_PASSCOMMAND='yq -r .encryption_passphrase /etc/borgmatic.d/config/passphrase.yaml' BORG_RSH='hpnssh -oBatchMode=yes -oNoneEnabled=yes -oNoneSwitch=yes' borg"
+   alias tamborg="BORG_REPO=borg@192.168.0.64:TAM BORG_PASSCOMMAND='yq -r .encryption_passphrase /etc/borgmatic.d/config/config_storage.yaml' BORG_RSH='hpnssh -oBatchMode=yes -oNoneEnabled=yes -oNoneSwitch=yes' borg"
    ```
    to `.zshrc`.
 
@@ -65,7 +68,7 @@
 sudo borgmatic -v1 create --progress --stats
 ```
 
-Note that SSH authentication is set to non-interactive, to avoid hanging. To remove this, delete `-oBatchMode=yes` from storage.yaml
+Note that SSH authentication is set to non-interactive, to avoid hanging. To remove this, delete `-oBatchMode=yes` from shared_storage.yaml
 
 If you need an SSH agent for non-interactive login, run with this line instead:
 ```sh
