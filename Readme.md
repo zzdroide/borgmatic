@@ -20,8 +20,11 @@
    1. `sudo install ssh /usr/local/bin/hpnssh`
 
 1. [Install Borgmatic](https://torsion.org/borgmatic/docs/how-to/set-up-backups/#installation)
-
-   `sudo -i pip3 install --upgrade borgmatic`
+    ```sh
+    #sudo -i pip3 install --upgrade "borgmatic >=1.5.24, ==1.*"
+    # TODO: install from PyPI when next version is released
+    sudo -i pip3 install --upgrade "https://github.com/borgmatic-collective/borgmatic/archive/4b3027e4fcfcf70b1c0e8e8b7efc199aaf010b08.tar.gz"
+    ```
 
 1. Clone this:
     ```sh
@@ -31,7 +34,6 @@
     ```sh
     sudo chown -R $USER: /etc/borgmatic.d
     ```
-    > Note: configuration could be in ~/.config/borgmatic.d, but without stable absolute paths, it would require `cd` before running borgmatic.
 
 1. Configure by creating `config` folder and creating files from `config_example`
     - `parts.cfg`: &lt;name> &lt;partition path> &lt;0 if raw (backup image with `dd`), 1 if NTFS>
@@ -83,7 +85,7 @@ If running with no GUI and no agent, run this first: `eval $(ssh-agent) && ssh-a
 
 1. Run:
     ```sh
-    tamborg -v mount --strip-components 2 -o allow_other,uid=$UID ::<archive name> /mnt/borg
+    tamborg -v mount -o allow_other,uid=$UID ::<archive name> /mnt/borg
     ```
 
 Unmount with:
@@ -125,7 +127,7 @@ borg umount /mnt/borg
 1. Restore raw images ( `ll *.img` ) with `pv raw.img | sudo tee /dev/sdXY >/dev/null`.
     > Note: if it extracts slowly from the mounted filesystem, you can try bypassing it:
     > ```sh
-    > tamborg extract --stdout ::<archive name> mnt/borg_parts/PART.img | pv | sudo tee /dev/sdXY >/dev/null
+    > tamborg extract --stdout ::<archive name> PART.img | pv | sudo tee /dev/sdXY >/dev/null
     > ```
     > This applies to the next step too.
 
@@ -147,7 +149,7 @@ borg umount /mnt/borg
         If only useless files (like in CryptnetUrlCache) show as pipes (or files match what is in ntfs_excludes.txt), you are good to go. Otherwise... reboot? It only happened to me once.
 
     1. ```sh
-       tamborg -v extract --strip-components 3 ::<archive name> mnt/borg_parts/PART_NTFS/
+       tamborg -v extract --strip-components 1 ::<archive name> PART_NTFS/
        ```
 
     1. Delete files excluded from backup, as their contents weren't restored.

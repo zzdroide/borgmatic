@@ -1,6 +1,7 @@
 location:
+    working_directory: /mnt/borg_parts
     source_directories:
-        - /mnt/borg_parts
+        - "."
     read_special: true
     one_file_system: false
     exclude_caches: true
@@ -17,16 +18,16 @@ location:
     atime: true
 
     exclude_patterns:
-        - sh:/mnt/borg_parts/*/Temp
-        - sh:/mnt/borg_parts/*/pagefile.sys
-        - sh:/mnt/borg_parts/*/hiberfil.sys
-        - sh:/mnt/borg_parts/*/Users/*/AppData/Local/Google/Chrome/User Data/*/*Cache
-        - sh:/mnt/borg_parts/*/Users/*/AppData/Local/Mozilla/Firefox/Profiles/                    # There are only caches in LocalAppData
-        - sh:/mnt/borg_parts/*/Users/*/AppData/Local/Moonchild Productions/Pale Moon/Profiles/
-        - sh:/mnt/borg_parts/*/Users/*/AppData/Roaming/Telegram Desktop/tdata/*/*cache*
+        - sh:*/Temp
+        - sh:*/pagefile.sys
+        - sh:*/hiberfil.sys
+        - sh:*/Users/*/AppData/Local/Google/Chrome/User Data/*/*Cache
+        - sh:*/Users/*/AppData/Local/Mozilla/Firefox/Profiles/                    # There are only caches in LocalAppData
+        - sh:*/Users/*/AppData/Local/Moonchild Productions/Pale Moon/Profiles/
+        - sh:*/Users/*/AppData/Roaming/Telegram Desktop/tdata/*/*cache*
 
     exclude_from:
-        - /mnt/borg_parts/ntfs_excludes.txt
+        - ntfs_excludes.txt
 
 storage:
     <<: !include /etc/borgmatic.d/config/parts_storage.yaml

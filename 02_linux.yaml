@@ -1,6 +1,7 @@
 location:
+    working_directory: /mnt/borg_lvm
     source_directories:
-        - /mnt/borg_lvm
+        - "."
     read_special: false
     one_file_system: true
     exclude_caches: true
@@ -9,40 +10,40 @@ location:
         !include /etc/borgmatic.d/shared/repo.yaml
 
     exclude_patterns:
-        - pf:/mnt/borg_lvm/cdrom
-        - pf:/mnt/borg_lvm/dev
-        - pf:/mnt/borg_lvm/media
-        - pf:/mnt/borg_lvm/mnt
-        - pf:/mnt/borg_lvm/proc
-        - pf:/mnt/borg_lvm/run
-        - pf:/mnt/borg_lvm/swapfile
-        - pf:/mnt/borg_lvm/swap.img
-        - pf:/mnt/borg_lvm/sys
-        - pf:/mnt/borg_lvm/tmp
+        - pf:cdrom
+        - pf:dev
+        - pf:media
+        - pf:mnt
+        - pf:proc
+        - pf:run
+        - pf:swapfile
+        - pf:swap.img
+        - pf:sys
+        - pf:tmp
 
-        - sh:/mnt/borg_lvm/home/*/.android/build-cache
-        - sh:/mnt/borg_lvm/home/*/.ansible/tmp
-        - sh:/mnt/borg_lvm/home/*/.cache
-        - sh:/mnt/borg_lvm/home/*/.cinnamon/spices.cache
-        - sh:/mnt/borg_lvm/home/*/.config/*/*Cache*  # crappy Electron apps
-        - sh:/mnt/borg_lvm/home/*/.config/chromium/*/GPUCache
-        - sh:/mnt/borg_lvm/home/*/.config/chromium/*/Service Worker/CacheStorage
-        - sh:/mnt/borg_lvm/home/*/.gradle/caches
-        - sh:/mnt/borg_lvm/home/*/.gvfs
-        - sh:/mnt/borg_lvm/home/*/.ICEauthority
-        - sh:/mnt/borg_lvm/home/*/.local/share/virtualenvs
-        - sh:/mnt/borg_lvm/home/*/.mozilla/firefox/Crash Reports
-        - sh:/mnt/borg_lvm/home/*/.mozilla/firefox/*/datareporting
-        - sh:/mnt/borg_lvm/home/*/.npm/_cacache
-        - sh:/mnt/borg_lvm/home/*/.nv
-        - sh:/mnt/borg_lvm/home/*/.var/app/org.telegram.desktop/data/TelegramDesktop/tdata/*/*cache*
-        - sh:/mnt/borg_lvm/home/*/.Xauthority
-        - pf:/mnt/borg_lvm/root/.cache
+        - sh:home/*/.android/build-cache
+        - sh:home/*/.ansible/tmp
+        - sh:home/*/.cache
+        - sh:home/*/.cinnamon/spices.cache
+        - sh:home/*/.config/*/*Cache*  # crappy Electron apps
+        - sh:home/*/.config/chromium/*/GPUCache
+        - sh:home/*/.config/chromium/*/Service Worker/CacheStorage
+        - sh:home/*/.gradle/caches
+        - sh:home/*/.gvfs
+        - sh:home/*/.ICEauthority
+        - sh:home/*/.local/share/virtualenvs
+        - sh:home/*/.mozilla/firefox/Crash Reports
+        - sh:home/*/.mozilla/firefox/*/datareporting
+        - sh:home/*/.npm/_cacache
+        - sh:home/*/.nv
+        - sh:home/*/.var/app/org.telegram.desktop/data/TelegramDesktop/tdata/*/*cache*
+        - sh:home/*/.Xauthority
+        - pf:root/.cache
 
-        - pf:/mnt/borg_lvm/var/cache/apt
-        - pf:/mnt/borg_lvm/var/lock
-        - pf:/mnt/borg_lvm/var/run
-        - pf:/mnt/borg_lvm/var/tmp
+        - pf:var/cache/apt
+        - pf:var/lock
+        - pf:var/run
+        - pf:var/tmp
 
         - '*/node_modules/'     # FIXME: some apps may vendor node_modules. Exclude only inside $HOME?
         - '*.pyc'
