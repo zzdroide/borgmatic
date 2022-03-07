@@ -200,17 +200,17 @@ What did worked for me, was to let Windows setup generate the correct numbers, a
 
 1. Backup the entire disk (recommended), or just the unbootable NTFS partition and the first 512 bytes of the disk (MBR).
 
-2. Begin to install Windows. Do not let the installer delete/create/resize partitions, just format the unbootable NTFS partition and install there.
+1. Begin to install Windows. Do not let the installer delete/create/resize partitions, just format the unbootable NTFS partition and install there.
 
-3. When the installer reboots to continue by booting from disk instead of from installation media, confirm that it actually boots and stop it.
+1. When the installer reboots to continue by booting from disk instead of from installation media, confirm that it actually boots and stop it.
 
-4. Backup the first 512 bytes of the now bootable NTFS partition, and then overwrite the partition with the unbootable one.
+1. Backup the first 512 bytes of the now bootable NTFS partition, and then overwrite the partition with the unbootable one.
 
-5. Compare those first 512 bytes, and change the relevant ones (0x18-0x1F). Serial number for example (0x48-0x4F) is irrelevant, and MFT clusters (0x30-0x3F) should not be changed.
+1. Compare those first 512 bytes, and change the relevant ones (0x18-0x1F). Serial number for example (0x48-0x4F) is irrelevant, and MFT clusters (0x30-0x3F) should not be changed.
 
     ![screenshot](readme_data/xpboot/pbr_mod.png)
 
-6. Overwrite the Windows MBR on disk with the one backed up.
+1. Overwrite the Windows MBR on disk with the one backed up, to restore booting to GRUB.
 
 
 ## Tips
