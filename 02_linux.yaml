@@ -46,8 +46,8 @@ location:
         - pf:var/run
         - pf:var/tmp
 
-        - '*/node_modules/'     # FIXME: some apps may vendor node_modules. Exclude only inside $HOME?
         - '*.pyc'
+        # '*/node_modules/' not excluded, as not all of them were created with "npm install"
 
 
 storage:
