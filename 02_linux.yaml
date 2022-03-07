@@ -60,12 +60,9 @@ retention:
 
 hooks:
     before_backup:
-        - bash -c "(( EUID == 0 ))" || (echo 'Use `sudo`'; exit 1)
-        - /etc/borgmatic.d/linux_hooks.sh setup
+        - /etc/borgmatic.d/linux_hooks.sh before
 
     after_backup:
-        - /etc/borgmatic.d/linux_hooks.sh cleanup
-
-    umask: 0077
+        - /etc/borgmatic.d/linux_hooks.sh after
 
     # TODO: https://torsion.org/borgmatic/docs/how-to/monitor-your-backups/#healthchecks-hook

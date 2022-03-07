@@ -16,6 +16,8 @@ if [[ ! " ${HOOKS[*]} " =~ " $HOOK_TYPE " ]]; then  # if HOOK_TYPE not in HOOKS 
   exit 1
 fi
 
+source shared/hooks.sh
+
 ensure_unmounted() {
   local part=$1
   local dev=$2
@@ -43,12 +45,6 @@ mount_boot() {
     systemctl start boot-efi.mount
   fi
 }
-
-root_borg_dirs_exist() {
-  [[ -e /root/.config/borg/ || -e /root/.cache/borg/ ]]
-}
-readonly ROOT_BORG_DIRS_EXIST_MSG="Warning: borg config and/or cache exists in /root" # in my usecase this shouldn't happen, it's a bug.
-# Alternative: hardcode repo id (as `borg config repo id` doesn't work for remote repos), and check those dirs.
 
 readonly PARTS_CONFIG="config/parts.cfg"
 readonly BASE_DIR="/mnt/borg_parts"
