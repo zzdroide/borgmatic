@@ -117,7 +117,7 @@ cat $PARTS_CONFIG | while read -r part dev ntfs; do
       mknod "$pipe_path" b $majmin
 
       # Sanity check:
-      if ! head -c 0 "$pipe_path" 2>/dev/null; then
+      if ! head -c 1 "$pipe_path" &>/dev/null; then
         echo "Error: created block device for $realdev doesn't work!"
         ls -lh --color=always "$realdev" "$pipe_path"
         exit 1
