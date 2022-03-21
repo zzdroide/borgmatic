@@ -28,7 +28,7 @@ location:
         - sh:*/Users/*/AppData/Roaming/Telegram Desktop/tdata/*/*cache*
 
     exclude_from:
-        - ntfs_excludes.txt
+        - /mnt/borg_parts/ntfs_excludes.txt
 
 storage:
     <<: !include /etc/borgmatic.d/config/parts_storage.yaml
