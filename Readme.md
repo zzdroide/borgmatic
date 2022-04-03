@@ -86,7 +86,7 @@ If running with no GUI and no agent, run this first: `eval $(ssh-agent) && ssh-a
 
 1. Run:
     ```sh
-    tamborg -v mount -o allow_other,uid=$UID ::<archive name> /mnt/borg
+    tamborg -v mount -o allow_root,uid=$UID ::<archive name> /mnt/borg
     ```
 
 Unmount with:
