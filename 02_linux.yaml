@@ -48,6 +48,13 @@ location:
 
         - '*.pyc'
         # '*/node_modules/' not excluded, as not all of them were created with "npm install"
+        - '*/.gradle/'
+        # Attempt to exclude Android Studio build/ but nothing else:
+        - '*/app/build/intermediates/'
+        - '*/app/build/outputs/'
+        - '*/app/build/kotlin/'
+        - '*/app/build/tmp/'
+        - '*/app/build/generated/'
 
 
 storage:
