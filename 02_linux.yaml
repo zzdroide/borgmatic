@@ -37,7 +37,7 @@ location:
         - sh:home/*/.mozilla/firefox/*/datareporting
         - sh:home/*/.npm/_cacache
         - sh:home/*/.nv
-        - sh:home/*/.var/app/org.telegram.desktop/data/TelegramDesktop/tdata/*/*cache*
+        - sh:home/*/.local/share/TelegramDesktop/tdata/*/*cache*
         - sh:home/*/.Xauthority
         - pf:root/.cache
 
