@@ -51,6 +51,8 @@ readonly BASE_DIR="/mnt/borg_parts"
 readonly NTFS_EXCLUDES="$BASE_DIR/ntfs_excludes.txt"
 
 if [[ $HOOK_TYPE == "$BEFORE" ]]; then
+  # ssh ...TODO   # Asks password immediately if required.
+
   $0 $CLEANUP
   mkdir $BASE_DIR
   touch $NTFS_EXCLUDES
