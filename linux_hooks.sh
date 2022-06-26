@@ -31,6 +31,9 @@ if [[ "$HOOK_TYPE" == "$BEFORE" ]]; then
 
   command -v docker &>/dev/null && docker image prune --force
 
+  readonly VBOX_BEFORE="/home/$SUDO_USER/VirtualBox VMs/borg_before.sh"
+  [ -x "$VBOX_BEFORE" ] && sudo -u "$SUDO_USER" "$VBOX_BEFORE"
+
   mkdir $MNT_DIR
   lvcreate --size=$SNAP_SIZE --snapshot --permission=r --name=$SNAP_NAME /dev/$VG/$LV
   mount -o ro $SNAP_DEV $MNT_DIR
