@@ -108,12 +108,17 @@ borg umount /mnt/borg
 
     Use `sudo parted -l` to figure out about the target restore disks.
 
-3. Restore disk header (includes partition table) with
+3. Restore disk header (includes partition table) with:
     ```sh
-    sudo tee /dev/sdX <sdA_header.bin >/dev/null && partprobe
+    < sdA_header.bin sudo tee /dev/sdX >/dev/null
     ```
 
-    Check restored disks with `sudo gdisk /dev/sdX`:
+    Then run:
+    ```sh
+    sudo partprobe
+    ```
+
+    and check restored disks with `sudo gdisk /dev/sdX`:
 
     > MBR:
     > ```
@@ -154,11 +159,24 @@ borg umount /mnt/borg
         ```
         If only useless files (like in CryptnetUrlCache) show as pipes (or files match what is in ntfs_excludes.txt), you are good to go. Otherwise... reboot? It only happened to me once.
 
-    4. ```sh
+    4. Check that the placeholder files do work:
+        ```sh
+        tar c . | pv -pterab --size="$(df --output=used --block-size=1 . | tail -n1)" >/dev/null
+        ```
+
+        If errors are printed, for example:
+        ```
+        tar: ./.../file1: Read error at byte 0, while reading 6656 bytes: Value too large for defined data type
+        tar: ./.../file2: File shrank by 3422576 bytes; padding with zeros
+        ```
+
+        then it looks like they don't :(
+
+    5. ```sh
        tamborg -v extract --strip-components 1 ::<archive name> PART_NTFS/
        ```
 
-    5. Delete files excluded from backup, as their contents weren't restored.
+    6. Delete files excluded from backup, as their contents weren't restored.
     > They contain all zeroes if small, or garbage previously stored in the hard drive. [Explanation](https://en.wikipedia.org/wiki/NTFS#Resident_vs._non-resident_attributes).
 
 7. If Windows can't mount the restored NTFS partition (Disk Manager shows it as healthy, but most options are greyed out, and `DISKPART> list volume` doesn't show it), check the partition type with `sudo fdisk -l /dev/sdX`.
