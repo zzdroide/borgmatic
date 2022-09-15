@@ -95,15 +95,20 @@ borg umount /mnt/borg
 ```
 
 
-## Restoring non-root partitions
+## Restoring Parts archives
 
 > Note: this section is mostly manual work because it shouldn't be used often, overwriting `/dev/sdX` is a delicate operation, and the case of multiple hard drives/partitions is complex.
 
-1. Mount the archive (see previous section) and `cd` to that folder.
+1. Mount the archive (see previous section) and `cd` to that folder. Add helper scripts to PATH with:
+   ```sh
+   export PATH="/etc/borgmatic.d/restore:$PATH"
+   ```
 
-1. From `realdev_*.txt` and `fdisk -l sd?_header.bin` figure out about the backed up disks, and with `sudo parted -l` about the target restore disks.
+2. Run `2-backed_up_disk_structure.sh` to visualize data from `realdev_*.txt` and `sd?_header.bin`.
 
-1. Restore disk header (includes partition table) with
+    Use `sudo parted -l` to figure out about the target restore disks.
+
+3. Restore disk header (includes partition table) with
     ```sh
     sudo tee /dev/sdX <sdA_header.bin >/dev/null && partprobe
     ```
@@ -125,38 +130,38 @@ borg umount /mnt/borg
 
     If the disk was GPT restore its backup partition table with `w`, else quit with `q`.
 
-1. Restore raw images ( `ll *.img` ) with `pv raw.img | sudo tee /dev/sdXY >/dev/null`.
+4. Restore raw images ( `ll *.img` ) with `pv raw.img | sudo tee /dev/sdXY >/dev/null`.
     > Note: if it extracts slowly from the mounted filesystem, you can try bypassing it:
     > ```sh
     > tamborg extract --stdout ::<archive name> PART.img | pv | sudo tee /dev/sdXY >/dev/null
     > ```
     > This applies to the next step too.
 
-1. Restore NTFS partition metadata ( `ll *.metadata.simg` ) with:
+5. Restore NTFS partition metadata ( `ll *.metadata.simg` ) with:
     ```sh
     sudo ntfsclone --restore-image --overwrite /dev/sdXY PART_NTFS.metadata.simg
     ```
 
-1. Restore NTFS partition contents:
+6. Restore NTFS partition contents:
 
     1. [Setup](https://borgbackup.readthedocs.io/en/stable/installation.html#git-installation): [borgwd](https://github.com/zzdroide/borgwd) (use borgwd-env instead of borg-env) and activate its virtualenv. Confirm with `tamborg --version`
 
-    1. Mount the partition and `cd` to there. TODO: https://unix.stackexchange.com/questions/536971/disadvantages-of-ntfs-3g-big-writes-mount-option
+    2. Mount the partition and `cd` to there. TODO: https://unix.stackexchange.com/questions/536971/disadvantages-of-ntfs-3g-big-writes-mount-option
 
-    1. Check that no files appear as pipes:
+    3. Check that no files appear as pipes:
         ```sh
         find -L . -type b -o -type c -o -type p 2>/dev/null
         ```
         If only useless files (like in CryptnetUrlCache) show as pipes (or files match what is in ntfs_excludes.txt), you are good to go. Otherwise... reboot? It only happened to me once.
 
-    1. ```sh
+    4. ```sh
        tamborg -v extract --strip-components 1 ::<archive name> PART_NTFS/
        ```
 
-    1. Delete files excluded from backup, as their contents weren't restored.
+    5. Delete files excluded from backup, as their contents weren't restored.
     > They contain all zeroes if small, or garbage previously stored in the hard drive. [Explanation](https://en.wikipedia.org/wiki/NTFS#Resident_vs._non-resident_attributes).
 
-1. If Windows can't mount the restored NTFS partition (Disk Manager shows it as healthy, but most options are greyed out, and `DISKPART> list volume` doesn't show it), check the partition type with `sudo fdisk -l /dev/sdX`.
+7. If Windows can't mount the restored NTFS partition (Disk Manager shows it as healthy, but most options are greyed out, and `DISKPART> list volume` doesn't show it), check the partition type with `sudo fdisk -l /dev/sdX`.
 
     |   | MBR             | GPT                  |
     | - | --------------- | -------------------- |
