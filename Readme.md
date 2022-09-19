@@ -179,7 +179,13 @@ borg umount /mnt/borg
     6. Delete files excluded from backup, as their contents weren't restored.
         > They contain all zeroes if small, or garbage previously stored in the hard drive. [Explanation](https://en.wikipedia.org/wiki/NTFS#Resident_vs._non-resident_attributes).
 
-    This process is long and complex, and now it's failing for some files (see substep 4 above), and it always lost Alternate Data Streams. So screw it: will go for full ntfsclone, or files only.
+    This process is long and complex, and now it's failing for some files (see substep 4 above), with ntfs-3g and ntfs3.
+
+    Also there's the damn NTFS pipe files issue... On backup (always) and restore (sometimes)...
+
+    Also this method always lost Alternate Data Streams.
+
+    So screw it: will go for full ntfsclone, or files only.
 
 7. If Windows can't mount the restored NTFS partition (Disk Manager shows it as healthy, but most options are greyed out, and `DISKPART> list volume` doesn't show it), check the partition type with `sudo fdisk -l /dev/sdX`.
 
