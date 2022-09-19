@@ -21,7 +21,7 @@
 
 1. [Install Borgmatic](https://torsion.org/borgmatic/docs/how-to/set-up-backups/#installation)
     ```sh
-    sudo -i pip3 install --upgrade "borgmatic >=1.5.24, ==1.*"
+    sudo -i pip3 install borgmatic==1.5.24
     ```
 
 1. Clone this:
