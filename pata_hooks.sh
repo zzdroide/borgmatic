@@ -74,6 +74,8 @@ cat $PATA_CONFIG | while read -r name dev target; do
     exit 1
   fi
 
+  realdev=$(realpath "$dev")
+
   fstype=$(lsblk -n -o fstype "$realdev")
   [[ $fstype == ntfs ]] && ntfs=x || ntfs=
 
@@ -82,7 +84,6 @@ cat $PATA_CONFIG | while read -r name dev target; do
   realdev_path=$BASE_DIR/realdev_$name.txt
 
   if [[ $HOOK_TYPE == "$BEFORE" ]]; then
-    realdev=$(realpath "$dev")
     echo "$realdev" > "$realdev_path"
     # Prefer realdev over dev because it's more readable
 
