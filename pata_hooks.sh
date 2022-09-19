@@ -121,6 +121,7 @@ cat $PATA_CONFIG | while read -r name dev target; do
             --output - \
             "$realdev" \
           > "$pipe_path" &
+        # TODO: fail if ntfsclone exits with error
       fi
 
     elif [[ $target == "$TARGET_PART" ]]; then
@@ -132,6 +133,7 @@ cat $PATA_CONFIG | while read -r name dev target; do
             --output - \
             "$realdev" \
           > "$pipe_path" &
+        # TODO: fail if ntfsclone exits with error
 
       else
         # This is not a pipe but anyway. "Hardlink" to /dev/sdXY:
