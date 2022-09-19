@@ -1,6 +1,10 @@
 # Borgmatic config
 
+# TODO: rewrite for new version
+
 ## Setup
+
+TODO: make a quickstart.sh for safe steps
 
 1. [Install Borg](https://borgbackup.readthedocs.io/en/stable/installation.html)
 

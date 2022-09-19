@@ -2,10 +2,10 @@ location:
     working_directory: /mnt/borg_lvm
     source_directories:
         - "."
-    read_special: false
-    one_file_system: true
-    exclude_caches: true
-    keep_exclude_tags: true
+    read_special: no
+    one_file_system: yes
+    exclude_caches: yes
+    keep_exclude_tags: yes
 
     repositories:
         !include /etc/borgmatic.d/shared/repo.yaml
@@ -29,7 +29,6 @@ location:
         - sh:home/*/.config/*/*Cache*  # crappy Electron apps
         - sh:home/*/.config/chromium/*/GPUCache
         - sh:home/*/.config/chromium/*/Service Worker/CacheStorage
-        - sh:home/*/.gradle/caches
         - sh:home/*/.gvfs
         - sh:home/*/.ICEauthority
         - sh:home/*/.local/share/virtualenvs
@@ -48,6 +47,7 @@ location:
 
         - '*.pyc'
         # '*/node_modules/' not excluded, as not all of them were created with "npm install"
+
         - '*/.gradle/'
         # Attempt to exclude Android Studio build/ but nothing else:
         - '*/app/build/intermediates/'

@@ -3,6 +3,7 @@ set -euo pipefail
 cd "$(dirname "$0")"
 # This script expects a safe umask set
 
+# TODO: refactor to shared/hooks.sh
 readonly BEFORE="before"
 readonly AFTER="after"
 readonly CLEANUP="cleanup"
@@ -62,14 +63,10 @@ elif [[ "$HOOK_TYPE" == "$CLEANUP" ]]; then
 elif [[ "$HOOK_TYPE" == "$AFTER" ]]; then
   $0 $CLEANUP
 
+  # TODO: run once per repo instead of each borgmatic config:
   chown -R "$SUDO_USER:$SUDO_USER" /home/"$SUDO_USER"/{.config,.cache}/borg/
-
   if root_borg_dirs_exist; then
     echo "$ROOT_BORG_DIRS_EXIST_MSG"
     exit 2
   fi
-
-else
-  echo "hook type assertion failed"
-  exit 1
 fi

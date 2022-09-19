@@ -1,0 +1,42 @@
+# Backs up PArtition images and daTA
+
+location:
+    working_directory: /mnt/borg_pata
+    source_directories:
+        - "."
+    read_special: yes
+    one_file_system: no
+    exclude_caches: yes
+    keep_exclude_tags: yes
+
+    repositories:
+        !include /etc/borgmatic.d/shared/repo.yaml
+
+    # Metadata useful for this data:
+    numeric_owner: yes
+    atime: yes
+    ctime: yes
+    birthtime: yes
+    bsd_flags: no
+
+    exclude_from:
+        - /mnt/borg_pata/ntfs_excludes.txt
+
+storage:
+    <<: !include /etc/borgmatic.d/config/pata_storage.yaml
+
+# Just because it's mandatory:
+retention:
+    prefix: INVALID-
+
+hooks:
+    before_backup:
+        #       - /etc/borgmatic.d/pata_hooks.sh before
+        # It hangs in Python process.stdout.read() :(
+        # So give no output to Python, but still print it:
+        - /etc/borgmatic.d/pata_hooks.sh before >/proc/$PPID/fd/1 2>&1
+
+    after_backup:
+        - /etc/borgmatic.d/pata_hooks.sh after
+
+    # TODO: https://torsion.org/borgmatic/docs/how-to/monitor-your-backups/#healthchecks-hook

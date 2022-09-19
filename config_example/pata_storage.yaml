@@ -1,2 +1,2 @@
-archive_name_format: TAM_2009-parts-{now}
+archive_name_format: TAM_2009-pata-{now}
 <<: !include /etc/borgmatic.d/shared/shared_storage.yaml
