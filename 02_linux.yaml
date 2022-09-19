@@ -2,10 +2,10 @@ location:
     working_directory: /mnt/borg_lvm
     source_directories:
         - "."
-    read_special: no
-    one_file_system: yes
-    exclude_caches: yes
-    keep_exclude_tags: yes
+    read_special: false
+    one_file_system: true
+    exclude_caches: true
+    keep_exclude_tags: true
 
     repositories:
         !include /etc/borgmatic.d/shared/repo.yaml

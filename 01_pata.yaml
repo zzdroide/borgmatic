@@ -4,20 +4,20 @@ location:
     working_directory: /mnt/borg_pata
     source_directories:
         - "."
-    read_special: yes
-    one_file_system: no
-    exclude_caches: yes
-    keep_exclude_tags: yes
+    read_special: true
+    one_file_system: false
+    exclude_caches: true
+    keep_exclude_tags: true
 
     repositories:
         !include /etc/borgmatic.d/shared/repo.yaml
 
     # Metadata useful for this data:
-    numeric_owner: yes
-    atime: yes
-    ctime: yes
-    birthtime: yes
-    bsd_flags: no
+    numeric_owner: true
+    atime: true
+    ctime: true
+    birthtime: true
+    bsd_flags: false
 
     exclude_from:
         - /mnt/borg_pata/ntfs_excludes.txt
