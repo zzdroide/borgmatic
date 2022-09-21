@@ -4,19 +4,7 @@ umask 077
 (( EUID == 0 )) || (echo "Run borgmatic with sudo"; exit 1)
 cd "$(dirname "$0")"
 
-# TODO: refactor to shared/hooks.sh
-readonly BEFORE="before"
-readonly AFTER="after"
-readonly CLEANUP="cleanup"
-readonly HOOKS=("$BEFORE" "$AFTER" "$CLEANUP")
 readonly HOOK_TYPE=$1
-
-# shellcheck disable=SC2076
-if [[ ! " ${HOOKS[*]} " =~ " $HOOK_TYPE " ]]; then  # if HOOK_TYPE not in HOOKS  https://stackoverflow.com/questions/3685970/check-if-a-bash-array-contains-a-value
-  echo "Bad hook type: [$HOOK_TYPE]"
-  exit 1
-fi
-
 source shared/hooks.sh
 
 ensure_unmounted() {
