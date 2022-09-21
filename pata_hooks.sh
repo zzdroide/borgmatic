@@ -100,12 +100,15 @@ cat $PATA_CONFIG | while read -r name dev target; do
     if [[ $target == "$TARGET_DATA" ]]; then
       mkdir -p "$mnt_path"
       mount -o ro "$realdev" "$mnt_path"
+      # TODO: use ntfs3 if available
 
       if [[ $ntfs ]]; then
-        # For some reason, ntfs-3g shows some files as pipes. (Does it happen with ntfs3 too?)
-        # Exclude them because they hang borg with --read-special.
-        # It used to happen to me with 0-bytes files in /Users/AppData/LocalLow/Microsoft/CryptnetUrlCache/Content/
-        # with Windows 7.
+        # For some reason, ntfs-3g (but not ntfs3) shows some files as pipes.
+        # Previously I saw it happen with some more files (can't remember details),
+        # currently I can only reproduce it with this path on a Windows 7 installation:
+        # C:/Windows/SysWOW64/config/systemprofile/AppData/LocalLow/Microsoft/CryptnetUrlCache/Content/94308059B57B3142E455B38A6EB92015
+        # Anyway, exclude them because they hang borg with --read-special.
+        # TODO: skip if using ntfs3
         [[ $mnt_path == $BASE_DIR/$name ]]  # Assert $mnt_path is this, as $name is used later:
         find -L "$mnt_path" \
             -type b -o -type c -o -type p \
