@@ -77,7 +77,12 @@ cat $PATA_CONFIG | while read -r name dev target; do
 
     ensure_unmounted "$name" "$realdev"
 
-    # TODO: fail if ntfs and dirty
+    # Fail if ntfs and dirty
+    if [[ $ntfs ]]; then
+      # This command prints a message on error, for example: "The disk contains an unclean file system (0, 0)."
+      ntfs-3g.probe -w "$realdev"
+      # This script will exit here on error, because of "set -e".
+    fi
 
     disk=$(lsblk -n -o pkname "$realdev")
     header_size=$(sfdisk -l --output Start --json "/dev/$disk" \
