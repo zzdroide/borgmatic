@@ -104,11 +104,11 @@ delete_windows_excluded_files() {
   #              And without --one-file-system of course.
   # This should be quick, so no "trap ... EXIT"
 
-  pushd "$mnt_path"   # Paranoid protection for "$var/sth" --> "/sth"
+  pushd "$mnt_path" >/dev/null   # Paranoid protection for "rm -rf $var/sth" --> "rm -rf /sth"
   local rm_rc=0
   rm -fv ./{pagefile.sys,hiberfil.sys,swapfile.sys} || rm_rc=$?
 
-  popd
+  popd >/dev/null
   umount "$mnt_path"
   rmdir "$mnt_path"
 
