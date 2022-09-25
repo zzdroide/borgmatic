@@ -133,8 +133,9 @@ Double-check the device you are about to write to!
         # "sudo tamborg" is failing SSH.
         # So currently tamborg and borgmatic have to be manually merged:
         sudo BORG_REPO=borg@192.168.0.64:TAM BORG_PASSCOMMAND='yq -r .encryption_passphrase /etc/borgmatic.d/config/config_storage.yaml' BORG_RSH='sh -c '\''sudo -u $SUDO_USER SSH_AUTH_SOCK="$SSH_AUTH_SOCK" /usr/local/bin/hpnssh -oBatchMode=yes -oNoneEnabled=yes -oNoneSwitch=yes "$@"'\'' 0' borg -v extract --numeric-owner --sparse ::<archive name>
-        # And permissions be fixed with:
+        # And permissions and dirs be fixed with:
         sudo chown -R $USER:$USER ~/{.config,.cache}/borg/
+        sudo rm -rf /root/{.config,.cache}/borg/
         ```
 
     - Unmount:
