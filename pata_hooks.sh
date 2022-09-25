@@ -85,6 +85,38 @@ check_no_weird_ntfs3g_files() {
     || true
 }
 
+delete_windows_excluded_files() {
+  local realdev=$1 mnt_path=$2
+  # As this partition will be backed up by ntfsclone,
+  # the ideal would be to have ntfsclone exclude the files so they don't end in the backup,
+  # *and* they are kept on disk. However this is not supported.
+  #
+  # So, this only excludes files which can be deleted without further consequences.
+  #
+  # Reference of typical Windows excludes: https://www.acronis.com/en-us/support/documentation/ATI2022/index.html#cshid=3488
+
+  mkdir -p "$mnt_path"
+  mount "$realdev" "$mnt_path"
+  # Alternative to mount: ntfstruncate.
+  #   Disadvantage: its input is inode number, which would have to be parsed from ntfsinfo...
+  #   Advantage: doesn't require mounting RW, which has the risk of data loss
+  #              if I blindly run "rm -rf $BASE_DIR" after failure, while mounted.
+  #              And without --one-file-system of course.
+  # This should be quick, so no "trap ... EXIT"
+
+  pushd "$mnt_path"   # Paranoid protection for "$var/sth" --> "/sth"
+  local rm_rc=0
+  rm -fv ./{pagefile.sys,hiberfil.sys,swapfile.sys} || rm_rc=$?
+
+  popd
+  umount "$mnt_path"
+  rmdir "$mnt_path"
+
+  if (( rm_rc > 0 )); then
+    exit $rm_rc
+  fi
+}
+
 make_ntfs_pipe_file() {
   local what=$1 realdev=$2 pipe_path=$3
 
@@ -111,9 +143,9 @@ make_ntfs_pipe_file() {
 }
 
 make_dev_pipe_file() {
+  local realdev=$1 pipe_path=$2
   # This is not a pipe but anyway. It's like a hardlink to /dev/sdXY.
 
-  local realdev=$1 pipe_path=$2
   local major_colon_minor major_space_minor
 
   #     major_space_minor=$(stat --format="%t %T" "$realdev")
@@ -170,7 +202,7 @@ run_hook_before_each() {
   elif [[ $target == "$TARGET_PART" ]]; then
 
     if [[ $ntfs ]]; then
-      # TODO: ntfstruncate /pagefile.sys, /hiberfil.sys and /swapfile.sys
+      delete_windows_excluded_files "$realdev" "$mnt_path"
       make_ntfs_pipe_file "data" "$realdev" "$pipe_path"
     else
       make_dev_pipe_file "$realdev" "$pipe_path"
