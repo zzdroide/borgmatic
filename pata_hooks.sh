@@ -17,6 +17,37 @@ readonly TARGET_PART=part
 readonly TARGET_DATA=data
 
 
+validate_disk_and_uuid() {
+  local name=$1 dev=$2 realdev=$3 disk=$4
+
+  if [[ ! $disk ]]; then
+    echo "Error: could not get disk for $name ($realdev)"
+    exit 1
+  fi
+
+  if ! echo "$dev" | grep -Eq "^/dev/disk/by-uuid/"; then
+    echo "Error: $name's dev is not specified with /dev/disk/by-uuid/: $dev"
+    exit 1
+  fi
+
+  local uuid instances disks
+  # shellcheck disable=SC2001   # would result in horrible escapes
+  uuid=$(echo "$dev" | sed 's|/dev/disk/by-uuid/||')
+  instances=$(lsblk --raw -o uuid,pkname | grep "$uuid")
+
+  if [[ $(echo "$instances" | wc -l) != 1 ]]; then
+    disks=$(echo "$instances" | cut -d" " -f2 | sed 's|^|/dev/|')
+
+    echo "Error: multiple UUIDs for $name." \
+      "Refusing to continue as the backup could be made from the wrong one."
+    echo
+    # shellcheck disable=SC2086
+    lsblk --tree -o name,uuid,model,serial $disks
+
+    exit 1
+  fi
+}
+
 ensure_unmounted() {
   local name=$1 dev=$2
 
@@ -183,6 +214,7 @@ run_hook_before_each() {
   echo "$realdev" > "$realdev_path"
   # Prefer realdev over dev because it's more readable
 
+  validate_disk_and_uuid "$name" "$dev" "$realdev" "$disk"
   ensure_unmounted "$name" "$realdev"
   fail_if_ntfs_dirty "$ntfs" "$realdev"
   write_disk_header "$realdev" "$disk"
