@@ -2,6 +2,155 @@
 
 # TODO: rewrite for new version
 
+## Mounting archives
+
+1. Create a target directory:
+    ```sh
+    sudo mkdir /mnt/borg
+    sudo chown $USER:$USER /mnt/borg
+    ```
+2. Find the archive to mount, for example with:
+    ```sh
+    tamborg list --last 5 --prefix TAM_2009-pata-
+    ```
+3. Mount it with:
+    ```sh
+    tamborg -v mount -o allow_root,uid=$UID ::<archive name> /mnt/borg
+    ```
+4. When you are done, unmount it with:
+    ```sh
+    umount /mnt/borg
+    ```
+
+### Mounting partition images
+
+<sub><sup>GUI instructions as you probably want to recover individual files while you still have a usable Linux with Desktop Environment</sup></sub>
+
+1. With the File Manager (Nemo), navigate to /mnt/borg
+2. Right-click the image file and click _Open With Disk Image Mounter_
+3. Open _Disks_ (`gnome-disks`)
+4. Click the loop device in the left pane, and then click the Play button to mount.
+5. When you are done, unmount with the Stop button, and detach the loop device with the `–` button in the title bar (next to the Minimize button).
+
+## Restoring partitions
+
+<sub><sup>CLI instructions as in an emergency this may have to be run from the usually-headless Borg server!</sup></sub>
+
+This section is mostly manual work because it shouldn't be used often, overwriting `/dev/sdX` is a delicate operation, and the case of multiple hard drives/partitions is complex.
+
+Double-check the device you are about to write to!
+
+1. Mount the archive (see previous section) and `cd` to that folder.
+
+2. Add helper scripts to PATH:
+    ```sh
+    export PATH="/etc/borgmatic.d/restore:$PATH"
+    ```
+
+3. Run `3-backed_up_disk_structure.sh` to visualize data from `realdev_*.txt` and `sd?_header.bin` (how devices were at backup time).
+
+    Use `sudo parted -l` to figure out about current target restore disks.
+
+4. For each disk, restore its header (includes partition table) with:
+    ```sh
+    < sdA_header.bin sudo tee /dev/sdX >/dev/null
+    ```
+
+    After restoring for all disks, run:
+    ```sh
+    sudo partprobe
+    ```
+
+    and check restored disks with `sudo gdisk /dev/sdX`:
+
+    > MBR:
+    > ```
+    > Partition table scan:
+    >   MBR: MBR only
+    >   GPT: not present
+    > ```
+    > GPT:
+    > ```
+    > Partition table scan:
+    >   MBR: protective
+    >   GPT: damaged
+    > ```
+
+    If the disk was GPT restore its backup partition table with `w`, else quit with `q`.
+
+5.  Find raw images with:
+    ```sh
+    ll *.img
+    ```
+
+    Restore them with:
+    ```sh
+    5-extract-file-pv.sh <archive name> PART.img | sudo tee /dev/sdXY >/dev/null
+    ```
+
+    > Note: use `borg extract` instead of ./PART.img, because reading from the mounted filesystem is slow.
+
+    However if they are NTFS and not too full and you don't care that empty space is not wiped with zeros, it may be faster to write only used data, even if reading from `./` is slower:
+    ```sh
+    ntfsclone --save-image --output - PART_NTFS.img |
+      sudo ntfsclone --restore-image --overwrite /dev/sdXY -
+    ```
+
+    > Unfortunately `borg extract` can't be used with `--restore-image`, because the image is raw and not special-image, and _Only special images can be read from standard input_.
+
+6.  Restore Linux root LVM partition:
+
+    - Format and mount:
+        ```sh
+        sudo vgcreate Z_vg /dev/sdXY
+
+        # Get available space in VG in GiB:
+        sudo vgs --noheadings -o vg_size /dev/Z_vg
+
+        # Remember to leave some space in VG for snapshots:
+        sudo lvcreate --size 100G --name Z_lv Z_vg
+
+        sudo mkfs.ext4 /dev/Z_vg/Z_lv
+        sudo mkdir /mnt/borg_linux_target
+        sudo mount /dev/Z_vg/Z_lv /mnt/borg_linux_target
+        ```
+
+        > Note: some customizations are not being backed up. For example:
+        > ```sh
+        > sudo tune2fs -l /dev/Z_vg/Z_lv | grep "Reserved block count"
+        > ```
+
+    - Find the matching Linux archive name in Borg repository
+
+    - Extract:
+        ```sh
+        pushd /mnt/borg_linux_target
+        sudo tamborg -v extract --numeric-owner --sparse ::<archive name>
+        popd
+
+        # FIXME: handle this with borgmatic instead (when tamborg alias is deleted)
+        # "sudo tamborg" is failing SSH.
+        # So currently tamborg and borgmatic have to be manually merged:
+        sudo BORG_REPO=borg@192.168.0.64:TAM BORG_PASSCOMMAND='yq -r .encryption_passphrase /etc/borgmatic.d/config/config_storage.yaml' BORG_RSH='sh -c '\''sudo -u $SUDO_USER SSH_AUTH_SOCK="$SSH_AUTH_SOCK" /usr/local/bin/hpnssh -oBatchMode=yes -oNoneEnabled=yes -oNoneSwitch=yes "$@"'\'' 0' borg -v extract --numeric-owner --sparse ::<archive name>
+        # And permissions be fixed with:
+        sudo chown -R $USER:$USER ~/{.config,.cache}/borg/
+        ```
+
+    - Unmount:
+        ```sh
+        sudo umount /mnt/borg_linux_target
+        ```
+
+7. Restore data:
+    - Boot into restored Linux to have GUI
+    - Format and mount with GUI
+    - With GUI open a terminal at mount point and run:
+        ```sh
+        tamborg -v extract --strip-components 1 ::<archive name> PART/
+        ```
+    - If you then realize that some important NTFS metadata is missing, you may try recovering it by converting the `.metadata.simg` to VHD with https://github.com/yirkha/ntfsclone2vhd/#metadata-only-images, and mounting it in Windows.
+
+# old readme below
 ## Setup
 
 TODO: make a quickstart.sh for safe steps
@@ -78,134 +227,22 @@ sudo SSH_AUTH_SOCK="$SSH_AUTH_SOCK" borgmatic ...
 ```
 If running with no GUI and no agent, run this first: `eval $(ssh-agent) && ssh-add`
 
-## Mounting Parts archives
-
-1. Create a target directory:
-    ```sh
-    sudo mkdir /mnt/borg
-    sudo chown $USER: /mnt/borg
-    ```
-
-1. Find the archive you want with `tamborg list`
-
-1. Run:
-    ```sh
-    tamborg -v mount -o allow_root,uid=$UID ::<archive name> /mnt/borg
-    ```
-
-Unmount with:
-```sh
-borg umount /mnt/borg
-```
-
-
-## Restoring Parts archives
-
-> Note: this section is mostly manual work because it shouldn't be used often, overwriting `/dev/sdX` is a delicate operation, and the case of multiple hard drives/partitions is complex.
-
-1. Mount the archive (see previous section) and `cd` to that folder. Add helper scripts to PATH with:
-   ```sh
-   export PATH="/etc/borgmatic.d/restore:$PATH"
-   ```
-
-2. Run `2-backed_up_disk_structure.sh` to visualize data from `realdev_*.txt` and `sd?_header.bin`.
-
-    Use `sudo parted -l` to figure out about the target restore disks.
-
-3. Restore disk header (includes partition table) with:
-    ```sh
-    < sdA_header.bin sudo tee /dev/sdX >/dev/null
-    ```
-
-    Then run:
-    ```sh
-    sudo partprobe
-    ```
-
-    and check restored disks with `sudo gdisk /dev/sdX`:
-
-    > MBR:
-    > ```
-    > Partition table scan:
-    >   MBR: MBR only
-    >   GPT: not present
-    > ```
-    > GPT:
-    > ```
-    > Partition table scan:
-    >   MBR: protective
-    >   GPT: damaged
-    > ```
-
-    If the disk was GPT restore its backup partition table with `w`, else quit with `q`.
-
-4. Restore raw images ( `ll *.img` ) with `pv raw.img | sudo tee /dev/sdXY >/dev/null`.
-    > Note: if it extracts slowly from the mounted filesystem, you can try bypassing it:
-    > ```sh
-    > tamborg extract --stdout ::<archive name> PART.img | pv | sudo tee /dev/sdXY >/dev/null
-    > ```
-    > This applies to the next step too.
-
-5. Restore NTFS partition metadata ( `ll *.metadata.simg` ) with:
-    ```sh
-    sudo ntfsclone --restore-image --overwrite /dev/sdXY PART_NTFS.metadata.simg
-    ```
-
-6. Restore NTFS partition contents:
-
-    1. [Setup](https://borgbackup.readthedocs.io/en/stable/installation.html#git-installation): [borgwd](https://github.com/zzdroide/borgwd) (use borgwd-env instead of borg-env) and activate its virtualenv. Confirm with `tamborg --version`
-
-    2. Mount the partition and `cd` to there. TODO: https://unix.stackexchange.com/questions/536971/disadvantages-of-ntfs-3g-big-writes-mount-option
-
-    3. Check that no files appear as pipes:
-        ```sh
-        find -L . -type b -o -type c -o -type p 2>/dev/null
-        ```
-        If only useless files (like in CryptnetUrlCache) show as pipes (or files match what is in ntfs_excludes.txt), you are good to go. Otherwise... reboot? It only happened to me once.
-
-    4. Check that the placeholder files do work:
-        ```sh
-        tar c . | pv -pterab --size="$(df --output=used --block-size=1 . | tail -n1)" >/dev/null
-        ```
-
-        If errors are printed, for example:
-        ```
-        tar: ./.../file1: Read error at byte 0, while reading 6656 bytes: Value too large for defined data type
-        tar: ./.../file2: File shrank by 3422576 bytes; padding with zeros
-        ```
-
-        then it looks like they don't :(
-
-    5. ```sh
-       tamborg -v extract --strip-components 1 ::<archive name> PART_NTFS/
-       ```
-
-    6. Delete files excluded from backup, as their contents weren't restored.
-        > They contain all zeroes if small, or garbage previously stored in the hard drive. [Explanation](https://en.wikipedia.org/wiki/NTFS#Resident_vs._non-resident_attributes).
-
-    This process is long and complex, and now it's failing for some files (see substep 4 above), with ntfs-3g and ntfs3.
-
-    Also there's the damn NTFS pipe files issue... On backup (always) and restore (sometimes)...
-
-    Also this method always lost Alternate Data Streams.
-
-    So screw it: will go for full ntfsclone, or files only.
-
-7. If Windows can't mount the restored NTFS partition (Disk Manager shows it as healthy, but most options are greyed out, and `DISKPART> list volume` doesn't show it), check the partition type with `sudo fdisk -l /dev/sdX`.
-
-    |   | MBR             | GPT                  |
-    | - | --------------- | -------------------- |
-    | ✓ | HPFS/NTFS/exFAT | Microsoft basic data |
-    | ✗ | Linux           | Linux filesystem     |
-
-    If for some unknown reason the partition type is not correct (happened to me once), change it with `sudo fdisk /dev/sdX`, command `t`.
-
 ## Troubleshooting
 
 ### This message appears: `mesg: ttyname failed: Inappropriate ioctl for device`
 
 In `/root/.profile`, replace `mesg n || true` with `tty -s && mesg n || true` [(Source)](https://superuser.com/questions/1160025/how-to-solve-ttyname-failed-inappropriate-ioctl-for-device-in-vagrant)
 
+### Windows can't mount NTFS partition
+
+If the restored partition can't be mounted (Disk Manager shows it as healthy, but most options are greyed out, and `DISKPART> list volume` doesn't show it), check the partition type with `sudo fdisk -l /dev/sdX`.
+
+|   | MBR             | GPT                  |
+| - | --------------- | -------------------- |
+| ✓ | HPFS/NTFS/exFAT | Microsoft basic data |
+| ✗ | Linux           | Linux filesystem     |
+
+If for some unknown reason the partition type is not correct (happened to me once), change it with `sudo fdisk /dev/sdX`, command `t`.
 
 ### NTFS boots to blinking cursor
 

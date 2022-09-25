@@ -277,7 +277,6 @@ main() {
     fi
   done
 
-
   if [[ $HOOK_TYPE == "$CLEANUP" ]]; then
     run_hook_cleanup_global
   elif [[ $HOOK_TYPE == "$AFTER" ]]; then
