@@ -6,10 +6,12 @@ cd "$(dirname "$0")"
 
 readonly HOOK_TYPE=$1
 source shared/hooks.sh
+global_exit=0
 
 readonly PATA_CONFIG="config/pata.cfg"
 readonly BASE_DIR="/mnt/borg_pata"
 readonly NTFS_EXCLUDES="$BASE_DIR/ntfs_excludes.txt"
+readonly NTFSCLONE_FAIL_FLAG="$BASE_DIR/ntfsclone_fail.flag"
 
 readonly TARGET_PART=part
 readonly TARGET_DATA=data
@@ -86,29 +88,26 @@ check_no_weird_ntfs3g_files() {
 make_ntfs_pipe_file() {
   local what=$1 realdev=$2 pipe_path=$3
 
-  mkfifo "$pipe_path"
-
   if [[ $what == data ]]; then
-    ntfsclone \
-        --output - \
-        "$realdev" \
-      > "$pipe_path" &
-
+    local extra_args=
   elif [[ $what == metadata ]]; then
-    # Although target is data instead of part, some of this metadata can be useful:
-    ntfsclone \
-        --metadata \
-        --save-image \
-        --output - \
-        "$realdev" \
-      > "$pipe_path" &
-
+    local extra_args="--metadata --save-image"
   else
     echo "Error: unknown what [$what]"
     exit 1
   fi
 
-  # TODO: fail if ntfsclone exits with error
+  mkfifo "$pipe_path"
+
+  {
+    # shellcheck disable=SC2086
+    ntfsclone \
+          $extra_args \
+          --output - \
+          "$realdev" \
+        > "$pipe_path" \
+      || touch $NTFSCLONE_FAIL_FLAG
+  } &
 }
 
 make_dev_pipe_file() {
@@ -164,6 +163,7 @@ run_hook_before_each() {
 
     if [[ $ntfs ]]; then
       check_no_weird_ntfs3g_files "$mnt_path" "$name"
+      # Although target is data instead of part, some of the metadata can be useful:
       make_ntfs_pipe_file "metadata" "$realdev" "$pipe_path"
     fi
 
@@ -191,12 +191,18 @@ run_hook_cleanup_each() {
 }
 
 run_hook_cleanup_global() {
-  rm -f $NTFS_EXCLUDES $BASE_DIR/*_header.bin
+  rm -f \
+    $NTFS_EXCLUDES \
+    $NTFSCLONE_FAIL_FLAG \
+    $BASE_DIR/*_header.bin
+
   [[ ! -e $BASE_DIR ]] || rmdir $BASE_DIR   # Inverted logic because of "set -e"
   mount_boot_parts
 }
 
 run_hook_after_global() {
+  [ -e $NTFSCLONE_FAIL_FLAG ] && global_exit=1
+
   $0 $CLEANUP
 
   # TODO: run once per repo instead of each borgmatic config:
@@ -248,3 +254,4 @@ main() {
 }
 
 main
+exit $global_exit
