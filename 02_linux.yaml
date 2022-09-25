@@ -6,7 +6,7 @@ location:
     one_file_system: true
     exclude_caches: true
     keep_exclude_tags: true
-    # TODO: numeric_ids: true
+    numeric_owner: true
 
     repositories:
         !include /etc/borgmatic.d/shared/repo.yaml

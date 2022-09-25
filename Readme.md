@@ -16,6 +16,7 @@
 3. Mount it with:
     ```sh
     tamborg -v mount -o allow_root,uid=$UID ::<archive name> /mnt/borg
+    # TODO: add --numeric-ids when borg is upgraded
     ```
 4. When you are done, unmount it with:
     ```sh
