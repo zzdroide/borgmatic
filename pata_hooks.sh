@@ -106,7 +106,7 @@ delete_windows_excluded_files() {
 
   pushd "$mnt_path" >/dev/null   # Paranoid protection for "rm -rf $var/sth" --> "rm -rf /sth"
   local rm_rc=0
-  rm -fv ./{pagefile.sys,hiberfil.sys,swapfile.sys} || rm_rc=$?
+  rm -fv pagefile.sys hiberfil.sys swapfile.sys || rm_rc=$?
 
   popd >/dev/null
   umount "$mnt_path"
