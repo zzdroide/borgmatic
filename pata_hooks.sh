@@ -55,10 +55,9 @@ fail_if_ntfs_dirty() {
 }
 
 write_disk_header() {
-  local dev=$1
-  local disk header_size
+  local dev=$1 disk=$2
+  local header_size
 
-  disk=$(lsblk -n -o pkname "$dev")
   header_size=$(sfdisk -l --output Start --json "/dev/$disk" \
                 | jq '.partitiontable.partitions[0].start')
   # No "pipe file" here because files could repeat, and are small.
@@ -179,14 +178,14 @@ run_hook_before_global() {
 }
 
 run_hook_before_each() {
-  local name=$1 dev=$2 target=$3 realdev=$4 ntfs=$5 mnt_path=$6 pipe_path=$7 realdev_path=$8
+  local name=$1 dev=$2 target=$3 realdev=$4 disk=$5 ntfs=$6 mnt_path=$7 pipe_path=$8 realdev_path=$9
 
   echo "$realdev" > "$realdev_path"
   # Prefer realdev over dev because it's more readable
 
   ensure_unmounted "$name" "$realdev"
   fail_if_ntfs_dirty "$ntfs" "$realdev"
-  write_disk_header "$realdev"
+  write_disk_header "$realdev" "$disk"
 
   if [[ $target == "$TARGET_DATA" ]]; then
     mkdir -p "$mnt_path"
@@ -215,7 +214,7 @@ run_hook_before_each() {
 }
 
 run_hook_cleanup_each() {
-  local name=$1 dev=$2 target=$3 realdev=$4 ntfs=$5 mnt_path=$6 pipe_path=$7 realdev_path=$8
+  local name=$1 dev=$2 target=$3 realdev=$4 disk=$5 ntfs=$6 mnt_path=$7 pipe_path=$8 realdev_path=$9
 
   findmnt "$mnt_path" >/dev/null && umount "$mnt_path"
   [[ -e "$mnt_path" ]] && rmdir "$mnt_path"   # check and rmdir to fail if not a dir
@@ -246,7 +245,7 @@ run_hook_after_global() {
 }
 
 main() {
-  local name dev target realdev ntfs mnt_path pipe_path realdev_path
+  local name dev target realdev disk ntfs mnt_path pipe_path realdev_path
 
   if [[ $HOOK_TYPE == "$BEFORE" ]]; then
     run_hook_before_global
@@ -261,6 +260,7 @@ main() {
     fi
 
     realdev=$(realpath "$dev")
+    disk=$(lsblk -n -o pkname "$realdev")
 
     local fstype
     fstype=$(lsblk -n -o fstype "$realdev")
@@ -271,9 +271,9 @@ main() {
     realdev_path=$BASE_DIR/realdev_$name.txt
 
     if [[ $HOOK_TYPE == "$BEFORE" ]]; then
-      run_hook_before_each "$name" "$dev" "$target" "$realdev" "$ntfs" "$mnt_path" "$pipe_path" "$realdev_path"
+      run_hook_before_each "$name" "$dev" "$target" "$realdev" "$disk" "$ntfs" "$mnt_path" "$pipe_path" "$realdev_path"
     elif [[ $HOOK_TYPE == "$CLEANUP" ]]; then
-      run_hook_cleanup_each "$name" "$dev" "$target" "$realdev" "$ntfs" "$mnt_path" "$pipe_path" "$realdev_path"
+      run_hook_cleanup_each "$name" "$dev" "$target" "$realdev" "$disk" "$ntfs" "$mnt_path" "$pipe_path" "$realdev_path"
     fi
   done
 
