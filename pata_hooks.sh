@@ -18,21 +18,21 @@ readonly TARGET_DATA=data
 
 
 validate_disk_and_uuid() {
-  local name=$1 dev=$2 realdev=$3 disk=$4
+  local name=$1 uuidev=$2 realdev=$3 disk=$4
 
   if [[ ! $disk ]]; then
     echo "Error: could not get disk for $name ($realdev)"
     exit 1
   fi
 
-  if ! echo "$dev" | grep -Eq "^/dev/disk/by-uuid/"; then
-    echo "Error: $name's dev is not specified with /dev/disk/by-uuid/: $dev"
+  if ! echo "$uuidev" | grep -Eq "^/dev/disk/by-uuid/"; then
+    echo "Error: $name's uuidev is not specified with /dev/disk/by-uuid/: $uuidev"
     exit 1
   fi
 
   local uuid instances disks
   # shellcheck disable=SC2001   # would result in horrible escapes
-  uuid=$(echo "$dev" | sed 's|/dev/disk/by-uuid/||')
+  uuid=$(echo "$uuidev" | sed 's|/dev/disk/by-uuid/||')
   instances=$(lsblk --raw -o uuid,pkname | grep "$uuid")
 
   if [[ $(echo "$instances" | wc -l) != 1 ]]; then
@@ -49,10 +49,10 @@ validate_disk_and_uuid() {
 }
 
 ensure_unmounted() {
-  local name=$1 dev=$2
+  local name=$1 realdev=$2
 
-  if findmnt "$dev" >/dev/null; then
-    echo "Error: $name ($dev) is mounted"
+  if findmnt "$realdev" >/dev/null; then
+    echo "Error: $name ($realdev) is mounted"
     exit 1
   fi
 }
@@ -76,17 +76,17 @@ mount_boot_parts() {
 }
 
 fail_if_ntfs_dirty() {
-  local ntfs=$1 dev=$2
+  local ntfs=$1 realdev=$2
 
   if [[ $ntfs ]]; then
     # This command prints a message on error, for example: "The disk contains an unclean file system (0, 0)."
-    ntfs-3g.probe -w "$dev"
+    ntfs-3g.probe -w "$realdev"
     # The script will exit here on error, because of "set -e".
   fi
 }
 
 write_disk_header() {
-  local dev=$1 disk=$2
+  local disk=$1
   local header_size
 
   header_size=$(sfdisk -l --output Start --json "/dev/$disk" \
@@ -209,15 +209,15 @@ run_hook_before_global() {
 }
 
 run_hook_before_each() {
-  local name=$1 dev=$2 target=$3 realdev=$4 disk=$5 ntfs=$6 mnt_path=$7 pipe_path=$8 realdev_path=$9
+  local name=$1 uuidev=$2 target=$3 realdev=$4 disk=$5 ntfs=$6 mnt_path=$7 pipe_path=$8 realdev_path=$9
 
   echo "$realdev" > "$realdev_path"
-  # Prefer realdev over dev because it's more readable
+  # Prefer realdev over uuidev because it's more readable
 
-  validate_disk_and_uuid "$name" "$dev" "$realdev" "$disk"
+  validate_disk_and_uuid "$name" "$uuidev" "$realdev" "$disk"
   ensure_unmounted "$name" "$realdev"
   fail_if_ntfs_dirty "$ntfs" "$realdev"
-  write_disk_header "$realdev" "$disk"
+  write_disk_header "$disk"
 
   if [[ $target == "$TARGET_DATA" ]]; then
     mkdir -p "$mnt_path"
@@ -246,7 +246,7 @@ run_hook_before_each() {
 }
 
 run_hook_cleanup_each() {
-  local name=$1 dev=$2 target=$3 realdev=$4 disk=$5 ntfs=$6 mnt_path=$7 pipe_path=$8 realdev_path=$9
+  local name=$1 uuidev=$2 target=$3 realdev=$4 disk=$5 ntfs=$6 mnt_path=$7 pipe_path=$8 realdev_path=$9
 
   findmnt "$mnt_path" >/dev/null && umount "$mnt_path"
   [[ -e "$mnt_path" ]] && rmdir "$mnt_path"   # check and rmdir to fail if not a dir
@@ -277,21 +277,21 @@ run_hook_after_global() {
 }
 
 main() {
-  local name dev target realdev disk ntfs mnt_path pipe_path realdev_path
+  local name uuidev target realdev disk ntfs mnt_path pipe_path realdev_path
 
   if [[ $HOOK_TYPE == "$BEFORE" ]]; then
     run_hook_before_global
   fi
 
   # shellcheck disable=SC2002   # More readable order
-  cat $PATA_CONFIG | while read -r name dev target; do
+  cat $PATA_CONFIG | while read -r name uuidev target; do
     if [[ ! $target ]]; then
       echo "Error: could't parse line in $PATA_CONFIG:"
-      echo "  $name $dev $target"
+      echo "  $name $uuidev $target"
       exit 1
     fi
 
-    realdev=$(realpath "$dev")
+    realdev=$(realpath "$uuidev")
     disk=$(lsblk -n -o pkname "$realdev")
 
     local fstype
@@ -303,9 +303,9 @@ main() {
     realdev_path=$BASE_DIR/realdev_$name.txt
 
     if [[ $HOOK_TYPE == "$BEFORE" ]]; then
-      run_hook_before_each "$name" "$dev" "$target" "$realdev" "$disk" "$ntfs" "$mnt_path" "$pipe_path" "$realdev_path"
+      run_hook_before_each "$name" "$uuidev" "$target" "$realdev" "$disk" "$ntfs" "$mnt_path" "$pipe_path" "$realdev_path"
     elif [[ $HOOK_TYPE == "$CLEANUP" ]]; then
-      run_hook_cleanup_each "$name" "$dev" "$target" "$realdev" "$disk" "$ntfs" "$mnt_path" "$pipe_path" "$realdev_path"
+      run_hook_cleanup_each "$name" "$uuidev" "$target" "$realdev" "$disk" "$ntfs" "$mnt_path" "$pipe_path" "$realdev_path"
     fi
   done
 
