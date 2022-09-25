@@ -39,4 +39,5 @@ hooks:
     after_backup:
         - /etc/borgmatic.d/pata_hooks.sh after
 
+    # TODO: on error run /etc/borgmatic.d/pata_hooks.sh cleanup
     # TODO: https://torsion.org/borgmatic/docs/how-to/monitor-your-backups/#healthchecks-hook
