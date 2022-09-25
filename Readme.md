@@ -207,7 +207,7 @@ borg umount /mnt/borg
 In `/root/.profile`, replace `mesg n || true` with `tty -s && mesg n || true` [(Source)](https://superuser.com/questions/1160025/how-to-solve-ttyname-failed-inappropriate-ioctl-for-device-in-vagrant)
 
 
-### Windows doesn't want to boot
+### NTFS boots to blinking cursor
 
 Windows booting can be quite fragile, specifically Windows XP on MBR.
 
@@ -229,21 +229,21 @@ The NTFS bootsector has some legacy Cylinder/Head/Sector shit configured into it
 
 - nor by booting the affected computer with BartPE, and running Bootice there.
 
-What did worked for me, was to let Windows setup generate the correct numbers, and plug them into my unbootable NTFS:
+What did work for me, was to let Windows setup generate the correct numbers, and plug them into my unbootable NTFS:
 
-1. Backup the entire disk (recommended), or just the unbootable NTFS partition and the first 512 bytes of the disk (MBR).
+1. Backup the entire disk containing the unbootable NTFS (recommended), or just the unbootable NTFS partition and the first 512 bytes of the disk (MBR).
 
-1. Begin to install Windows. Do not let the installer delete/create/resize partitions, just format the unbootable NTFS partition and install there.
+2. Begin to install a new Windows into this affected disk. Do not let the installer delete/create/resize partitions, just format the unbootable NTFS partition and install there.
 
-1. When the installer reboots to continue by booting from disk instead of from installation media, confirm that it actually boots and stop it.
+3. When the installer reboots to continue by booting from disk instead of from installation media, confirm that it actually boots and stop it.
 
-1. Backup the first 512 bytes of the now bootable NTFS partition, and then overwrite the partition with the unbootable one.
+4. Backup the first 512 bytes of the now bootable NTFS partition (PBR), and then overwrite this now bootable partition with the unbootable one.
 
-1. Compare those first 512 bytes, and change the relevant ones (0x18-0x1F). Serial number for example (0x48-0x4F) is irrelevant, and MFT clusters (0x30-0x3F) should not be changed.
+5. Compare the PBRs of the partitions, and change the relevant bytes (0x18-0x1F) in the unbootable one. Serial number for example (0x48-0x4F) is irrelevant, and MFT clusters (0x30-0x3F) should not be changed.
 
     ![screenshot](readme_data/xpboot/pbr_mod.png)
 
-1. Overwrite the Windows MBR on disk with the one backed up, to restore booting to GRUB.
+6. Overwrite the recently written Windows MBR on disk with the previous backed up MBR, to restore booting to GRUB.
 
 
 ## Tips
