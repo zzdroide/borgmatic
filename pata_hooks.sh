@@ -42,7 +42,7 @@ validate_disk_and_uuid() {
       "Refusing to continue as the backup could be made from the wrong one."
     echo
     # shellcheck disable=SC2086
-    lsblk --tree -o name,uuid,model,serial $disks
+    lsblk --tree -o name,uuid,label,model,serial $disks
 
     exit 1
   fi
