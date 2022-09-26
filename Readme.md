@@ -127,7 +127,6 @@ Double-check the device you are about to write to!
         ```sh
         pushd /mnt/borg_linux_target
         sudo tamborg -pv extract --numeric-owner --sparse ::<archive name>
-        popd
 
         # FIXME: handle this with borgmatic instead (when tamborg alias is deleted)
         # "sudo tamborg" is failing SSH.
@@ -138,8 +137,21 @@ Double-check the device you are about to write to!
         sudo rm -rf /root/{.config,.cache}/borg/
         ```
 
-    - Unmount:
+    - Recreate the excluded stuff: (see "exclude_patterns" in 02_linux.yaml)
         ```sh
+        sudo su
+        (umask 022; mkdir cdrom dev media mnt run tmp var/cache/apt var/tmp)
+        (umask 222; mkdir proc sys)
+        # No need to mess with `tmp` and `var/tmp` as they are automatically created.
+        ln -s /run/lock var/lock
+        ln -s /run var/run
+        # TODO: etc/borgmatic.d/config/mkswap.sh
+        exit
+        ```
+
+    - Finalize:
+        ```sh
+        popd
         sudo umount /mnt/borg_linux_target
         ```
 

@@ -22,6 +22,10 @@ location:
         - pf:swap.img
         - pf:sys
         - pf:tmp
+        - pf:var/cache/apt
+        - pf:var/lock
+        - pf:var/run
+        - pf:var/tmp
 
         - sh:home/*/.android/build-cache
         - sh:home/*/.ansible/tmp
@@ -40,11 +44,6 @@ location:
         - sh:home/*/.local/share/TelegramDesktop/tdata/*/*cache*
         - sh:home/*/.Xauthority
         - pf:root/.cache
-
-        - pf:var/cache/apt
-        - pf:var/lock
-        - pf:var/run
-        - pf:var/tmp
 
         - '*.pyc'
         # '*/node_modules/' not excluded, as not all of them were created with "npm install"
