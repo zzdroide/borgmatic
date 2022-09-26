@@ -140,7 +140,7 @@ Double-check the device you are about to write to!
     - Recreate the excluded stuff: (see "exclude_patterns" in 02_linux.yaml)
         ```sh
         sudo su
-        (umask 022; mkdir cdrom dev media mnt run tmp var/cache/apt var/tmp)
+        (umask 022; mkdir cdrom dev media mnt run tmp var/cache/apt)
         (umask 222; mkdir proc sys)
         # No need to mess with `tmp` and `var/tmp` as they are automatically created.
         ln -s /run/lock var/lock
