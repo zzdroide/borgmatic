@@ -284,6 +284,11 @@ What did work for me, was to let Windows setup generate the correct numbers, and
 
 6. Overwrite the recently written Windows MBR on disk with the previous backed up MBR, to restore booting to GRUB.
 
+### There's a ghost/zombie/leftover/nonexistant `/dev/Z_vg/Z_lv`
+```sh
+sudo dmsetup remove /dev/Z_vg/Z_lv
+```
+
 
 ## Tips
 
