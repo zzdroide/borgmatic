@@ -25,24 +25,24 @@ validate_disk_and_uuid() {
     exit 1
   fi
 
-  if ! echo "$uuidev" | grep -Eq "^/dev/disk/by-uuid/"; then
-    echo "Error: $name's uuidev is not specified with /dev/disk/by-uuid/: $uuidev"
+  if ! echo "$uuidev" | grep -Eq "^/dev/disk/by-.*uuid/"; then
+    echo "Error: $name's uuidev is not specified with /dev/disk/by-*uuid/: $uuidev"
     exit 1
   fi
 
   local uuid instances disks
   # shellcheck disable=SC2001   # would result in horrible escapes
-  uuid=$(echo "$uuidev" | sed 's|/dev/disk/by-uuid/||')
-  instances=$(lsblk --raw -o uuid,pkname | grep "$uuid")
+  uuid=$(echo "$uuidev" | sed 's|/dev/disk/by-.*uuid/||')
+  instances=$(lsblk --raw -o uuid,partuuid,pkname | grep "$uuid")
 
   if [[ $(echo "$instances" | wc -l) != 1 ]]; then
-    disks=$(echo "$instances" | cut -d" " -f2 | sed 's|^|/dev/|')
+    disks=$(echo "$instances" | cut -d" " -f3 | sed 's|^|/dev/|')
 
     echo "Error: multiple UUIDs for $name." \
       "Refusing to continue as the backup could be made from the wrong one."
     echo
     # shellcheck disable=SC2086
-    lsblk --tree -o name,uuid,label,model,serial $disks
+    lsblk --tree -o name,uuid,partuuid,label,model,serial $disks
 
     exit 1
   fi
