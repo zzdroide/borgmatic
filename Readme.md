@@ -162,7 +162,10 @@ Double-check the device you are about to write to!
         ```sh
         tamborg -v extract --strip-components 1 ::<archive name> PART/
         ```
+        This assumes backup uid matches restore uid.
     - If you then realize that some important NTFS metadata is missing, you may try recovering it by converting the `.metadata.simg` to VHD with https://github.com/yirkha/ntfsclone2vhd/#metadata-only-images, and mounting it in Windows.
+
+    TODO: does this restore hardlinks and symlinks?
 
 # old readme below
 ## Setup
