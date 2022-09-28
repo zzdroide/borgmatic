@@ -261,8 +261,10 @@ If the restored partition can't be mounted (Disk Manager shows it as healthy, bu
 
 If for some unknown reason the partition type is not correct (happened to me once), change it with `sudo fdisk /dev/sdX`, command `t`.
 
-### NTFS boots to blinking cursor
+### NTFS boots to blinking cursor (after resizing/moving/messing with partitions)
 
+<details>
+<summary>Explanation</summary>
 Windows booting can be quite fragile, specifically Windows XP on MBR.
 
 The NTFS bootsector has some legacy Cylinder/Head/Sector shit configured into it, and if it's wrong it just boots into a blinking cursor. This has been vaguely documented, for example in [ntfsclone](https://man.archlinux.org/man/ntfsclone.8#Windows_Cloning).
@@ -298,6 +300,29 @@ What did work for me, was to let Windows setup generate the correct numbers, and
     ![screenshot](readme_data/xpboot/pbr_mod.png)
 
 6. Overwrite the recently written Windows MBR on disk with the previous backed up MBR, to restore booting to GRUB.
+</details>
+
+#### Summary
+```sh
+# In Ubuntu, in same computer as non-working NTFS boot, which is for example /dev/sdXY:
+sudo apt install -y lz4
+cd somewhere_with_lots_of_free_space
+sudo dd if=/dev/sdX of=mbr.bin count=1
+sudo ntfsclone --save-image --output - /dev/sdXY | lz4 - unbootable_ntfs.simg.lz4
+
+# Then insert Windows XP setup CD and boot it. Remember to press F6 and have floppy disk if required.
+# Refuse to repair existing installation, and press lots of keys to install new Windows and just format (quick) the affected partition, without deleting the partition itself or altering anything else.
+# After formatting, when setup is copying files, forcefully reboot the computer 🔥
+
+# Now boot a live Ubuntu iso, as the MBR will be screwed and nothing will boot. (Advanced alternative: use the iso's GRUB to boot the installed Ubuntu in hard drive instead)
+sudo apt install -y lz4
+cd the_previous_folder
+sudo dd if=/dev/sdXY bs=8 skip=3 count=1 of=magic_numbers.bin
+lz4 -dc unbootable_ntfs.simg.lz4 | sudo ntfsclone --restore-image --overwrite /dev/sdXY -
+sudo dd if=magic_numbers.bin of=/dev/sdXY bs=8 seek=3
+sudo dd if=mbr.bin of=/dev/sdX
+# Reboot and in GRUB choose Windows 😈
+```
 
 ### There's a ghost/zombie/leftover/nonexistant `/dev/Z_vg/Z_lv`
 ```sh
