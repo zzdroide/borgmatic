@@ -1,5 +1,5 @@
 location:
-    working_directory: /mnt/borg_lvm
+    working_directory: /mnt/borg_root_snapshot
     source_directories:
         - "."
     read_special: false
