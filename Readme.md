@@ -79,6 +79,22 @@ Double-check the device you are about to write to!
 
     If the disk was GPT restore its backup partition table with `w`, else quit with `q`.
 
+    <details>
+    <summary>To restore to smaller GPT disk</summary>
+    Assuming that the last partition is the Linux root, and only that one will be shrinked:
+
+    1. Inside `gdisk`, `w` will fail with:
+        ```
+        Problem: partition 3 is too big for the disk.
+        Aborting write operation!
+        Aborting write of new partition table.
+        ```
+    2. Print partition table with `p`
+    3. Delete last partition with `d`
+    4. Recreate the partition with `n`. Accept all defaults.
+    5. Write and exit with `w`.
+    </details>
+
 5.  Find raw images with:
     ```sh
     ll *.img
