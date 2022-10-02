@@ -83,16 +83,18 @@ Double-check the device you are about to write to!
     <summary>To restore to smaller GPT disk</summary>
     Assuming that the last partition is the Linux root, and only that one will be shrinked:
 
-    1. Inside `gdisk`, `w` will fail with:
+    1. `sudo gdisk /dev/sdX`
+    2. Make write fail with `w`:
         ```
         Problem: partition 3 is too big for the disk.
         Aborting write operation!
         Aborting write of new partition table.
         ```
-    2. Print partition table with `p`
-    3. Delete last partition with `d`
-    4. Recreate the partition with `n`. Accept all defaults.
-    5. Write and exit with `w`.
+        This is actually required, as it changes the default _Last sector_ in step 5.
+    3. Print partition table with `p`
+    4. Delete last partition with `d`
+    5. Recreate the partition with `n`. Accept all defaults.
+    6. Write and exit with `w`.
     </details>
 
 5.  Find raw images with:
