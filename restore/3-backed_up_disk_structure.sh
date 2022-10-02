@@ -43,9 +43,9 @@ list_header_partitions() {
 }
 
 list_partitions() {
-  local headers
-  headers=$(cat realdev_*.txt | cut -c 6-8 | sort -u | sed 's/$/_header.bin/')
-  for header in $headers; do
+  local header_files
+  header_files=$(cat realdev_*.txt | cut -c 6-8 | sort -u | sed 's/$/_header.bin/')
+  for header in $header_files; do
     list_header_partitions "$header"
   done
 }
