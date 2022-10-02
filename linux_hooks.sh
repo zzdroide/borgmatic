@@ -11,6 +11,48 @@ readonly MNT_DIR="/mnt/borg_root_snapshot"
 readonly SNAP_NAME="borg_snapshot"
 
 
+generate_mkswap() {
+  filter_comments() {
+    grep -v '^\s*#'
+  }
+
+  filter_swap_print_col1() {
+    awk '{if ($3 == "swap") print $1;}'
+  }
+
+  local swapfile
+  swapfile=$(</etc/fstab filter_comments | filter_swap_print_col1)
+
+  if [[ ! $swapfile ]]; then
+    # No swapfile
+    return 0
+  fi
+
+  if (( $(echo "$swapfile" | wc -l ) > 1 )); then
+    echo -e "Error: only 1 swapfile is supported. Found:\n$swapfile"
+    return 1
+  fi
+
+  if [[ $(findmnt --noheadings --output=target --target="$swapfile") != / ]]; then
+    # Swapfile not in root filesystem?
+    return 0
+  fi
+
+  local megabytes
+  megabytes=$(du --block-size=1M --apparent-size "$swapfile" | cut -f1)
+
+  local relative_file
+  relative_file=$(realpath --relative-to=/ "$swapfile")
+
+  sed "
+    s|%relative_file%|$relative_file|
+    s|%megabytes%|$megabytes|
+  " \
+    < restore/machine_specific/mkswap.template.sh \
+    > restore/machine_specific/mkswap.generated.sh
+  chmod 744 restore/machine_specific/mkswap.generated.sh
+}
+
 prune_docker_images() {
   if command -v docker &>/dev/null; then
     docker image prune --force
@@ -59,6 +101,7 @@ run_hook_before() {
   local root_dev=$1 snap_dev=$2
 
   $0 $CLEANUP
+  generate_mkswap
   prune_docker_images
   run_virtualbox_before_hook
   make_and_mount_snapshot "$root_dev" "$snap_dev"
