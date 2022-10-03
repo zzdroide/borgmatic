@@ -1,2 +1,2 @@
-archive_name_format: TAM_2009-pata-{now}  # TODO: {now} without seconds
+archive_name_format: TAM_2009-pata-{now:%Y-%m-%dT%H:%M}
 <<: !include /etc/borgmatic.d/shared/shared_storage.yaml
