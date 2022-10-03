@@ -106,7 +106,7 @@ run_hook_before() {
   run_virtualbox_before_hook
   make_and_mount_snapshot "$root_dev" "$snap_dev"
 
-  # TODO: run once per repo instead of each borgmatic config:
+  # TODO(upg): run once per repo instead of each borgmatic config:
   if root_borg_dirs_exist; then
     echo "$ROOT_BORG_DIRS_EXIST_MSG"
     echo "Backup will still run, but fail at after_backup hook."
@@ -122,7 +122,7 @@ run_hook_cleanup() {
 run_hook_after() {
   $0 $CLEANUP
 
-  # TODO: run once per repo instead of each borgmatic config:
+  # TODO(upg): run once per repo instead of each borgmatic config:
   chown -R "$SUDO_USER:$SUDO_USER" /home/"$SUDO_USER"/{.config,.cache}/borg/
   if root_borg_dirs_exist; then
     echo "$ROOT_BORG_DIRS_EXIST_MSG"

@@ -201,7 +201,7 @@ run_hook_before_global() {
   touch $NTFS_EXCLUDES
   unmount_boot_parts
 
-  # TODO: run once per repo instead of each borgmatic config:
+  # TODO(upg): run once per repo instead of each borgmatic config:
   if root_borg_dirs_exist; then
     echo "$ROOT_BORG_DIRS_EXIST_MSG"
     echo "Backup will still run, but fail at after_backup hook."
@@ -268,7 +268,7 @@ run_hook_after_global() {
 
   $0 $CLEANUP
 
-  # TODO: run once per repo instead of each borgmatic config:
+  # TODO(upg): run once per repo instead of each borgmatic config:
   chown -R "$SUDO_USER:$SUDO_USER" /home/"$SUDO_USER"/{.config,.cache}/borg/
   if root_borg_dirs_exist; then
     echo "$ROOT_BORG_DIRS_EXIST_MSG"

@@ -1,6 +1,6 @@
 # Borgmatic config
 
-# TODO: rewrite for new version
+# TODO(upg): rewrite for new version
 
 ## Mounting archives
 
@@ -16,7 +16,7 @@
 3. Mount it with:
     ```sh
     tamborg -v mount -o allow_root,uid=$UID ::<archive name> /mnt/borg
-    # TODO: add --numeric-ids when borg is upgraded
+    # TODO(upg): add --numeric-ids
     ```
 4. When you are done, unmount it with:
     ```sh
@@ -188,11 +188,11 @@ Double-check the device you are about to write to!
 # old readme below
 ## Setup
 
-TODO: make a quickstart.sh for safe steps
+TODO(upg): make a quickstart.sh for safe steps
 
 1. [Install Borg](https://borgbackup.readthedocs.io/en/stable/installation.html)
 
-    TODO: https://launchpad.net/~costamagnagianfranco/+archive/ubuntu/borgbackup ?
+    TODO(upg): https://launchpad.net/~costamagnagianfranco/+archive/ubuntu/borgbackup ?
 
     To install with `pip` for all users:
     - `sudo apt install python3-pip python3-setuptools libssl-dev pkg-config fuse libfuse-dev libacl1-dev`
