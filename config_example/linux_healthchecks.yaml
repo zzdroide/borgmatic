@@ -1,2 +1,1 @@
-healthchecks: https://hc-ping.com/your-uuid-here
-# Set url, or comment line to disable
+healthchecks: https://hc-ping.com/your-uuid-here # or '' to disable
