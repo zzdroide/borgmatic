@@ -74,4 +74,4 @@ hooks:
 
     # TODO(upg): on error run /etc/borgmatic.d/pata_hooks.sh cleanup
 
-    healthchecks: !include /etc/borgmatic.d/config/linux_healthchecks.yaml
+    <<: !include /etc/borgmatic.d/config/linux_healthchecks.yaml
