@@ -201,16 +201,22 @@ TODO(upg): make a quickstart.sh for safe steps
 
     This way, `borg` starts in 0.6s in a computer with weak CPU, instead of 2.3s with the Standalone Binary.
 
+    alternative: https://github.com/pypa/pipx/issues/754
+
 1. Install HPN-SSH
    1. [Download source from a tag](https://github.com/rapier1/openssh-portable/tags), which matches your version (for example `ssh -V` --> `8_2`) for easier compiling. One of `hpn-KitchenSink-*`, which includes all patches (same as `hpn-*`)
    1. Extract and `cd`
    1. `autoreconf && ./configure && make && ./ssh -V`
    1. `sudo install ssh /usr/local/bin/hpnssh`
 
+   alternative: https://sourceforge.net/projects/hpnssh/files/Debian%20Packages/
+
 1. [Install Borgmatic](https://torsion.org/borgmatic/docs/how-to/set-up-backups/#installation)
     ```sh
     sudo -i pip3 install borgmatic==1.5.24
     ```
+
+    "==" because the project doesn't follow semver (search for `BREAKING` in the [changelog](https://projects.torsion.org/borgmatic-collective/borgmatic/src/branch/master/NEWS))
 
 1. Clone this:
     ```sh
