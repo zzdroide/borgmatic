@@ -120,6 +120,8 @@ run_hook_cleanup() {
 }
 
 run_hook_after() {
+  # TODO: exit 1 if snapshot ran out of space and failed
+
   $0 $CLEANUP
 
   # TODO(upg): run once per repo instead of each borgmatic config:
