@@ -163,7 +163,7 @@ Double-check the device you are about to write to!
         # No need to mess with `tmp` and `var/tmp` as they are automatically created.
         ln -s /run/lock var/lock
         ln -s /run var/run
-        etc/borgmatic.d/restore/machine_specific/mkswap.generated.sh
+        etc/borgmatic.d/restore/machine_specific/mkswap.generated.sh  # May not exist
         exit
         ```
 
