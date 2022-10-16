@@ -173,6 +173,8 @@ Double-check the device you are about to write to!
         sudo umount /mnt/borg_linux_target
         ```
 
+    > Try to remember what has to be regenerated :s. For example, the Poetry virtualenv (in ~/.cache/) for a project run by cron. Dockerized apps shouldn't have this problem.
+
 7. Restore data:
     - Boot into restored Linux to have GUI
     - Format and mount with GUI
