@@ -52,6 +52,8 @@ def inhibit_suspend():
     else:
         print('Note: not preventing suspension')
 
+# TODO: run 01_pata.yaml before_backup hooks here, so 02_linux.yaml won't run on failure,
+# possibly creating an LVM snapshot and filling it with chunks cache synchronization.
 
 inhibit_suspend()
 
