@@ -175,6 +175,7 @@ make_ntfs_pipe_file() {
 make_dev_pipe_file() {
   local realdev=$1 pipe_path=$2
   # This is not a pipe but anyway. It's like a hardlink to /dev/sdXY.
+  # TODO: refactor to symlink to block device. They are read with --read-special.
 
   local major_colon_minor major_space_minor
 
