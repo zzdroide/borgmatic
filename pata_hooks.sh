@@ -119,7 +119,7 @@ delete_windows_excluded_files() {
   local realdev=$1 mnt_path=$2
   # As this partition will be backed up by ntfsclone,
   # the ideal would be to have ntfsclone exclude the files so they don't end in the backup,
-  # *and* they are kept on disk. However this is not supported.
+  # *and* keep them on disk. However this is not supported.
   #
   # So, this only excludes files which can be deleted without further consequences.
   #
