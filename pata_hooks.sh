@@ -172,30 +172,6 @@ make_ntfs_pipe_file() {
   } &
 }
 
-make_dev_pipe_file() {
-  local realdev=$1 pipe_path=$2
-  # This is not a pipe but anyway. It's like a hardlink to /dev/sdXY.
-  # TODO: refactor to symlink to block device. They are read with --read-special.
-
-  local major_colon_minor major_space_minor
-
-  #     major_space_minor=$(stat --format="%t %T" "$realdev")
-  # Oh great. I have no idea why, but it's returning "8 11" when ll shows "8, 17"
-
-  major_colon_minor=$(cat "/sys/$(udevadm info --query=path "$realdev")/dev")
-  major_space_minor=$(echo "$major_colon_minor" | tr : " ")
-
-  # shellcheck disable=SC2086
-  mknod "$pipe_path" b $major_space_minor
-
-  # Sanity check:
-  if ! head -c 1 "$pipe_path" &>/dev/null; then
-    echo "Error: created block device for $realdev doesn't work!"
-    ls -l "$realdev" "$pipe_path"
-    exit 1
-  fi
-}
-
 run_hook_before_global() {
   $0 $CLEANUP
   mkdir $BASE_DIR
@@ -237,7 +213,8 @@ run_hook_before_each() {
       delete_windows_excluded_files "$realdev" "$mnt_path"
       make_ntfs_pipe_file "data" "$realdev" "$pipe_path"
     else
-      make_dev_pipe_file "$realdev" "$pipe_path"
+      # --read-special reads block devices referenced by symlinks
+      ln -s "$realdev" "$pipe_path"
     fi
 
   else
