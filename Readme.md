@@ -185,7 +185,18 @@ Double-check the device you are about to write to!
         This assumes backup uid matches restore uid.
     - If you then realize that some important NTFS metadata is missing, you may try recovering it by converting the `.metadata.simg` to VHD with https://github.com/yirkha/ntfsclone2vhd/#metadata-only-images, and mounting it in Windows.
 
-    TODO: does this restore hardlinks and symlinks?
+    > However, after restoring special files:
+    > - Hardlinks work fine
+    > - Relative symlinks work on Linux
+    > - Absolute symlinks and junctions are broken on Linux but could be restored:
+    >   ```
+    >   /media/user/ntfs_test_restored $ ll
+    >   ... 'Junction of folder' -> /mnt/borg_pata/ntfs_test/folder
+    >   ```
+    > - Symlinks and junctions are screwed on Windows. They are regular files, with some prefix and then text with the Linux's target path :(
+    >
+    > TODO: same with ntfs3?
+
 
 # old readme below
 ## Setup
