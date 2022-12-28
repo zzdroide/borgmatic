@@ -6,6 +6,7 @@ cd "$(dirname "$0")"
 
 readonly HOOK_TYPE=$1
 source shared/hooks.sh
+global_exit=0
 
 readonly MNT_DIR="/mnt/borg_root_snapshot"
 readonly SNAP_NAME="borg_snapshot"
@@ -91,10 +92,23 @@ umount_and_remove_snapshot() {
     percent=$(lvs --noheadings -o snap_percent "$snap_dev")
     rounded=$(echo "$percent" | awk '{print int($1+0.5)}')
     echo "Snapshot usage: $rounded%"
+    # Note: could be unaccurate, as the percentage takes 30-60s to stop updating.
     lvremove -qq --yes "$snap_dev"
   fi
 
   [[ ! -e $MNT_DIR ]] || rmdir $MNT_DIR
+}
+
+check_snapshot_overflow() {
+  local snap_dev=$1
+
+  local status
+  status=$(dmsetup status "$snap_dev")
+  if echo "$status" | grep -qi Invalid; then
+    echo "Error: lvm snapshot is invalid"
+    journalctl -b -u dm-event.service | grep $SNAP_NAME
+    global_exit=1
+  fi
 }
 
 run_hook_before() {
@@ -120,8 +134,9 @@ run_hook_cleanup() {
 }
 
 run_hook_after() {
-  # TODO: exit 1 if snapshot ran out of space and failed
+  local root_dev=$1 snap_dev=$2
 
+  check_snapshot_overflow "$snap_dev"
   $0 $CLEANUP
 
   # TODO(upg): run once per repo instead of each borgmatic config:
@@ -143,8 +158,9 @@ main() {
   elif [[ "$HOOK_TYPE" == "$CLEANUP" ]]; then
     run_hook_cleanup "$root_dev" "$snap_dev"
   elif [[ "$HOOK_TYPE" == "$AFTER" ]]; then
-    run_hook_after
+    run_hook_after "$root_dev" "$snap_dev"
   fi
 }
 
 main
+exit $global_exit
