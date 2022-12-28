@@ -98,7 +98,7 @@ write_disk_header() {
 check_no_weird_ntfs3g_files() {
   local mnt_path=$1 name=$2
 
-  # TODO: skip if using ntfs3
+  # TODO(ntfs3): skip if using ntfs3
 
   # For some reason, ntfs-3g (but not ntfs3) shows some files as pipes.
   # Previously I saw it happen with some more files (can't remember details),
@@ -199,7 +199,7 @@ run_hook_before_each() {
   if [[ $target == "$TARGET_DATA" ]]; then
     mkdir -p "$mnt_path"
     mount -o ro "$realdev" "$mnt_path"
-    # TODO: use ntfs3 if available
+    # TODO(ntfs3): use ntfs3 if available
 
     if [[ $ntfs ]]; then
       check_no_weird_ntfs3g_files "$mnt_path" "$name"

@@ -195,7 +195,7 @@ Double-check the device you are about to write to!
     >   ```
     > - Symlinks and junctions are screwed on Windows. They are regular files, with some prefix and then text with the Linux's target path :(
     >
-    > TODO: same with ntfs3?
+    > TODO(ntfs3): same with ntfs3?
 
 
 # old readme below
