@@ -61,7 +61,7 @@ prune_docker_images() {
 }
 
 run_virtualbox_before_hook() {
-  readonly VBOX_BEFORE="/home/$SUDO_USER/VirtualBox VMs/borg_before.sh"
+  readonly VBOX_BEFORE="/home/$SUDO_USER/VirtualBox VMs/scripts/borg_before.sh"
 
   if [ -x "$VBOX_BEFORE" ]; then
     sudo -u "$SUDO_USER" "$VBOX_BEFORE"
