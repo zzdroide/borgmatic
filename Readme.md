@@ -246,7 +246,7 @@ TODO(upg): make a quickstart.sh for safe steps
     - `parts.cfg`: &lt;name> &lt;partition path> &lt;0 if raw (backup image with `dd`), 1 if NTFS>
     - `config_storage.yaml`:
       - `sed -i "s|borg_base_directory: NULL|borg_base_directory: $HOME|" /etc/borgmatic.d/config/config_storage.yaml`
-      - regenerate the passphrase using regenerate_passphrase.py interactively
+      - regenerate the passphrase using derive_pass.py
       - protect the file with `chmod 600 /etc/borgmatic.d/config/config_storage.yaml`
 
 1. For easy usage, add
