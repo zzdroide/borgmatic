@@ -52,10 +52,10 @@ def inhibit_suspend():
     else:
         print('Note: not preventing suspension')
 
+inhibit_suspend()
+
 # TODO(upg): run 01_pata.yaml before_backup hooks here, so 02_linux.yaml won't run on failure,
 # possibly creating an LVM snapshot and filling it with chunks cache synchronization.
-
-inhibit_suspend()
 
 subprocess.run(
     'sudo SSH_AUTH_SOCK="$SSH_AUTH_SOCK" borgmatic -v1 create --progress --stats',

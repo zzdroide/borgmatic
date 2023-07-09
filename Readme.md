@@ -231,6 +231,8 @@ TODO(upg): make a quickstart.sh for safe steps
 
     "==" because the project doesn't follow semver (search for `BREAKING` in the [changelog](https://projects.torsion.org/borgmatic-collective/borgmatic/src/branch/master/NEWS))
 
+1. sudo apt install smartmontools jq
+
 1. Clone this:
     ```sh
     sudo GIT_SSH_COMMAND="ssh -i ~$USER/.ssh/id_ed25519" git clone git@github.com:zzdroide/borgmatic.git /etc/borgmatic.d
@@ -240,7 +242,7 @@ TODO(upg): make a quickstart.sh for safe steps
     sudo chown -R $USER: /etc/borgmatic.d
     ```
 
-1. Configure by creating `config` folder and creating files from `config_example`
+1. Configure by creating `config` folder and creating files from `config_example` (TODO: umask 077)
     - `parts.cfg`: &lt;name> &lt;partition path> &lt;0 if raw (backup image with `dd`), 1 if NTFS>
     - `config_storage.yaml`:
       - `sed -i "s|borg_base_directory: NULL|borg_base_directory: $HOME|" /etc/borgmatic.d/config/config_storage.yaml`
