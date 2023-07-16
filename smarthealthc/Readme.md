@@ -20,7 +20,7 @@ So trigger this together with the backup, which should happen periodically as we
 
 ### At Healthchecks website:
 1. Create a project `HDD Smart` in Healthchecks
-2. Create a healthcheck for each disk, for example `HddSmart-Tam2009-1TB`
+2. Create a healthcheck for each disk, for example `TAM_2009-1TB`
 
 ### `smarthealthc.cfg`:
 Add a line for each HDD to be monitored.
