@@ -158,11 +158,8 @@ Double-check the device you are about to write to!
     - Recreate the excluded stuff: (see "exclude_patterns" in 02_linux.yaml)
         ```sh
         sudo su
-        (umask 022; mkdir cdrom dev media mnt run tmp var/cache/apt)
-        (umask 222; mkdir proc sys)
+        (umask 022; mkdir var/cache/apt)
         # No need to mess with `tmp` and `var/tmp` as they are automatically created.
-        ln -s /run/lock var/lock
-        ln -s /run var/run
         etc/borgmatic.d/restore/machine_specific/mkswap.generated.sh  # May not exist
         exit
         ```

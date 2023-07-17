@@ -2,30 +2,50 @@ location:
     working_directory: /mnt/borg_root_snapshot
     source_directories:
         - "."
-    read_special: false
-    one_file_system: true
     exclude_caches: true
     keep_exclude_tags: true
     numeric_owner: true
+
+    one_file_system: false
+    # Even with `true`, it would still cross mountpoints.
+    # But because of the snapshot, it doesn't matter.
+    #
+    # If you have bind-mounts, for example from `/home/user/proj/public/` to `/var/www/proj/`,
+    # the data would be duplicated in `var/www/proj/` if `/` was backed up.
+    # It would be just a small problem on backup (because of deduplication),
+    # but a restore would write 2 copies of the data.
+    #
+    # But as the backup is made at `/mnt/borg_root_snapshot`, and the bind-mount is in `/var/www/proj/`,
+    # `/mnt/borg_root_snapshot/var/www/proj/` should just be an empty directory.
+    # And at `/mnt/borg_root_snapshot` there's definitely only one filesystem.
+
+    read_special: false
+    # However, setting this to `true` would hang the backup if it encounters a pipe.
+    #
+    # Excluding pipes would break restoration.
+    #
+    # Recreating the pipes would work...
+    # But there are also whiteout char files in /var/lib/docker/overlay2/ ...
+    # And what about symlinks to these files?
+    #
+    # This would allow to have a single archive, insted of pata+linux :eyes:
+    # But there's the chunks cache synchronization issue...
+    # To be continued.
 
     repositories:
         !include /etc/borgmatic.d/shared/repo.yaml
 
     exclude_patterns:
-        - pf:cdrom
-        - pf:dev
-        - pf:media
-        - pf:mnt
-        - pf:proc
-        - pf:run
         - pf:swapfile
         - pf:swap.img
-        - pf:sys
         - pf:tmp
         - pf:var/cache/apt
-        - pf:var/lock
-        - pf:var/run
         - pf:var/tmp
+        # Don't exclude dev, proc, run and sys.
+        # Their contents are mounted under `/` but not under `/mnt/borg_root_snapshot`, so they are empty here.
+        # Also the empty directories would need to be recreated when restoring.
+        #
+        # The same applies to cdrom, media and mnt: only its directory structure will be backed up.
 
         - sh:home/*/.android/build-cache
         - sh:home/*/.ansible/tmp

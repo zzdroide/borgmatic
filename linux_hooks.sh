@@ -118,6 +118,8 @@ run_hook_before() {
   generate_mkswap
   prune_docker_images
   run_virtualbox_before_hook
+
+  # The snapshot should be last: (so it includes the modifications made above)
   make_and_mount_snapshot "$root_dev" "$snap_dev"
 
   # TODO(upg): run once per repo instead of each borgmatic config:
