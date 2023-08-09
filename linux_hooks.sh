@@ -56,6 +56,7 @@ generate_mkswap() {
 
 prune_docker_images() {
   if command -v docker &>/dev/null; then
+    printf "docker image prune: "
     docker image prune --force
   fi
 }
