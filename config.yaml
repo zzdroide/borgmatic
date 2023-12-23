@@ -1,0 +1,21 @@
+
+# This runs before create, list, mount, etc.
+before_actions: [wakeup_server]
+
+before_backup: [cleanup, before]
+
+# Runs only if hook and backup didn't errored.
+after_backup: [after]
+
+# "after_everything" runs after a create, even if errors occur in hook or backup.
+# Except if the hook is "before_everything", so be careful with that one.
+after_everything: [cleanup]
+before_everything: []
+
+
+
+
+
+store_config_files: false
+
+#https://torsion.org/borgmatic/docs/how-to/set-up-backups/#skipping-actions

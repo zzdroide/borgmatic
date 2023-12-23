@@ -28,5 +28,4 @@ echo "$json" | >/dev/null jq -e "\
   " &&
     { echo "A relevant attribute is greater than 0"; exit 1; }
 
-
-exit 0
+true

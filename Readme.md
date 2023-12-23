@@ -265,6 +265,14 @@ TODO(upg): make a quickstart.sh for safe steps
 
 1. Of course, add the public key of the computer you are setting up to the Borg server.
 
+## SMART Healthchecks Setup
+
+### At Healthchecks website:
+1. Create a project `HDD Smart` in Healthchecks
+2. Create a healthcheck for each disk, for example `TAM_2009-1TB`
+
+### `smarthealthc.cfg`:
+Add a line for each HDD to be monitored.
 
 ## Running
 
@@ -303,7 +311,10 @@ If for some unknown reason the partition type is not correct (happened to me onc
 <summary>Explanation</summary>
 Windows booting can be quite fragile, specifically Windows XP on MBR.
 
-The NTFS bootsector has some legacy Cylinder/Head/Sector shit configured into it, and if it's wrong it just boots into a blinking cursor. This has been vaguely documented, for example in [ntfsclone](https://man.archlinux.org/man/ntfsclone.8#Windows_Cloning).
+The NTFS bootsector has some legacy Cylinder/Head/Sector shit configured into it, and if it's wrong it just boots into a blinking cursor. This is vaguely documented in
+[ntfsclone](https://man.archlinux.org/man/ntfsclone.8#Windows_Cloning)
+and [partclone.ntfsfixboot](https://man.archlinux.org/man/partclone.ntfsfixboot.8)
+(at least its source code [links](https://thestarman.pcministry.com/asm/mbr/NTFSBR.htm) to way too much detail).
 
 - `jaclaz` explains
     [here](https://reboot.pro/index.php?showtopic=8233#post_id_70088)
@@ -320,6 +331,10 @@ The NTFS bootsector has some legacy Cylinder/Head/Sector shit configured into it
 - nor by booting the XP disk, going into the recovery console, and running `fixmbr`, `fixboot`, `bootcfg /rebuild`,
 
 - nor by booting the affected computer with BartPE, and running Bootice there.
+
+- Rescuezilla explains
+[why these attempts fail]((https://github.com/rescuezilla/rescuezilla/blob/2.4.2/src/apps/rescuezilla/rescuezilla/usr/lib/python3/dist-packages/rescuezilla/parser/chs_utilities.py)).
+However I haven't tried this EDD method, just because I hadn't found it at the time.
 
 What did work for me, was to let Windows setup generate the correct numbers, and plug them into my unbootable NTFS:
 

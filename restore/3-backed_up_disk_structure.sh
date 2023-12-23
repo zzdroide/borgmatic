@@ -21,10 +21,9 @@ print_last_paragraph() {
 
 list_header_partitions() {
   local header=$1
-  [ -s "$header" ]  # Assert exists
+  [[ -s "$header" ]]  # Assert exists
 
-  local pttype
-  pttype=$(blkid --match-tag PTTYPE --output value "$header")
+  local pttype; pttype=$(blkid --match-tag PTTYPE --output value "$header")
   case $pttype in
     dos)
       echo " MBR"
@@ -43,8 +42,7 @@ list_header_partitions() {
 }
 
 list_partitions() {
-  local header_files
-  header_files=$(cat realdev_*.txt | cut -c 6-8 | sort -u | sed 's/$/_header.bin/')
+  local header_files; header_files=$(cat realdev_*.txt | cut -c 6-8 | sort -u | sed 's/$/_header.bin/')
   for header in $header_files; do
     list_header_partitions "$header"
   done

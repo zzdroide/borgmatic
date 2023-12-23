@@ -1,9 +1,10 @@
 #!/usr/bin/env python3
+# ruff: noqa: T201
 
 from hashlib import scrypt
 
-passw = bytes(input('password: '), 'ascii')
-salt = b''  # TODO(upg): b'tam borg'
+passw = bytes(input("password: "), "ascii")
+salt = b"tamborg"
 np = 20
 n = 2**np
 r = 8
