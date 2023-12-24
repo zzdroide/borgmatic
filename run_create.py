@@ -1,8 +1,14 @@
 #!/usr/bin/env python3
 
-import dbus
 import subprocess
 
+import dbus
+
+# Reference: https://gitlab.gnome.org/GNOME/gnome-settings-daemon/-/blob/master/gnome-settings-daemon/org.gnome.SessionManager.xml#L102
+INHIBIT_APP_ID = "Borgmatic"
+INHIBIT_REASON = "Running backup"
+INHIBIT_SUSPEND_FLAG = 4
+INHIBIT_TOPLEVEL_XID = 0
 
 def inhibit_suspend():
     """
@@ -24,7 +30,7 @@ def inhibit_suspend():
 
     Note that inhibitors are automatically released when the process exits
     (https://stackoverflow.com/questions/17478532/powermanagement-inhibit-works-with-dbus-python-but-not-dbus-send),
-    so that's why this script is Python instead of Bash.
+    so that's why this wrapper is Python, instead of Bash or a borgmatic hook.
 
     So according to https://arnaudr.io/2020/09/25/inhibit-suspending-the-computer-with-gtkapplication/,
     the best and most compatible would be to use
@@ -33,32 +39,32 @@ def inhibit_suspend():
     https://codeberg.org/WhyNotHugo/caffeine-ng/src/tag/v4.0.2/caffeine/inhibitors.py#L66
     which works in Cinnamon so let's copy that.
     """
-
     bus = dbus.SessionBus()
     applicable = "org.gnome.SessionManager" in bus.list_names()
 
     if applicable:
         proxy1 = bus.get_object("org.gnome.SessionManager", "/org/gnome/SessionManager")
-        proxy = dbus.Interface(proxy1, dbus_interface="org.gnome.SessionManager")
-
-        # https://gitlab.gnome.org/GNOME/gnome-settings-daemon/-/blob/master/gnome-settings-daemon/org.gnome.SessionManager.xml#L102
-        APP_ID = 'Borgmatic'
-        REASON = 'Running backup'
-        INHIBIT_SUSPEND_FLAG = 4
-        TOPLEVEL_XID = 0
-        proxy.Inhibit(APP_ID, dbus.UInt32(TOPLEVEL_XID), REASON, dbus.UInt32(INHIBIT_SUSPEND_FLAG))
+        proxy2 = dbus.Interface(proxy1, dbus_interface="org.gnome.SessionManager")
+        proxy2.Inhibit(
+            INHIBIT_APP_ID,
+            dbus.UInt32(INHIBIT_TOPLEVEL_XID),
+            INHIBIT_REASON,
+            dbus.UInt32(INHIBIT_SUSPEND_FLAG),
+        )
         # No need to store cookie or call Uninhibit, just exit script.
 
     else:
-        print('Note: not preventing suspension')
+        print("Note: not preventing suspension")  # noqa: T201
+
 
 inhibit_suspend()
 
-# TODO(upg): run 01_pata.yaml before_backup hooks here, so 02_linux.yaml won't run on failure,
-# possibly creating an LVM snapshot and filling it with chunks cache synchronization.
-
 subprocess.run(
-    'sudo SSH_AUTH_SOCK="$SSH_AUTH_SOCK" borgmatic -v1 create --progress --stats',
-    shell=True,
+    (
+        '/bin/sudo'
+        ' SSH_AUTH_SOCK="$SSH_AUTH_SOCK"'
+        ' borgmatic2 -v1 create --progress --stats'
+    ),
+    shell=True,  # noqa: S602
     check=True,
 )
