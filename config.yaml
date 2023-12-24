@@ -1,21 +1,82 @@
+constants:
+    !include /etc/borgmatic/config/constants.yaml
 
-# This runs before create, list, mount, etc.
-before_actions: [wakeup_server]
-
-before_backup: [cleanup, before]
-
-# Runs only if hook and backup didn't errored.
-after_backup: [after]
-
-# "after_everything" runs after a create, even if errors occur in hook or backup.
-# Except if the hook is "before_everything", so be careful with that one.
-after_everything: [cleanup]
-before_everything: []
-
-
-
-
-
+working_directory: /mnt/tamborgmatic/merged
+source_directories: ["."]
+source_directories_must_exist: true
+numeric_ids: true
+one_file_system: false
+read_special: false     # Uses "specialfile" to selectively read.
+exclude_caches: true
+keep_exclude_tags: true
 store_config_files: false
 
-#https://torsion.org/borgmatic/docs/how-to/set-up-backups/#skipping-actions
+exclude_patterns:
+    - fm:*.py[cod]
+    # fm:*/node_modules/ not excluded, as not all of them were created with "npm install"
+
+    - fm:*/.gradle/
+    # Attempt to exclude Android Studio build/ but nothing else:
+    - fm:*/app/build/intermediates/
+    - fm:*/app/build/outputs/
+    - fm:*/app/build/kotlin/
+    - fm:*/app/build/tmp/
+    - fm:*/app/build/generated/
+
+    # Note: the following assumes "linux_root" name is used in bupsrcs.cfg.
+
+    - pf:linux_root/swapfile
+    - pf:linux_root/swap.img
+    - pf:linux_root/tmp
+    - pf:linux_root/var/cache/apt
+    - pf:linux_root/var/tmp
+    # cdrom, dev, media, mnt, proc, run and sys: only the empty dirs will be stored.
+
+    - sh:linux_root/home/*/.android/build-cache
+    - sh:linux_root/home/*/.ansible/tmp
+    - sh:linux_root/home/*/.cache
+    - sh:linux_root/home/*/.cinnamon/spices.cache
+    - sh:linux_root/home/*/.config/*/*Cache*  # crappy Electron apps which don't use .cache/
+    - sh:linux_root/home/*/.config/chromium/*/GPUCache
+    - sh:linux_root/home/*/.config/chromium/*/Service Worker/CacheStorage
+    - sh:linux_root/home/*/.gvfs
+    - sh:linux_root/home/*/.ICEauthority
+    - sh:linux_root/home/*/.local/share/virtualenvs
+    - sh:linux_root/home/*/.mozilla/firefox/Crash Reports
+    - sh:linux_root/home/*/.mozilla/firefox/*/datareporting
+    - sh:linux_root/home/*/.npm/_cacache
+    - sh:linux_root/home/*/.local/share/TelegramDesktop/tdata/*/*cache*
+    - sh:linux_root/home/*/.Xauthority
+    - pf:linux_root/root/.cache
+
+local_path: borg2
+encryption_passphrase: "{encryption_passphrase}"
+compression: zstd,1
+repositories:
+    - path: ssh://borg@{server}/./TAM
+borg_base_directory: "{home}"
+archive_name_format: "{user}-{now:%Y-%m-%dT%H:%M}"
+
+# Use HPN SSH with some options, as the original user if sudo was used.
+#   sh makes env vars work.
+#   SSH_AUTH_SOCK provides unlocked identity_file.
+#   As Borg appends parameters to the command, and -c requires quotes, $@ is used. "0" fills $0.
+ssh_command: sh -c 'sudo -u "${SUDO_USER:-$USER}" SSH_AUTH_SOCK="$SSH_AUTH_SOCK" /usr/local/bin/hpnssh -oBatchMode=yes -oNoneEnabled=yes -oNoneSwitch=yes "$@"' 0
+
+skip_actions: [prune, compact, check]
+
+# This runs before create, list, mount, extract, etc.
+before_actions: [wakeup_server]
+
+before_backup: [./hooks.sh cleanup, ./hooks.sh before]
+
+# Runs only if hook and backup didn't errored.
+after_backup: [./hooks.sh after]
+
+# "after_everything" runs after a create, even if errors occur in hook or backup.
+# Except if the errored hook is "before_everything", so be careful with that one.
+after_everything: [./hooks.sh cleanup]
+before_everything: []
+
+healthchecks:
+    ping_url: "{healthchecks_ping_url}"

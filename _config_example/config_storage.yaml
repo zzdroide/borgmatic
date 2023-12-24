@@ -1,4 +1,0 @@
-encryption_passphrase: pass
-
-# This variable doesn't support expansion, so hardcode it:
-borg_base_directory: NULL

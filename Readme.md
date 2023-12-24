@@ -200,7 +200,26 @@ Double-check the device you are about to write to!
 
 TODO(upg): make a quickstart.sh for safe steps
 
-1. [Install Borg](https://borgbackup.readthedocs.io/en/stable/installation.html)
+1. Install Python3.12:
+
+    ```sh
+    sudo add-apt-repository ppa:deadsnakes/ppa && sudo apt update && sudo apt install python3.12 python3.12-dev
+    ```
+
+1. Install pipx:
+
+    `sudo apt install pipx` for Ubuntu >= 22
+
+    `sudo pip3 install pipx` for Ubuntu 20
+
+1. Install borg2 and borgmatic "2":
+    ```sh
+    sudo PIPX_HOME=/opt/pipx PIPX_BIN_DIR=/usr/local/bin pipx install 'borgbackup[pyfuse3]==2.0.0b7' --suffix 2 --python python3.12
+
+    sudo PIPX_HOME=/opt/pipx PIPX_BIN_DIR=/usr/local/bin pipx install 'borgmatic==1.8.5' --suffix 2 --python python3.12
+    ```
+
+1. OLD/////////// [Install Borg](https://borgbackup.readthedocs.io/en/stable/installation.html)
 
     TODO(upg): https://launchpad.net/~costamagnagianfranco/+archive/ubuntu/borgbackup ?
 
