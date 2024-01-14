@@ -23,7 +23,8 @@ exclude_patterns:
     - fm:*/app/build/tmp/
     - fm:*/app/build/generated/
 
-    # Note: the following assumes "linux_root" name is used in bupsrcs.cfg.
+    # Note: the following assumes "linux_root" name is used in bupsrcs.cfg
+    # (and that /home/ is in the same partition as /)
 
     - pf:linux_root/swapfile
     - pf:linux_root/swap.img
