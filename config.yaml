@@ -52,7 +52,7 @@ exclude_patterns:
 
 local_path: borg2
 encryption_passphrase: "{encryption_passphrase}"
-compression: zstd,1
+compression: zstd,3
 repositories:
     - path: ssh://borg@{server}/./TAM
 borg_base_directory: "{home}"
