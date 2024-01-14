@@ -54,7 +54,7 @@ local_path: borg2
 encryption_passphrase: "{encryption_passphrase}"
 compression: zstd,3
 repositories:
-    - path: ssh://borg@{server}/./TAM
+    - path: ssh://borg@{server_ip}/./TAM
 borg_base_directory: "{home}"
 archive_name_format: "{user}-{now:%Y-%m-%dT%H:%M}"
 
@@ -71,7 +71,7 @@ skip_actions:
 
 # This runs before create, list, mount, extract, etc.
 before_actions:
-    - wakeup_server.sh
+    - scripts/wakeup_server.sh {server_ip} {server_mac}
 
 before_backup:
     - scripts/hooks.sh cleanup

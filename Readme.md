@@ -200,6 +200,8 @@ Double-check the device you are about to write to!
 
 TODO(upg): make a quickstart.sh for safe steps
 
+sudo apt install wakeonlan
+
 1. Install Python3.12:
 
     ```sh
