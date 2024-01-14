@@ -1,5 +1,5 @@
 user: TAM_2009
 server: 192.168.0.63
-encryption_passphrase: pass     # Use derive_pass.py
+encryption_passphrase: pass     # Use scripts/derive_pass.py
 home: /home/user    # Because "/home/${SUDO_USER:-$USER}" doesn't work
 healthchecks_ping_url: https://hc-ping.com/your-uuid-here

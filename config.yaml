@@ -64,19 +64,27 @@ archive_name_format: "{user}-{now:%Y-%m-%dT%H:%M}"
 #   As Borg appends parameters to the command, and -c requires quotes, $@ is used. "0" fills $0.
 ssh_command: sh -c 'sudo -u "${SUDO_USER:-$USER}" SSH_AUTH_SOCK="$SSH_AUTH_SOCK" /usr/local/bin/hpnssh -oBatchMode=yes -oNoneEnabled=yes -oNoneSwitch=yes "$@"' 0
 
-skip_actions: [prune, compact, check]
+skip_actions:
+    - prune
+    - compact
+    - check
 
 # This runs before create, list, mount, extract, etc.
-before_actions: [wakeup_server]
+before_actions:
+    - wakeup_server.sh
 
-before_backup: [./hooks.sh cleanup, ./hooks.sh before]
+before_backup:
+    - scripts/hooks.sh cleanup
+    - scripts/hooks.sh before
 
 # Runs only if hook and backup didn't errored.
-after_backup: [./hooks.sh after]
+after_backup:
+    - scripts/hooks.sh after
 
 # "after_everything" runs after a create, even if errors occur in hook or backup.
 # Except if the errored hook is "before_everything", so be careful with that one.
-after_everything: [./hooks.sh cleanup]
+after_everything:
+    - scripts/hooks.sh cleanup
 before_everything: []
 
 healthchecks:

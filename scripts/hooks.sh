@@ -2,8 +2,8 @@
 set -euo pipefail
 umask 077
 
-cd "$(dirname "$0")/hooks.d"
-# shellcheck source-path=hooks.d
+cd "$(dirname "$0")/../hooks.d"
+# shellcheck source-path=../hooks.d
 source helpers/common.py
 
 case "$1" in
