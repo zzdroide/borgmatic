@@ -354,7 +354,7 @@ and [partclone.ntfsfixboot](https://man.archlinux.org/man/partclone.ntfsfixboot.
 - nor by booting the affected computer with BartPE, and running Bootice there.
 
 - Rescuezilla explains
-[why these attempts fail]((https://github.com/rescuezilla/rescuezilla/blob/2.4.2/src/apps/rescuezilla/rescuezilla/usr/lib/python3/dist-packages/rescuezilla/parser/chs_utilities.py)).
+[why these attempts fail](https://github.com/rescuezilla/rescuezilla/blob/2.4.2/src/apps/rescuezilla/rescuezilla/usr/lib/python3/dist-packages/rescuezilla/parser/chs_utilities.py).
 However I haven't tried this EDD method, just because I hadn't found it at the time.
 
 What did work for me, was to let Windows setup generate the correct numbers, and plug them into my unbootable NTFS:
