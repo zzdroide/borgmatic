@@ -232,7 +232,7 @@ Double-check the device you are about to write to!
 
 1. Clone this:
     ```sh
-    sudo SSH_AUTH_SOCK="$SSH_AUTH_SOCK" git clone git@github.com:zzdroide/borgmatic.git /etc/borgmatic
+    sudo SSH_AUTH_SOCK="$SSH_AUTH_SOCK" GIT_SSH_COMMAND="sudo -u $USER ssh" git clone git@github.com:zzdroide/borgmatic.git /etc/borgmatic
     ```
     For ease of usage, also run:
     ```sh
