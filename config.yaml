@@ -1,5 +1,5 @@
 constants:
-    !include /etc/borgmatic/config/constants.yaml
+    !include config/constants.yaml
 
 working_directory: /mnt/tamborgmatic/merged
 source_directories: ["."]
