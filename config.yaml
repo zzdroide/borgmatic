@@ -56,7 +56,7 @@ compression: zstd,3
 repositories:
     - path: ssh://borg@{server_ip}/./TAM
 borg_base_directory: "{home}"
-archive_name_format: "{user}-{now:%Y-%m-%dT%H:%M}"
+archive_name_format: "{server_user}-{now:%Y-%m-%dT%H:%M}"
 
 # Use HPN SSH with some options, as the original user if sudo was used.
 #   sh makes env vars work.

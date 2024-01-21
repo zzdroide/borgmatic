@@ -1,6 +1,24 @@
 # Borgmatic config
 
-# TODO(upg): rewrite for new version
+- [Running](#running)
+- [Mounting archives](#mounting-archives)
+- [Restoring partitions](#restoring-partitions)
+- [Setup](#setup)
+- [Troubleshooting](#troubleshooting)
+- [Tips](#tips)
+
+
+
+## Running
+
+```sh
+./run_create.py
+```
+```sh
+borgmatic2 ...
+```
+
+
 
 ## Mounting archives
 
@@ -32,6 +50,8 @@
 3. Open _Disks_ (`gnome-disks`)
 4. Click the loop device in the left pane, and then click the Play button to mount.
 5. When you are done, unmount with the Stop button, and detach the loop device with the `–` button in the title bar (next to the Minimize button).
+
+
 
 ## Restoring partitions
 
@@ -201,119 +221,45 @@ Double-check the device you are about to write to!
     > TODO(ntfs3): same with ntfs3?
 
 
-# old readme below
+
 ## Setup
 
-TODO(upg): make a quickstart.sh for safe steps
-
-sudo apt install wakeonlan
-
-1. Install Python3.12:
-
-    ```sh
-    sudo add-apt-repository ppa:deadsnakes/ppa && sudo apt update && sudo apt install python3.12 python3.12-dev
-    ```
-
-1. Install pipx:
-
-    `sudo apt install pipx` for Ubuntu >= 22
-
-    `sudo pip3 install pipx` for Ubuntu 20
-
-1. Install borg2 and borgmatic "2":
-    ```sh
-    sudo PIPX_HOME=/opt/pipx PIPX_BIN_DIR=/usr/local/bin pipx install 'borgbackup[pyfuse3]==2.0.0b7' --suffix 2 --python python3.12
-
-    sudo PIPX_HOME=/opt/pipx PIPX_BIN_DIR=/usr/local/bin pipx install 'borgmatic==1.8.5' --suffix 2 --python python3.12
-    ```
-
-1. OLD/////////// [Install Borg](https://borgbackup.readthedocs.io/en/stable/installation.html)
-
-    TODO(upg): https://launchpad.net/~costamagnagianfranco/+archive/ubuntu/borgbackup ?
-
-    To install with `pip` for all users:
-    - `sudo apt install python3-pip python3-setuptools libssl-dev pkg-config fuse libfuse-dev libacl1-dev`
-    - `sudo -i pip3 install --upgrade wheel`
-    - `sudo -i pip3 install --upgrade "borgbackup[fuse]"`
-
-    This way, `borg` starts in 0.6s in a computer with weak CPU, instead of 2.3s with the Standalone Binary.
-
-    alternative: https://github.com/pypa/pipx/issues/754
-
-1. Install HPN-SSH
-   1. [Download source from a tag](https://github.com/rapier1/openssh-portable/tags), which matches your version (for example `ssh -V` --> `8_2`) for easier compiling. One of `hpn-KitchenSink-*`, which includes all patches (same as `hpn-*`)
-   1. Extract and `cd`
-   1. `autoreconf && ./configure && make && ./ssh -V`
-   1. `sudo install ssh /usr/local/bin/hpnssh`
-
-   alternative: https://sourceforge.net/projects/hpnssh/files/Debian%20Packages/
-
-1. [Install Borgmatic](https://torsion.org/borgmatic/docs/how-to/set-up-backups/#installation)
-    ```sh
-    sudo -i pip3 install borgmatic==1.5.24
-    ```
-
-    "==" because the project doesn't follow semver (search for `BREAKING` in the [changelog](https://projects.torsion.org/borgmatic-collective/borgmatic/src/branch/master/NEWS))
-
-1. sudo apt install smartmontools jq
+1. Create an account at [healthchecks.io](https://healthchecks.io), and create projects "Borg" and "HDD Smart".
 
 1. Clone this:
     ```sh
-    sudo GIT_SSH_COMMAND="ssh -i ~$USER/.ssh/id_ed25519" git clone git@github.com:zzdroide/borgmatic.git /etc/borgmatic.d
+    sudo SSH_AUTH_SOCK="$SSH_AUTH_SOCK" git clone git@github.com:zzdroide/borgmatic.git /etc/borgmatic
     ```
-    For easy development, also run
+    For ease of usage, also run:
     ```sh
-    sudo chown -R $USER: /etc/borgmatic.d
+    sudo chown -R $USER:$USER /etc/borgmatic
     ```
 
-1. Configure by creating `config` folder and creating files from `config_example` (TODO: umask 077)
-    - `parts.cfg`: &lt;name> &lt;partition path> &lt;0 if raw (backup image with `dd`), 1 if NTFS>
-    - `config_storage.yaml`:
-      - `sed -i "s|borg_base_directory: NULL|borg_base_directory: $HOME|" /etc/borgmatic.d/config/config_storage.yaml`
-      - regenerate the passphrase using derive_pass.py
-      - protect the file with `chmod 600 /etc/borgmatic.d/config/config_storage.yaml`
+1.
+    ```sh
+    (umask 077 && cp -r /etc/borgmatic/{config_example,config})
+    ```
+    And configure:
 
-1. For easy usage, add
-   ```sh
-   alias tamborg="BORG_REPO=borg@192.168.0.64:TAM BORG_PASSCOMMAND='yq -r .encryption_passphrase /etc/borgmatic.d/config/config_storage.yaml' BORG_RSH='hpnssh -oBatchMode=yes -oNoneEnabled=yes -oNoneSwitch=yes' borg"
-   ```
-   to `.zshrc`.
+    - `bupsrcs.cfg`: &lt;type> &lt;name> &lt;path>
 
-   The required dependencies are:
-   ```sh
-   sudo apt install jq
-   sudo -i pip3 install --upgrade yq
-   ```
+      Where &lt;type> is:
+      - `linux` for a linux root or data (ext4) partition (must be a LV and have free space in the VG for a snapshot, to backup while in use)
+      - `part` to backup the raw partition
+      - `data` to backup file data only (exFAT-style)
 
-1. Add server's public ssh key with
-   ```sh
-   ssh-keyscan -H 192.168.0.64 >> ~/.ssh/known_hosts
-   ```
+    - `constants.yaml`: (this file supports comments, so see instructions there)
 
-1. Of course, add the public key of the computer you are setting up to the Borg server.
+    - `smarthealthc.cfg`: &lt;hc_url> &lt;dev>
 
-## SMART Healthchecks Setup
+      One line for every mechanical HDD worth preventative replacement.
 
-### At Healthchecks website:
-1. Create a project `HDD Smart` in Healthchecks
-2. Create a healthcheck for each disk, for example `TAM_2009-1TB`
+1.
+    ```sh
+    scripts/setup.sh
+    ```
 
-### `smarthealthc.cfg`:
-Add a line for each HDD to be monitored.
 
-## Running
-
-```sh
-sudo borgmatic -v1 create --progress --stats
-```
-
-Note that SSH authentication is set to non-interactive, to avoid hanging. To remove this, delete `-oBatchMode=yes` from shared_storage.yaml
-
-If you need an SSH agent for non-interactive login, run with this line instead:
-```sh
-sudo SSH_AUTH_SOCK="$SSH_AUTH_SOCK" borgmatic ...
-```
-If running with no GUI and no agent, run this first: `eval $(ssh-agent) && ssh-add`
 
 ## Troubleshooting
 
@@ -406,6 +352,7 @@ sudo dd if=mbr.bin of=/dev/sdX
 ```sh
 sudo dmsetup remove /dev/machine_name/root
 ```
+
 
 
 ## Tips
