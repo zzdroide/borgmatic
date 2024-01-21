@@ -121,22 +121,22 @@ Double-check the device you are about to write to!
 
     - Format and mount:
         ```sh
-        sudo vgcreate Z_vg /dev/sdXY
+        sudo vgcreate machine_name /dev/sdXY
 
         # Get available space in VG in GiB:
-        sudo vgs --noheadings -o vg_size /dev/Z_vg
+        sudo vgs --noheadings -o vg_size /dev/machine_name
 
         # Remember to leave some space in VG for snapshots:
-        sudo lvcreate --size 100G --name Z_lv Z_vg
+        sudo lvcreate --size 100G --name root machine_name
 
-        sudo mkfs.ext4 /dev/Z_vg/Z_lv
+        sudo mkfs.ext4 /dev/machine_name/root
         sudo mkdir /mnt/borg_linux_target
-        sudo mount /dev/Z_vg/Z_lv /mnt/borg_linux_target
+        sudo mount /dev/machine_name/root /mnt/borg_linux_target
         ```
 
         > Note: some customizations are not being backed up. For example:
         > ```sh
-        > sudo tune2fs -l /dev/Z_vg/Z_lv | grep "Reserved block count"
+        > sudo tune2fs -l /dev/machine_name/root | grep "Reserved block count"
         > ```
 
     - Find the matching Linux archive name in Borg repository
@@ -396,9 +396,9 @@ sudo dd if=mbr.bin of=/dev/sdX
 # Reboot and in GRUB choose Windows 😈
 ```
 
-### There's a ghost/zombie/leftover/nonexistant `/dev/Z_vg/Z_lv`
+### There's a ghost/zombie/leftover/nonexistant `/dev/machine_name/root`
 ```sh
-sudo dmsetup remove /dev/Z_vg/Z_lv
+sudo dmsetup remove /dev/machine_name/root
 ```
 
 
