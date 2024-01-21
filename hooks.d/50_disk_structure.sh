@@ -15,8 +15,7 @@ stream_disk_header() {
 }
 
 print_part_serial() {
-  # https://unix.stackexchange.com/questions/12858/how-to-change-filesystem-uuid-2-same-uuid
-  echo "TODO"
+  blkid --match-tag=UUID --output=value "${bupsrc[devpart]}"
 }
 
 do_bupsrc() {
@@ -39,8 +38,9 @@ do_bupsrc() {
   case "$hook_type" in
     "$hook_before")
       echo "${bupsrc[devpart]}" >"$part_file"
-      [[ ${lvdev_file:-} ]] && echo "${bupsrc[devlv]}" >"$lvdev_file"
       print_part_serial >"$serial_file"
+      [[ ${lvdev_file:-} ]] && echo "${bupsrc[devlv]}" >"$lvdev_file"
+      # TODO: get_ext4_reserved_space.sh
 
       stream_disk_header "$disk_name" >"$header_file"
       ;;

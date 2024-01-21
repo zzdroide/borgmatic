@@ -129,7 +129,7 @@ Double-check the device you are about to write to!
         # Remember to leave some space in VG for snapshots:
         sudo lvcreate --size 100G --name root machine_name
 
-        sudo mkfs.ext4 /dev/machine_name/root
+        sudo mkfs.ext4 -U "$(cat structure/serial_linux_root.txt)" /dev/machine_name/root
         sudo mkdir /mnt/borg_linux_target
         sudo mount /dev/machine_name/root /mnt/borg_linux_target
         ```
@@ -161,6 +161,8 @@ Double-check the device you are about to write to!
         (umask 022; mkdir var/cache/apt)
         # No need to mess with `tmp` and `var/tmp` as they are automatically created.
         etc/borgmatic.d/restore/machine_specific/mkswap.generated.sh  # May not exist
+        # TODO: ext4_reserve.sh
+        # TODO: for script in etc/borgmatic.d/restore/machine_specific/*.generated.sh
         exit
         ```
 
@@ -174,8 +176,12 @@ Double-check the device you are about to write to!
 
 7. Restore data:
     - Boot into restored Linux to have GUI
-    - Format and mount with GUI
-    - With GUI open a terminal at mount point and run:
+    - Format partition with its previous filesystem
+    - Restore its serial from `structure/serial_xxxx.txt`:
+      - NTFS: `sudo ntfslabel --new-serial=<serial> /dev/sdXY`
+      - exFAT: `sudo tune.exfat -I <serial> /dev/sdXY`
+    - Mount
+    - Open a terminal at mount point and run:
         ```sh
         tamborg -v extract --strip-components 1 ::<archive name> PART/
         ```

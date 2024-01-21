@@ -23,7 +23,7 @@ list_header_partitions() {
   local header=$1
   [[ -s "$header" ]]  # Assert exists
 
-  local pttype; pttype=$(blkid --match-tag PTTYPE --output value "$header")
+  local pttype; pttype=$(blkid --match-tag=PTTYPE --output=value "$header")
   case $pttype in
     dos)
       echo " MBR"
