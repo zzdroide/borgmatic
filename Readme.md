@@ -224,6 +224,10 @@ Double-check the device you are about to write to!
 
 ## Setup
 
+0. Requirements:
+    - Runs on Linux only. Windows can be backed up with dual-boot from Linux.
+    - Encrypted filesystems are not supported.
+
 1. Create an account at [healthchecks.io](https://healthchecks.io), and create projects "Borg" and "HDD Smart".
 
 1. Clone this:
