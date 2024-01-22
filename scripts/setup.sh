@@ -1,5 +1,6 @@
 #!/bin/bash
 set -euo pipefail
+cd "$(dirname "$0")/../"
 
 # https://stackoverflow.com/questions/73764339/pipx-fails-for-poetry-on-ubuntu-20-04
 [[ $(source /etc/os-release && echo "$UBUNTU_CODENAME") == "focal" ]] \
@@ -31,3 +32,14 @@ sudo PIPX_HOME=/opt/pipx PIPX_BIN_DIR=/usr/local/bin \
   pipx install 'borgmatic==1.8.5' --suffix 2
 # Exact version because the project doesn't follow semver
 # (search for `BREAKING` in the changelog: https://projects.torsion.org/borgmatic-collective/borgmatic/src/branch/master/NEWS)
+
+# This is like "ssh-keyscan {server_ip} >>~/.ssh/known_hosts"
+# but using borgmatic to obtain {server_ip}.
+borgmatic2 --verbosity=-2 \
+  `# Skip wakeup_server.sh which will fail with "Host key verification failed":` \
+  --override before_actions="[]" \
+  --override ssh_command="hpnssh \
+    -oStrictHostKeyChecking=accept-new `# Automatically add to known_hosts` \
+    -oBatchMode=yes
+    -oPreferredAuthentications=null `# Fail authentication on purpose and close connection`" \
+  info 2>/dev/null
