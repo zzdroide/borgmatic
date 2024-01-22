@@ -226,6 +226,7 @@ Double-check the device you are about to write to!
 
 0. Requirements:
     - Runs on Linux only. Windows can be backed up with dual-boot from Linux.
+    - Ubuntu and Linux Mint are supported. Debian-based distros are untested. Others are currently unsupported.
     - Encrypted filesystems are not supported.
 
 1. Create an account at [healthchecks.io](https://healthchecks.io), and create projects "Borg" and "HDD Smart".
