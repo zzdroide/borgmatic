@@ -1,4 +1,4 @@
-## Backup from Windows-only computer
+## Alternative to backup from Windows-only computer
 
 Instead of installing a dual-boot just to run borgmatic:
 - Make the backup from the running Windows with [disk2vhd](https://learn.microsoft.com/en-us/sysinternals/downloads/disk2vhd)
