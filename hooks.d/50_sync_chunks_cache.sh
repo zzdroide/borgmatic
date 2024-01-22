@@ -6,7 +6,6 @@ source helpers/common.py
 
 case "$1" in
   "$hook_before")
-    # TODO: enable
-    #   borgmatic2 rinfo >/dev/null
+    borgmatic2 rinfo >/dev/null
     ;;
 esac
