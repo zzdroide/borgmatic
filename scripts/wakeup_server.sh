@@ -6,7 +6,7 @@ server_mac=$2
 
 wakeonlan "$server_mac" >/dev/null
 
-ssh \
+hpnssh \
   -oBatchMode=yes \
   -oConnectTimeout=1 \
   -oConnectionAttempts=20 \
