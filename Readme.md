@@ -1,8 +1,8 @@
 # Borgmatic config
 
 - [Running](#running)
-- [Mounting archives](#mounting-archives)
-- [Restoring partitions](#restoring-partitions)
+- [Mounting archives](#mounting-archives) (TODO)
+- [Restoring partitions](#restoring-partitions) (TODO)
 - [Setup](#setup)
 - [Troubleshooting](#troubleshooting)
 - [Tips](#tips)
