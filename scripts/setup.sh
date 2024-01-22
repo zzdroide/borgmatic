@@ -36,8 +36,6 @@ sudo PIPX_HOME=/opt/pipx PIPX_BIN_DIR=/usr/local/bin \
 # This is like "ssh-keyscan {server_ip} >>~/.ssh/known_hosts"
 # but using borgmatic to obtain {server_ip}.
 borgmatic2 --verbosity=-2 \
-  `# Skip wakeup_server.sh which will fail with "Host key verification failed":` \
-  --override before_actions="[]" \
   --override ssh_command="hpnssh \
     -oStrictHostKeyChecking=accept-new `# Automatically add to known_hosts` \
     -oBatchMode=yes
