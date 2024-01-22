@@ -71,20 +71,20 @@ skip_actions:
 
 # This runs before create, list, mount, extract, etc.
 before_actions:
-    - scripts/wakeup_server.sh {server_ip} {server_mac}
+    - /etc/borgmatic/scripts/wakeup_server.sh {server_ip} {server_mac}
 
 before_backup:
-    - scripts/hooks.sh cleanup
-    - scripts/hooks.sh before
+    - /etc/borgmatic/scripts/hooks.sh cleanup
+    - /etc/borgmatic/scripts/hooks.sh before
 
 # Runs only if hook and backup didn't errored.
 after_backup:
-    - scripts/hooks.sh after
+    - /etc/borgmatic/scripts/hooks.sh after
 
 # "after_everything" runs after a create, even if errors occur in hook or backup.
 # Except if the errored hook is "before_everything", so be careful with that one.
 after_everything:
-    - scripts/hooks.sh cleanup
+    - /etc/borgmatic/scripts/hooks.sh cleanup
 before_everything: []
 
 healthchecks:
