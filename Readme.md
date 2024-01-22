@@ -135,7 +135,7 @@ Double-check the device you are about to write to!
       sudo ntfsclone --restore-image --overwrite /dev/sdXY -
     ```
 
-    > Unfortunately `borg extract` can't be used with `--restore-image`, because the image is raw and not special-image, and _Only special images can be read from standard input_.
+    > Unfortunately `borg extract` can't be used with `--restore-image`, because the image is raw and not special-image (so it can be mounted), and _Only special images can be read from standard input_.
 
 6.  Restore Linux root LVM partition:
 
