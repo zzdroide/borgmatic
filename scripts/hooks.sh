@@ -1,5 +1,6 @@
 #!/bin/bash
 set -euo pipefail
+(( EUID == 0 )) || { echo "Error: not root"; exit 1; }
 umask 077
 
 cd "$(dirname "$0")/../hooks.d"
