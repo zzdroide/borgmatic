@@ -62,7 +62,7 @@ archive_name_format: "{server_user}-{now:%Y-%m-%dT%H:%M}"
 #   sh makes env vars work.
 #   SSH_AUTH_SOCK provides unlocked identity_file.
 #   As Borg appends parameters to the command, and -c requires quotes, $@ is used. "0" fills $0.
-ssh_command: sh -c 'sudo -u "${SUDO_USER:-$USER}" SSH_AUTH_SOCK="$SSH_AUTH_SOCK" /usr/local/bin/hpnssh -oBatchMode=yes -oNoneEnabled=yes -oNoneSwitch=yes "$@"' 0
+ssh_command: sh -c 'sudo -u "${SUDO_USER:-$USER}" SSH_AUTH_SOCK="$SSH_AUTH_SOCK" /bin/hpnssh -oBatchMode=yes -oNoneEnabled=yes -oNoneSwitch=yes "$@"' 0
 
 skip_actions:
     - prune
