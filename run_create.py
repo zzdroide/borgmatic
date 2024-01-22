@@ -68,3 +68,5 @@ subprocess.run(
     shell=True,  # noqa: S602
     check=True,
 )
+
+# TODO: make something with the backup if it completed with errors (or it could be kept by prune :s )
