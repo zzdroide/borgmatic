@@ -272,6 +272,10 @@ Double-check the device you are about to write to!
 
 ## Troubleshooting
 
+### Borgmatic fails with `borg.remote.ConnectionClosed: Connection closed by remote host`
+
+This is most likely the ssh hook rejecting the connection. Confirm this by running again but adding `-v2`. Now the output will contain: _Got unexpected RPC data format from server: Repo is NOT OK_
+
 ### This message appears: `mesg: ttyname failed: Inappropriate ioctl for device`
 
 In `/root/.profile`, replace `mesg n || true` with `tty -s && mesg n || true` [(Source)](https://superuser.com/questions/1160025/how-to-solve-ttyname-failed-inappropriate-ioctl-for-device-in-vagrant)
