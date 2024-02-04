@@ -23,6 +23,8 @@ if [[ -z "$pipx_apt" ]]; then
   sudo pip3 install pipx
 fi
 
+# TODO: install specialfile
+
 sudo PIPX_HOME=/opt/pipx PIPX_BIN_DIR=/usr/local/bin \
   pipx install 'borgbackup[pyfuse3]==2.0.0b7' --suffix 2
 # Exact version because betas can have breaking changes.
