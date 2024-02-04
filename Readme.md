@@ -255,11 +255,11 @@ Double-check the device you are about to write to!
       - `part` to backup the raw partition
       - `data` to backup file data only (exFAT-style)
 
-    - `constants.yaml`: (this file supports comments, so see instructions there)
-
     - `smarthealthc.cfg`: &lt;hc_url> &lt;dev>
 
       One line for every mechanical HDD worth preventative replacement.
+
+    - `constants.yaml` and `env`: these files support comments, so see instructions there.
 
 1.
     ```sh

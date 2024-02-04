@@ -1,0 +1,4 @@
+# shellcheck shell=bash
+
+# Obtain this with "grep id ~/TAM/config" in server, or from the config in another computer.
+export REPO_ID=0123456789abcdef

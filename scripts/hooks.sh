@@ -4,6 +4,8 @@ set -euo pipefail
 umask 077
 
 cd "$(dirname "$0")/../hooks.d"
+# shellcheck source=../config_example/env
+source ../config/env
 # shellcheck source-path=../hooks.d
 source helpers/common.py
 
