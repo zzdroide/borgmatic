@@ -15,5 +15,5 @@ wakeonlan "$server_mac" >/dev/null
 #     "borg --version"
 # Checking with ssh:
 # - is too slow (command must be "borg" and 2 hooks have to be called)
-# - The consecutive sshs (check awake, borg) fail because the second open_session
+# - [obsolete] The consecutive sshs (check awake, borg) fail because the second open_session
 #   runs before the first close_session finishes
