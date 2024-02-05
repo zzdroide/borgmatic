@@ -38,7 +38,11 @@ do_bupsrc() {
   case "$hook_type" in
     "$hook_before")
       echo "${bupsrc[devpart]}" >"$part_file"
-      print_part_serial >"$serial_file"
+
+      is_bupsrc_target_part \
+        `# Serial not required for part targets, it's embedded in the .img ;)` \
+        || print_part_serial >"$serial_file"
+
       [[ ${lvdev_file:-} ]] && echo "${bupsrc[devlv]}" >"$lvdev_file"
       # TODO: get_ext4_reserved_space.sh
 
@@ -47,8 +51,8 @@ do_bupsrc() {
 
     "$hook_after")
       rm "$part_file"
+      is_bupsrc_target_part || rm "$serial_file"
       [[ ${lvdev_file:-} ]] && rm "$lvdev_file"
-      rm "$serial_file"
 
       rm -f "$header_file"
       ;;

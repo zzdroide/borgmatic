@@ -53,6 +53,12 @@ _=''''
 
 declare -A bupsrc
 
+is_bupsrc_target_part() {
+    [[ "${bupsrc[target]}" == "$target_part" ]]
+}
+is_bupsrc_target_data() {
+    [[ "${bupsrc[target]}" == "$target_data" ]]
+}
 is_bupsrc_target_linux() {
     [[ "${bupsrc[target]}" == "$target_linux" ]]
 }
