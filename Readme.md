@@ -1,7 +1,7 @@
 # Borgmatic config
 
 - [Running](#running)
-- [Mounting archives](#mounting-archives) (TODO)
+- [Mounting archives](#mounting-archives)
 - [Restoring partitions](#restoring-partitions) (TODO)
 - [Setup](#setup)
 - [Troubleshooting](#troubleshooting)
@@ -29,12 +29,12 @@ borgmatic2 ...
     ```
 2. Find the archive to mount, for example with:
     ```sh
-    tamborg list --last 5 --prefix TAM_2009-pata-
+    borgmatic2 rlist --last 5 -a "sh:TAM_2009-*"
     ```
 3. Mount it with:
     ```sh
-    tamborg -v mount -o allow_root,uid=$UID ::<archive name> /mnt/borg
-    # TODO(upg): add --numeric-ids
+    borgmatic2 -v1 mount --options=allow_root,uid=$UID --mount-point=/mnt/borg --archive=<archive_name>
+    # TODO: add --numeric-ids
     ```
 4. When you are done, unmount it with:
     ```sh
