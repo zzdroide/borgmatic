@@ -251,7 +251,7 @@ Double-check the device you are about to write to!
     - `bupsrcs.cfg`: &lt;type> &lt;name> &lt;path>
 
       Where &lt;type> is:
-      - `linux` for a linux root or data (ext4) partition (must be a LV and have free space in the VG for a snapshot, to backup while in use)
+      - `linux` for an ext4 linux root or data partition. Must be a LV and have free space in the VG for a snapshot, to backup while in use.
       - `part` to backup the raw partition
       - `data` to backup file data only (exFAT-style)
 

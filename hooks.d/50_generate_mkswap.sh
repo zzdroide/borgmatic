@@ -10,14 +10,15 @@ filter_swap_print_col1() {
   awk '{if ($3 == "swap") print $1;}'
 }
 
-readonly gen_path=../restore/machine_specific/mkswap.generated.sh
+readonly template_path=../restore/machine_specific/mkswap.template.sh
+readonly generated_path=../restore/machine_specific/mkswap.generated.sh
 
 generate_mkswap() {
   local swapfile_path; swapfile_path=$(</etc/fstab filter_comments | filter_swap_print_col1)
 
   if [[ ! $swapfile_path ]]; then
     # No swapfile
-    rm -fv $gen_path
+    rm -fv $generated_path
     return 0
   fi
 
@@ -28,7 +29,7 @@ generate_mkswap() {
 
   if [[ $(findmnt --noheadings --output=target --target="$swapfile_path") != / ]]; then
     # Swapfile not in root filesystem?
-    rm -fv $gen_path
+    rm -fv $generated_path
     return 0
   fi
 
@@ -39,9 +40,9 @@ generate_mkswap() {
     s|%relative_file%|$relative_file|
     s|%megabytes%|$megabytes|
   " \
-    < ../restore/machine_specific/mkswap.template.sh \
-    > $gen_path
-  chmod 744 $gen_path
+    < $template_path \
+    > $generated_path
+  chmod 744 $generated_path
 }
 
 case "$1" in
