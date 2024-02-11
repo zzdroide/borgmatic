@@ -18,7 +18,6 @@ generate_mkswap() {
 
   if [[ ! $swapfile_path ]]; then
     # No swapfile
-    rm -fv $generated_path
     return 0
   fi
 
@@ -29,7 +28,6 @@ generate_mkswap() {
 
   if [[ $(findmnt --noheadings --output=target --target="$swapfile_path") != / ]]; then
     # Swapfile not in root filesystem?
-    rm -fv $generated_path
     return 0
   fi
 
