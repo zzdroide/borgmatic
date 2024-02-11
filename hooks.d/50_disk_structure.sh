@@ -17,6 +17,9 @@ stream_disk_header() {
 print_part_serial() {
   blkid --match-tag=UUID --output=value "${bupsrc[devpart]}"
 }
+print_lv_serial() {
+  blkid --match-tag=UUID --output=value "${bupsrc[devlv]}"
+}
 
 get_val() {
   sed -r 's/.+: +//'
@@ -26,13 +29,13 @@ generate_ext4_reserved_space() {
   local template_path="../restore/machine_specific/ext4_reserved_space.template.sh"
   local generated_path="../restore/machine_specific/ext4_reserved_space-${bupsrc[name]}.generated.sh"
 
-  local part_serial; part_serial="$(print_part_serial)"
+  local e4_serial; e4_serial="$(print_lv_serial)"
 
   local tune_list; tune_list=$(tune2fs -l "${bupsrc[devlv]}")
   local reserved_blocks; reserved_blocks=$(echo "$tune_list" | grep "Reserved block count:" | get_val)
 
   sed "
-    s/%part_serial%/$part_serial/
+    s/%e4_serial%/$e4_serial/
     s/%reserved_blocks%/$reserved_blocks/
   " \
     < $template_path \
@@ -61,9 +64,11 @@ do_bupsrc() {
     "$hook_before")
       echo "${bupsrc[devpart]}" >"$part_file"
 
-      is_bupsrc_target_part \
-        `# Serial not required for part targets, it's embedded in the .img ;)` \
-        || print_part_serial >"$serial_file"
+      case "${bupsrc[target]}" in
+        "$target_part") true ;;  # Serial not required for part targets, it's embedded in the .img ;)
+        "$target_data") print_part_serial >"$serial_file" ;;
+        "$target_linux") print_lv_serial >"$serial_file" ;;
+      esac
 
       is_bupsrc_target_linux && {
         echo "${bupsrc[devlv]}" >"$lvdev_file";
