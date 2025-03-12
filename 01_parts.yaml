@@ -39,17 +39,12 @@ retention:
 
 hooks:
     before_backup:
-        - bash -c "(( EUID == 0 ))" || (echo 'Use `sudo`'; exit 1)
-
-        #       - /etc/borgmatic.d/parts_hooks.sh setup
+        #       - /etc/borgmatic.d/parts_hooks.sh before
         # It hangs in Python process.stdout.read() :(
         # So give no output to Python, but still print it:
-        - /etc/borgmatic.d/parts_hooks.sh setup >/proc/$PPID/fd/1 2>&1
+        - /etc/borgmatic.d/parts_hooks.sh before >/proc/$PPID/fd/1 2>&1
 
     after_backup:
-        - /etc/borgmatic.d/parts_hooks.sh cleanup
-        - 'chown -R "$SUDO_USER:$SUDO_USER" /home/"$SUDO_USER"/.config/borg/ /home/"$SUDO_USER"/.cache/borg/'
-
-    umask: 0077
+        - /etc/borgmatic.d/parts_hooks.sh after
 
     # TODO: https://torsion.org/borgmatic/docs/how-to/monitor-your-backups/#healthchecks-hook

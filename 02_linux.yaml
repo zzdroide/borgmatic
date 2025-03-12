@@ -65,7 +65,6 @@ hooks:
 
     after_backup:
         - /etc/borgmatic.d/linux_hooks.sh cleanup
-        - 'chown -R "$SUDO_USER:$SUDO_USER" /home/"$SUDO_USER"/.config/borg/ /home/"$SUDO_USER"/.cache/borg/'
 
     umask: 0077
 
