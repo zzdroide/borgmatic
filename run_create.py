@@ -70,7 +70,7 @@ subprocess.run(
     (
         '/bin/sudo'
         ' SSH_AUTH_SOCK="$SSH_AUTH_SOCK"'
-        ' borgmatic -v1 create --progress --stats'
+        ' borgmatic create --progress --stats'
     ),
     shell=True,  # noqa: S602
     check=True,

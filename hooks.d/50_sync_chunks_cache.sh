@@ -6,6 +6,6 @@ source helpers/common.py
 
 case "$1" in
   "$hook_before")
-    borgmatic rinfo >/dev/null
+    borgmatic repo-info >/dev/null
     ;;
 esac

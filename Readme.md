@@ -29,11 +29,11 @@ borgmatic ...
     ```
 2. Find the archive to mount, for example with:
     ```sh
-    borgmatic rlist --last 5 -a "sh:TAM_2009-*"
+    borgmatic repo-list --last 5 -a "sh:TAM_2009-*"
     ```
 3. Mount it with:
     ```sh
-    borgmatic -v1 mount --options=allow_root,uid=$UID --mount-point=/mnt/borg --archive=<archive_name>
+    borgmatic mount --options=allow_root,uid=$UID --mount-point=/mnt/borg --archive=<archive_name>
     # TODO: add --numeric-ids
     ```
 4. When you are done, unmount it with:
@@ -198,7 +198,7 @@ Double-check the device you are about to write to!
     - Mount
     - Open a terminal at mount point and run:
         ```sh
-        tamborg -v extract --strip-components 1 ::<archive name> PART/
+        tamborg extract --strip-components 1 ::<archive name> PART/
         ```
         This assumes backup uid matches restore uid.
     - If you then realize that some important NTFS metadata is missing, you may try recovering it by converting the `.metadata.simg` to VHD with https://github.com/yirkha/ntfsclone2vhd/#metadata-only-images, and mounting it in Windows.
