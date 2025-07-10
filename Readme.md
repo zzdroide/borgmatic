@@ -34,7 +34,6 @@ borgmatic ...
 3. Mount it with:
     ```sh
     borgmatic mount --options=allow_root,uid=$UID --mount-point=/mnt/borg --archive=<archive_name>
-    # TODO: add --numeric-ids
     ```
 4. When you are done, unmount it with:
     ```sh
