@@ -50,24 +50,22 @@ exclude_patterns:
     - sh:linux_root/home/*/.Xauthority
     - pf:linux_root/root/.cache
 
-local_path: borg2
 encryption_passphrase: "{encryption_passphrase}"
 compression: zstd,3
 repositories:
     - path: ssh://borg@{server_ip}/./TAM
 borg_base_directory: "{home}"
 archive_name_format: "{server_user}-{now:%Y-%m-%dT%H:%M}"
+skip_actions:
+    - prune
+    - compact
+    - check
 
 # Use HPN SSH with some options, as the original user if sudo was used.
 #   sh makes env vars work.
 #   SSH_AUTH_SOCK provides unlocked identity_file.
 #   As Borg appends parameters to the command, and -c requires quotes, $@ is used. "0" fills $0.
 ssh_command: sh -c 'sudo -u "${SUDO_USER:-$USER}" SSH_AUTH_SOCK="$SSH_AUTH_SOCK" /bin/hpnssh -oBatchMode=yes -oNoneEnabled=yes -oNoneSwitch=yes "$@"' 0
-
-skip_actions:
-    - prune
-    - compact
-    - check
 
 # This runs before create, list, mount, extract, etc.
 before_actions:

@@ -15,7 +15,7 @@
 ./run_create.py
 ```
 ```sh
-borgmatic2 ...
+borgmatic ...
 ```
 
 
@@ -29,11 +29,11 @@ borgmatic2 ...
     ```
 2. Find the archive to mount, for example with:
     ```sh
-    borgmatic2 rlist --last 5 -a "sh:TAM_2009-*"
+    borgmatic rlist --last 5 -a "sh:TAM_2009-*"
     ```
 3. Mount it with:
     ```sh
-    borgmatic2 -v1 mount --options=allow_root,uid=$UID --mount-point=/mnt/borg --archive=<archive_name>
+    borgmatic -v1 mount --options=allow_root,uid=$UID --mount-point=/mnt/borg --archive=<archive_name>
     # TODO: add --numeric-ids
     ```
 4. When you are done, unmount it with:
@@ -45,7 +45,7 @@ borgmatic2 ...
 
 <sub><sup>GUI instructions as you probably want to recover individual files while you still have a usable Linux with Desktop Environment</sup></sub>
 
-1. With the File Manager (Nemo), navigate to /mnt/borg
+1. With the File Manager (Nemo), navigate to `/mnt/borg`
 2. Right-click the image file and click _Open With Disk Image Mounter_
 3. Open _Disks_ (`gnome-disks`)
 4. Click the loop device in the left pane, and then click the Play button to mount.
@@ -74,7 +74,7 @@ Double-check the device you are about to write to!
 
 4. For each disk, restore its header (includes partition table) with:
     ```sh
-    < sdA_header.bin sudo tee /dev/sdX >/dev/null
+    <sdA_header.bin sudo tee /dev/sdX >/dev/null
     ```
 
     After restoring for all disks, run:
@@ -154,11 +154,6 @@ Double-check the device you are about to write to!
         sudo mount /dev/machine_name/root /mnt/borg_linux_target
         ```
 
-        > Note: some customizations are not being backed up. For example:
-        > ```sh
-        > sudo tune2fs -l /dev/machine_name/root | grep "Reserved block count"
-        > ```
-
     - Find the matching Linux archive name in Borg repository
 
     - Extract:
@@ -175,14 +170,14 @@ Double-check the device you are about to write to!
         sudo rm -rf /root/{.config,.cache}/borg/
         ```
 
-    - Recreate the excluded stuff: (see "exclude_patterns" in 02_linux.yaml)
+    - Restore stuff:
         ```sh
         sudo su
+
         (umask 022; mkdir var/cache/apt)
         # No need to mess with `tmp` and `var/tmp` as they are automatically created.
-        etc/borgmatic.d/restore/machine_specific/mkswap.generated.sh  # May not exist
-        # TODO: ext4_reserve.sh
-        # TODO: for script in etc/borgmatic.d/restore/machine_specific/*.generated.sh
+
+        for s in etc/borgmatic.d/restore/machine_specific/*.generated.sh; do $s; done
         exit
         ```
 
@@ -225,11 +220,10 @@ Double-check the device you are about to write to!
 ## Setup
 
 0. Requirements:
-    - Runs on Linux only. Windows can be backed up with dual-boot from Linux.
-    - Ubuntu and Linux Mint are supported. Debian-based distros are untested. Others are currently unsupported.
-    - Encrypted filesystems are not supported.
+    - Debian / Ubuntu / Linux Mint
+    - Encrypted filesystems are currently unsupported.
 
-1. Create an account at [healthchecks.io](https://healthchecks.io), and create projects "Borg" and "HDD Smart".
+1. Create projects "Borg" and "HDD Smart" at [healthchecks.io](https://healthchecks.io).
 
 1. Clone this:
     ```sh
@@ -275,10 +269,6 @@ Double-check the device you are about to write to!
 ### Borgmatic fails with `borg.remote.ConnectionClosed: Connection closed by remote host`
 
 This is most likely the ssh hook rejecting the connection. Confirm this by running again but adding `-v2`. Now the output will contain: _Got unexpected RPC data format from server: Repo is NOT OK_
-
-### This message appears: `mesg: ttyname failed: Inappropriate ioctl for device`
-
-In `/root/.profile`, replace `mesg n || true` with `tty -s && mesg n || true` [(Source)](https://superuser.com/questions/1160025/how-to-solve-ttyname-failed-inappropriate-ioctl-for-device-in-vagrant)
 
 ### Windows can't mount NTFS partition
 

@@ -14,9 +14,9 @@ Instead of installing a dual-boot just to run borgmatic:
 TODO: create a script like this:
 ```sh
 ./run_create.py
-borg2 rdelete --cache-only
+borgmatic repo-delete --cache-only
 ./run_create.py --override healthchecks.ping_url=...
-borgmatic2 diff ...
+borgmatic diff ...
 ```
 
 make a new healthcheck for this
