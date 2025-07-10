@@ -39,22 +39,29 @@ def inhibit_suspend():
     https://codeberg.org/WhyNotHugo/caffeine-ng/src/tag/v4.0.2/caffeine/inhibitors.py#L66
     which works in Cinnamon so let's copy that.
     """
-    bus = dbus.SessionBus()
-    applicable = "org.gnome.SessionManager" in bus.list_names()
 
-    if applicable:
-        proxy1 = bus.get_object("org.gnome.SessionManager", "/org/gnome/SessionManager")
-        proxy2 = dbus.Interface(proxy1, dbus_interface="org.gnome.SessionManager")
-        proxy2.Inhibit(
-            INHIBIT_APP_ID,
-            dbus.UInt32(INHIBIT_TOPLEVEL_XID),
-            INHIBIT_REASON,
-            dbus.UInt32(INHIBIT_SUSPEND_FLAG),
-        )
-        # No need to store cookie or call Uninhibit, just exit script.
+    if subprocess.run(
+        ("systemctl", "is-enabled", "display-manager"),
+        stdout=subprocess.DEVNULL,
+        stderr=subprocess.DEVNULL,
+    ).returncode == 0:
 
-    else:
-        print("Note: not preventing suspension")  # noqa: T201
+        bus = dbus.SessionBus()
+        applicable = "org.gnome.SessionManager" in bus.list_names()
+
+        if applicable:
+            proxy1 = bus.get_object("org.gnome.SessionManager", "/org/gnome/SessionManager")
+            proxy2 = dbus.Interface(proxy1, dbus_interface="org.gnome.SessionManager")
+            proxy2.Inhibit(
+                INHIBIT_APP_ID,
+                dbus.UInt32(INHIBIT_TOPLEVEL_XID),
+                INHIBIT_REASON,
+                dbus.UInt32(INHIBIT_SUSPEND_FLAG),
+            )
+            # No need to store cookie or call Uninhibit, just exit script.
+
+        else:
+            print("Note: not preventing suspension")  # noqa: T201
 
 
 inhibit_suspend()
