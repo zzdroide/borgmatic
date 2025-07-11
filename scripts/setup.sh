@@ -20,8 +20,7 @@ sudo apt install -y \
 #   make
 #   sudo make install
 
-sudo PIPX_HOME=/opt/pipx PIPX_BIN_DIR=/usr/local/bin \
-  pipx install borgmatic==2.0.7
+sudo pipx install --global borgmatic==2.0.7
 # Exact version because the project doesn't follow semver  https://torsion.org/borgmatic/docs/how-to/upgrade/#versioning-and-breaking-changes
 
 # This is like "ssh-keyscan {server_ip} >>~/.ssh/known_hosts"
