@@ -2,6 +2,14 @@
 set -euo pipefail
 cd "$(dirname "$0")/../"
 
+if (source /etc/os-release && [[
+  "$VERSION_CODENAME" == "focal" || "$UBUNTU_CODENAME" == "focal"
+]]); then
+  echo "20.04 setup is not automated. Please install deadsnakes PPA and" \
+       "pipx, and run setup.sh commands manually."
+  exit 1
+fi
+
 sudo add-apt-repository -y ppa:rapier1/hpnssh
 sudo add-apt-repository -y ppa:costamagnagianfranco/borgbackup
 sudo apt update

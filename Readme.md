@@ -219,7 +219,7 @@ Double-check the device you are about to write to!
 ## Setup
 
 0. Requirements:
-    - Debian / Ubuntu / Linux Mint
+    - Debian / Linux Mint / Ubuntu 20.04
     - Encrypted filesystems are currently unsupported.
 
 1. Create projects "Borg" and "HDD Smart" at [healthchecks.io](https://healthchecks.io).
