@@ -2,7 +2,7 @@
 
 - [Running](#running)
 - [Mounting archives](#mounting-archives)
-- [Restoring partitions](#restoring-partitions) (TODO)
+- [Restoring partitions](#restoring-partitions)
 - [Setup](#setup)
 - [Troubleshooting](#troubleshooting)
 - [Tips](#tips)
@@ -160,7 +160,7 @@ Double-check the device you are about to write to!
         pushd /mnt/borg_linux_target
         sudo tamborg -pv extract --numeric-owner --sparse ::<archive name>
 
-        # FIXME: handle this with borgmatic instead (when tamborg alias is deleted)
+        # FIXME(extract): handle this with borgmatic instead (when tamborg alias is deleted)
         # "sudo tamborg" is failing SSH.
         # So currently tamborg and borgmatic have to be manually merged:
         sudo BORG_REPO=borg@192.168.0.64:TAM BORG_PASSCOMMAND='yq -r .encryption_passphrase /etc/borgmatic.d/config/config_storage.yaml' BORG_RSH='sh -c '\''sudo -u $SUDO_USER SSH_AUTH_SOCK="$SSH_AUTH_SOCK" /usr/local/bin/hpnssh -oBatchMode=yes -oNoneEnabled=yes -oNoneSwitch=yes "$@"'\'' 0' borg -pv extract --numeric-owner --sparse ::<archive name>
@@ -212,7 +212,7 @@ Double-check the device you are about to write to!
     >   ```
     > - Symlinks and junctions are screwed on Windows. They are regular files, with some prefix and then text with the Linux's target path :(
     >
-    > TODO(ntfs3): same with ntfs3?
+    > TODO(extract): same with ntfs3?
 
 
 

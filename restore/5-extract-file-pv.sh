@@ -6,7 +6,7 @@ FILE=$2
 
 echo "Sorry, not implemented yet. See script's code and run manually."
 exit 1
-# FIXME: implement with borgmatic set up so that tamborg alias is not required
+# FIXME(extract): implement with borgmatic set up so that tamborg alias is not required
 
 # size=$(du --bytes "$FILE" | cut -f1)
 

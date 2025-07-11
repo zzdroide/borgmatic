@@ -11,7 +11,7 @@ Instead of installing a dual-boot just to run borgmatic:
 
 ## source data corruption detection
 
-TODO: create a script like this:
+TODO(future): create a script like this:
 ```sh
 ./run_create.py
 borgmatic repo-delete --cache-only
