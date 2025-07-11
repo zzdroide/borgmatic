@@ -1,8 +1,8 @@
-# This is a hack to define consts only once, and source a single file.
+# This is a hack to define consts only once, and source a single file.  # noqa: INP001
 
 # shellcheck shell=bash
 # shellcheck disable=SC2034 # This file is to be sourced
-# ruff: noqa: Q001
+# ruff: noqa: Q001, E225, E261, E262, E303, W605
 
 # This file is valid bash and python,
 # and python executes `foo="bar"`,

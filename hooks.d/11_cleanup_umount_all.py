@@ -1,13 +1,14 @@
 #!/usr/bin/env -S PYTHONPATH=. python3
 import subprocess
 import sys
+from pathlib import Path
 
 from helpers.common import base_dir, hook_cleanup
 
 if sys.argv[1] != hook_cleanup:
     sys.exit(0)
 
-with open("/proc/mounts", "r") as f:
+with Path("/proc/mounts").open(encoding="utf-8") as f:
     procmounts = f.readlines()
 
 # Second column of /proc/mounts:
@@ -27,8 +28,8 @@ if len(sorted_mounts) > 0:
     #
     # Note: `umount --recursive ./mnt1` works for two mounts like `./mnt1` and `./mnt1/mnt2`,
     # but `umount --recursive ./foo` fails for `./foo/mnt1` and `./foo/mnt2`.
-    subprocess.run(
-        (  # noqa: S603
+    subprocess.run(  # noqa: S603
+        (
             "umount",
             "--force",
             "--verbose",    # Alert that something wasn't cleanly unmounted by the "after" hook

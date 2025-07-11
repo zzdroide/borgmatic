@@ -6,7 +6,7 @@ umask 077
 cd "$(dirname "$0")/../hooks.d"
 # shellcheck source=../config_example/env
 source ../config/env
-# shellcheck source-path=../hooks.d
+# shellcheck source=../hooks.d/helpers/common.py
 source helpers/common.py
 
 case "$1" in

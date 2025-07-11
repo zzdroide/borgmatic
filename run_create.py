@@ -2,13 +2,14 @@
 
 import subprocess
 
-import dbus
+import dbus  # type: ignore[import]
 
 # Reference: https://gitlab.gnome.org/GNOME/gnome-settings-daemon/-/blob/master/gnome-settings-daemon/org.gnome.SessionManager.xml#L102
 INHIBIT_APP_ID = "Borgmatic"
 INHIBIT_REASON = "Running backup"
 INHIBIT_SUSPEND_FLAG = 4
 INHIBIT_TOPLEVEL_XID = 0
+
 
 def inhibit_suspend():
     """
@@ -44,6 +45,7 @@ def inhibit_suspend():
         ("systemctl", "is-enabled", "display-manager"),
         stdout=subprocess.DEVNULL,
         stderr=subprocess.DEVNULL,
+        check=False,
     ).returncode == 0:
 
         bus = dbus.SessionBus()
@@ -61,7 +63,7 @@ def inhibit_suspend():
             # No need to store cookie or call Uninhibit, just exit script.
 
         else:
-            print("Note: not preventing suspension")  # noqa: T201
+            print("Note: not preventing suspension")
 
 
 inhibit_suspend()
@@ -72,6 +74,6 @@ subprocess.run(
         ' SSH_AUTH_SOCK="$SSH_AUTH_SOCK"'
         ' borgmatic create --progress --stats'
     ),
-    shell=True,  # noqa: S602
+    shell=True,
     check=True,
 )

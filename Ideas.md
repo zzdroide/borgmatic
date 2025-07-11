@@ -26,9 +26,3 @@ so once a year, manually run a long backup which reads all source data from disk
 manually judge that changes in `/var/log/` are fine, but changes in `/home/user/archived/cd.iso` are bit rot!
 
 (because of the files cache, `cd.iso` was read a year ago and never again. then it became corrupted, but wasn't detected.)
-
-## pre-commit
-https://github.com/shellcheck-py/shellcheck-py
-https://github.com/pre-commit/pre-commit-hooks#check-executables-have-shebangs
-https://github.com/pre-commit/pre-commit-hooks#check-shebang-scripts-are-executable
-https://github.com/pre-commit/pre-commit-hooks#check-yaml

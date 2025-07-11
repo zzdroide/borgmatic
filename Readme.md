@@ -262,6 +262,15 @@ Double-check the device you are about to write to!
 1. Configure `server_user` on server.
 
 
+### Development setup
+
+```sh
+poetry env use python3.13
+poetry sync
+pre-commit install
+```
+
+
 
 ## Troubleshooting
 
