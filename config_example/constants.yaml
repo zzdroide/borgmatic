@@ -1,4 +1,3 @@
-server_user: TAM_2009
 server_ip: 192.168.0.63
 server_mac: 11:22:33:44:55:66
 encryption_passphrase: pass     # Use scripts/derive_pass.py

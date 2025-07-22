@@ -259,7 +259,7 @@ Double-check the device you are about to write to!
     scripts/setup.sh
     ```
 
-1. Configure `server_user` on server.
+1. Configure `SERVER_USER` on server.
 
 
 ### Development setup

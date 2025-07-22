@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 import subprocess
+from pathlib import Path
 
 import dbus  # type: ignore[import]
 
@@ -31,7 +32,7 @@ def inhibit_suspend():
 
     Note that inhibitors are automatically released when the process exits
     (https://stackoverflow.com/questions/17478532/powermanagement-inhibit-works-with-dbus-python-but-not-dbus-send),
-    so that's why this wrapper is Python, instead of Bash or a borgmatic hook.
+    so that's why this wrapper is Python with subprocess, instead of Bash or a borgmatic hook.
 
     So according to https://arnaudr.io/2020/09/25/inhibit-suspending-the-computer-with-gtkapplication/,
     the best and most compatible would be to use
@@ -70,10 +71,13 @@ inhibit_suspend()
 
 subprocess.run(
     (
-        '/bin/sudo'
+        'source config/env'  # noqa: S607
+        ' && sudo'
         ' SSH_AUTH_SOCK="$SSH_AUTH_SOCK"'
+        ' SERVER_USER="$SERVER_USER"'
         ' borgmatic create --progress --stats'
     ),
+    cwd=Path(__file__).parent,
     shell=True,
     check=True,
 )

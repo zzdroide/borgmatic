@@ -56,8 +56,11 @@ compression: zstd,3
 repositories:
     - path: ssh://borg@{server_ip}/./TAM
 borg_base_directory: "{home}"
-archive_name_format: "{server_user}-{now:%Y-%m-%dT%H:%M}"
 default_actions: false
+
+# Backup to a temporary archive first, and rename it to a full name only if successful.
+# Otherwise, archives kept by prune could be ones with errors!
+archive_name_format: "${SERVER_USER}[temp]"
 
 # Use HPN SSH with some options, as the original user if sudo was used.
 #   sh makes env vars work.
