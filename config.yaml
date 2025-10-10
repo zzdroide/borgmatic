@@ -70,6 +70,10 @@ archive_name_format: "{server_user}[temp]"
 ssh_command: sh -c 'sudo -u "${SUDO_USER:-$USER}" SSH_AUTH_SOCK="$SSH_AUTH_SOCK" /bin/hpnssh -p1701 -oBatchMode=yes -oNoneEnabled=yes -oNoneSwitch=yes "$@"' 0
 
 commands:
+    # Dummy placeholder for keyscan_server() in setup.sh
+    - after: error
+      run: [/bin/true]  # (full path because even `"true"` is parsed to boolean 😵‍💫)
+
     - before: repository
       run:
         - /etc/borgmatic/scripts/wakeup_server.sh {server_ip} {server_mac}

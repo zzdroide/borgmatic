@@ -16,15 +16,28 @@ install_specialfile() {
 }
 
 keyscan_server() {
+  echo -n "Running keyscan_server... "
   # This is like "ssh-keyscan {server_ip} >>~/.ssh/known_hosts"
-  # but using borgmatic to obtain {server_ip}.
-  borgmatic --verbosity=-2 \
+  # but using borgmatic to obtain {server_ip} and wakeup_server.
+
+  local output
+  output=$(borgmatic --verbosity=-1 \
     --ssh-command="hpnssh \
       -p1701 \
-      -oStrictHostKeyChecking=accept-new `# Automatically add to known_hosts` \
+      -oStrictHostKeyChecking=accept-new  `# Automatically add to known_hosts` \
       -oBatchMode=yes \
-      -oPreferredAuthentications=null" `# Fail authentication on purpose and close connection` \
-    info 2>/dev/null
+      -oPreferredAuthentications=null"    `# Fail authentication on purpose and close connection` \
+    `# Check if the entry got written into ~/.ssh/known_hosts:` \
+    "--commands[0].run[0]=ssh-keygen -F '[{server_ip}]:1701' >/dev/null && echo ok_known_host_found" \
+    info 2>&1 || true)
+
+  if [[ "$output" == *ok_known_host_found* ]]; then
+    echo "ok"
+  else
+    echo -e "\nkeyscan_server failed:"
+    echo "$output"
+    exit 1
+  fi
 }
 
 
