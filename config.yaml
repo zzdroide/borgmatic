@@ -9,7 +9,8 @@ one_file_system: false
 read_special: false     # Uses "specialfile" to selectively read.
 exclude_caches: true
 keep_exclude_tags: true
-store_config_files: false
+bootstrap:
+    store_config_files: false
 
 exclude_patterns:
     - fm:*.py[cod]
