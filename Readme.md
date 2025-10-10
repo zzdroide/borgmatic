@@ -219,16 +219,17 @@ Double-check the device you are about to write to!
 ## Setup
 
 0. Requirements:
-    - Debian / Linux Mint / Ubuntu 20.04
-    - Encrypted filesystems are currently unsupported.
+    - Debian / Linux Mint / Ubuntu 20.04+, installed on LVM
+    - Encrypted filesystems are currently unsupported
+    - sudo [NOPASSWD](https://xkcd.com/1200/)
 
 1. Create projects "Borg" and "HDD Smart" at [healthchecks.io](https://healthchecks.io).
 
 1. Clone this:
     ```sh
-    sudo SSH_AUTH_SOCK="$SSH_AUTH_SOCK" GIT_SSH_COMMAND="sudo -u $USER ssh" git clone git@github.com:zzdroide/borgmatic.git /etc/borgmatic
+    sudo apt install git
 
-    cd /etc/borgmatic/
+    sudo SSH_AUTH_SOCK="$SSH_AUTH_SOCK" GIT_SSH_COMMAND="sudo -u $USER ssh" git clone git@github.com:zzdroide/borgmatic.git /etc/borgmatic
     ```
     For ease of usage, also run:
     ```sh
@@ -238,6 +239,7 @@ Double-check the device you are about to write to!
 1.
     ```sh
     (umask 077 && cp -r /etc/borgmatic/{config_example,config})
+    cd /etc/borgmatic/config/
     ```
     And configure:
 
@@ -259,7 +261,7 @@ Double-check the device you are about to write to!
     scripts/setup.sh
     ```
 
-1. Configure `SERVER_USER` on server.
+1. Configure `$SERVER_USER` on server.
 
 
 ### Development setup
