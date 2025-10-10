@@ -55,7 +55,7 @@ verbosity: 1
 encryption_passphrase: "{encryption_passphrase}"
 compression: zstd,3
 repositories:
-    - path: ssh://borg@{server_ip}/./TAM
+    - path: ssh://borg@{server_ip}/./{server_repo}
 borg_base_directory: "{home}"
 default_actions: false
 
