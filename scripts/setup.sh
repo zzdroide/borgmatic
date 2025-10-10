@@ -60,7 +60,9 @@ sudo apt install -y \
   smartmontools \
   jq \
   pipx \
-  libfuse-dev # To build specialfile
+  `# To build specialfile:` \
+  build-essential \
+  libfuse-dev
 
 sudo PIPX_HOME=/opt/pipx PIPX_BIN_DIR=/usr/local/bin pipx install borgmatic==2.0.9
 # Exact version because the project doesn't follow semver  https://torsion.org/borgmatic/docs/how-to/upgrade/#versioning-and-breaking-changes
