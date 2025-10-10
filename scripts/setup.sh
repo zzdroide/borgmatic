@@ -19,10 +19,10 @@ keyscan_server() {
   # This is like "ssh-keyscan {server_ip} >>~/.ssh/known_hosts"
   # but using borgmatic to obtain {server_ip}.
   borgmatic --verbosity=-2 \
-    --override ssh_command="hpnssh \
+    --ssh-command="hpnssh \
       -oStrictHostKeyChecking=accept-new `# Automatically add to known_hosts` \
-      -oBatchMode=yes
-      -oPreferredAuthentications=null `# Fail authentication on purpose and close connection`" \
+      -oBatchMode=yes \
+      -oPreferredAuthentications=null" `# Fail authentication on purpose and close connection` \
     info 2>/dev/null
 }
 
