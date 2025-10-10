@@ -20,6 +20,7 @@ keyscan_server() {
   # but using borgmatic to obtain {server_ip}.
   borgmatic --verbosity=-2 \
     --ssh-command="hpnssh \
+      -p1701 \
       -oStrictHostKeyChecking=accept-new `# Automatically add to known_hosts` \
       -oBatchMode=yes \
       -oPreferredAuthentications=null" `# Fail authentication on purpose and close connection` \
