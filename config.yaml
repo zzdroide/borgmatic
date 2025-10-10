@@ -74,19 +74,19 @@ commands:
         - /etc/borgmatic/scripts/wakeup_server.sh {server_ip} {server_mac}
 
     - before: action
-      when: [backup]
+      when: [create]
       run:
         - /etc/borgmatic/scripts/hooks.sh cleanup
         - /etc/borgmatic/scripts/hooks.sh before
 
     - after: action
-      when: [backup]
+      when: [create]
       states: [finish]
       run:
         - /etc/borgmatic/scripts/hooks.sh after
 
     - after: action
-      when: [backup]
+      when: [create]
       run:
         - /etc/borgmatic/scripts/hooks.sh cleanup
 
