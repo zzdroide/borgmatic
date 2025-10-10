@@ -71,11 +71,8 @@ inhibit_suspend()
 
 subprocess.run(
     (
-        'source config/env'  # noqa: S607
-        ' && sudo'
-        ' SSH_AUTH_SOCK="$SSH_AUTH_SOCK"'
-        ' SERVER_USER="$SERVER_USER"'
-        ' borgmatic create --progress --stats'
+        'sudo SSH_AUTH_SOCK="$SSH_AUTH_SOCK" sh -c '  # noqa: S607
+        '"source config/env && borgmatic create --progress --stats"'
     ),
     cwd=Path(__file__).parent,
     shell=True,
