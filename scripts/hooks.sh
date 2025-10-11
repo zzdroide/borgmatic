@@ -8,6 +8,7 @@ cd "$(dirname "$0")/../hooks.d"
 source helpers/common.py
 # shellcheck source=../config_example/env
 source ../config/env
+export LVM_SUPPRESS_FD_WARNINGS=x
 
 case "$1" in
   "$hook_before") order_arg="" ;;
