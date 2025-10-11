@@ -70,7 +70,7 @@ def inhibit_suspend():
 inhibit_suspend()
 
 subprocess.run(
-    'sudo SSH_AUTH_SOCK="$SSH_AUTH_SOCK" borgmatic create --progress --stats"',  # noqa: S607
+    'sudo SSH_AUTH_SOCK="$SSH_AUTH_SOCK" borgmatic create --progress --stats',  # noqa: S607
     cwd=Path(__file__).parent,
     shell=True,
     check=True,
