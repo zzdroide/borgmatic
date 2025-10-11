@@ -58,6 +58,7 @@ repositories:
     - path: ssh://borg@{server_ip}/./{server_repo}
 borg_base_directory: "{home}"
 default_actions: false
+ssh_command: /etc/borgmatic/scripts/ssh_command.sh
 
 # Backup to a temporary archive first, and rename it to a full name only if successful.
 # Otherwise, archives kept by prune could be ones with errors!
@@ -66,11 +67,6 @@ archive_name_format: "{server_user}[temp]"
 # Revert it:
 match_archives: "*"
 
-# Use HPN SSH with some options, as the original user if sudo was used.
-#   sh makes env vars work.
-#   SSH_AUTH_SOCK provides unlocked identity_file.
-#   As Borg appends parameters to the command, and -c requires quotes, $@ is used. "0" fills $0.
-ssh_command: sh -c 'sudo -u "${SUDO_USER:-$USER}" SSH_AUTH_SOCK="$SSH_AUTH_SOCK" /bin/hpnssh -p1701 -oBatchMode=yes -oNoneEnabled=yes -oNoneSwitch=yes "$@"' 0
 
 commands:
     # Dummy placeholder for keyscan_server() in setup.sh
