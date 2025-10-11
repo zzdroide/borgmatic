@@ -29,7 +29,7 @@ borgmatic ...
     ```
 2. Find the archive to mount, for example with:
     ```sh
-    borgmatic repo-list --last 5 -a "sh:TAM_2009-*"
+    borgmatic repo-list --last 5 -a "TAM_2009-*"
     ```
 3. Mount it with:
     ```sh

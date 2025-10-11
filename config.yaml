@@ -1,9 +1,6 @@
 constants:
     !include config/constants.yaml
 
-source_directories:
-    - /mnt/tamborgmatic/merged/./
-source_directories_must_exist: true
 numeric_ids: true
 one_file_system: false
 read_special: false     # Uses "specialfile" to selectively read.
@@ -11,8 +8,20 @@ exclude_caches: true
 keep_exclude_tags: true
 bootstrap:
     store_config_files: false
+source_directories_must_exist: true
+source_directories:
+    - /mnt/tamborgmatic/merged/./
 
 exclude_patterns:
+    # The following assumes "linux_root" name is used in bupsrcs.cfg
+    - pf:/mnt/tamborgmatic/merged/./linux_root/swapfile
+    - pf:/mnt/tamborgmatic/merged/./linux_root/swap.img
+    - pf:/mnt/tamborgmatic/merged/./linux_root/tmp
+    - pf:/mnt/tamborgmatic/merged/./linux_root/var/cache/apt
+    - pf:/mnt/tamborgmatic/merged/./linux_root/var/tmp
+    - pf:/mnt/tamborgmatic/merged/./linux_root/root/.cache
+    # cdrom, dev, media, mnt, proc, run and sys: only the empty dirs will be stored.
+
     - fm:*.py[cod]
     # fm:*/node_modules/ not excluded, as not all of them were created with "npm install"
 
@@ -24,16 +33,7 @@ exclude_patterns:
     - fm:*/app/build/tmp/
     - fm:*/app/build/generated/
 
-    # Note: the following assumes "linux_root" name is used in bupsrcs.cfg
-    # (and that /home/ is in the same partition as /)
-
-    - pf:linux_root/swapfile
-    - pf:linux_root/swap.img
-    - pf:linux_root/tmp
-    - pf:linux_root/var/cache/apt
-    - pf:linux_root/var/tmp
-    # cdrom, dev, media, mnt, proc, run and sys: only the empty dirs will be stored.
-
+    # The following assumes that /home/ is in the same partition as /
     - sh:linux_root/home/*/.android/build-cache
     - sh:linux_root/home/*/.ansible/tmp
     - sh:linux_root/home/*/.cache
@@ -49,7 +49,6 @@ exclude_patterns:
     - sh:linux_root/home/*/.npm/_cacache
     - sh:linux_root/home/*/.local/share/TelegramDesktop/tdata/*/*cache*
     - sh:linux_root/home/*/.Xauthority
-    - pf:linux_root/root/.cache
 
 verbosity: 1
 encryption_passphrase: "{encryption_passphrase}"
