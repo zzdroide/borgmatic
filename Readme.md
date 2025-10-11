@@ -12,7 +12,7 @@
 ## Running
 
 ```sh
-./run_create.py
+/etc/borgmatic/run_create.py
 ```
 ```sh
 borgmatic ...
@@ -258,7 +258,7 @@ Double-check the device you are about to write to!
 
 1.
     ```sh
-    scripts/setup.sh
+    /etc/borgmatic/scripts/setup.sh
     ```
 
 1. Configure `$SERVER_USER` on server.
