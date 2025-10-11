@@ -1,8 +1,8 @@
 constants:
     !include config/constants.yaml
 
-working_directory: /mnt/tamborgmatic/merged
-source_directories: ["."]
+source_directories:
+    - /mnt/tamborgmatic/merged/./
 source_directories_must_exist: true
 numeric_ids: true
 one_file_system: false
