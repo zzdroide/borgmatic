@@ -1,6 +1,6 @@
 server_ip: 192.168.0.63
 server_mac: 11:22:33:44:55:66
-server_user: TAM_2009
+server_user: TAM_2009   # [a-zA-Z0-9_]+ (no dashes)
 server_repo: TAM
 encryption_passphrase: pass     # Use scripts/derive_pass.py
 home: /home/user    # Because "/home/${SUDO_USER:-$USER}" doesn't work
