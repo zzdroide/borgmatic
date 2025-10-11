@@ -2,7 +2,7 @@
 
 # shellcheck shell=bash
 # shellcheck disable=SC2034 # This file is to be sourced
-# ruff: noqa: Q001, E225, E261, E262, E303, W605
+# ruff: noqa: Q001, E225, E261, E262, E303
 
 # This file is valid bash and python,
 # and python executes `foo="bar"`,
@@ -49,7 +49,7 @@ target_linux="linux"
 
 
 
-_=''''
+_=r''''
 
 declare -A bupsrc
 
