@@ -273,6 +273,7 @@ Double-check the device you are about to write to!
 ```sh
 poetry env use python3.13
 poetry sync
+eval $(poetry env activate)
 pre-commit install
 ```
 
