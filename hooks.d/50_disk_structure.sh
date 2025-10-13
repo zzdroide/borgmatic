@@ -5,6 +5,17 @@ source helpers/common.py
 readonly hook_type=$1
 readonly struct_dir=$src_dir/structure
 
+# Examples:
+#   /dev/sda1  -> sda
+#   /dev/nvme0n1p1 -> nvme0n1
+get_disk_name_from_part_path() {
+  local part_path=$1
+  local part; part=$(basename "$part_path")
+  local sysfs_path="/sys/class/block/$part"
+  [[ -e "$sysfs_path/partition" ]] || { echo "Not a partition?: $part_path"; exit 1; }
+  basename "$(readlink -f "$sysfs_path/..")"
+}
+
 stream_disk_header() {
   local disk_name=$1
 
@@ -44,14 +55,7 @@ generate_ext4_reserved_space() {
 }
 
 do_bupsrc() {
-  # $disk_name will be "sda", "sdb", etc.
-  local disk_name; disk_name=$(lsblk --noheadings --output pkname "${bupsrc[devpart]}" | head -n1)
-
-  if [[ ! -b "/dev/$disk_name" ]]; then
-    echo "Error: could not get disk_name for ${bupsrc[name]} (${bupsrc[devpart]})"
-    exit 1
-  fi
-
+  local disk_name; disk_name=$(get_disk_name_from_part_path "${bupsrc[devpart]}")
   local part_file="$struct_dir/part_${bupsrc[name]}.txt"
   is_bupsrc_target_linux && local lvdev_file="$struct_dir/lvdev_${bupsrc[name]}.txt"
   local serial_file="$struct_dir/serial_${bupsrc[name]}.txt"
