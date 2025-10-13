@@ -65,8 +65,8 @@ do_ntfsclone() {
     ntfsclone $extra_args --output - "${bupsrc[devpart]}" >"$img_path" || rc=$?
     # Write to file only if it still exists: (we're not on cleanup)
     [[ -e "$ntfsclone_rc_path" ]] && echo $rc >"$ntfsclone_rc_path"
-  } >&- 2>/proc/$PPID/fd/2 &
-  # Redirection for output to get past run-parts capture pipe, which will no longer exist.
+  } >&- 2>"$STDERR_ABOVE_BORGMATIC" &
+  # Redirection so that output bypasses borgmatic and reaches the terminal.
 }
 
 break_pipe() {
