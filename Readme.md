@@ -250,15 +250,13 @@ Double-check the device you are about to write to!
       - `part` to backup the raw partition
       - `data` to backup file data only (exFAT-style)
 
-      No blank lines allowed.
-
     - `smarthealthc.cfg`: &lt;hc_url> &lt;dev>
 
       One line for every mechanical HDD worth preventative replacement.
 
-      No blank lines allowed.
-
     - `constants.yaml` and `env`: these files support comments, so see instructions there.
+
+    > Note: *.cfg files can have comments by starting lines with `#`
 
 1.
     ```sh

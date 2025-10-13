@@ -24,8 +24,12 @@ source helpers/common.py
 
 
 loop_disks() {
-  # shellcheck disable=SC2002   # More readable order
-  cat ../config/smarthealthc.cfg | while read -r hc_url dev; do
+  grep -v \
+    -e '^\s*$' `# Skip empty or whitespace-only lines` \
+    -e '^#'    `# Skip comments` \
+    ../config/smarthealthc.cfg |
+      while read -r hc_url dev; do
+
     if [[ ! $dev ]]; then
       echo "Bad line in smarthealthc.cfg:"
       echo "  $hc_url $dev"

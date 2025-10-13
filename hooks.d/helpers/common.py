@@ -78,7 +78,12 @@ _print_is_ntfs() {
     [[ $fstype == ntfs ]] && echo 1 || echo 0
 }
 
-<$bupsrcs_path readarray -t _bupsrcs
+# Process substitution instead of pipe because of https://www.shellcheck.net/wiki/SC2030
+< <(grep -v \
+    -e '^\s*$' `# Skip empty or whitespace-only lines` \
+    -e '^#'    `# Skip comments` \
+    "$bupsrcs_path") \
+        readarray -t _bupsrcs
 
 reset_bupsrc() {
     _i=0
