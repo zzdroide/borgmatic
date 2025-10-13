@@ -33,7 +33,7 @@ borgmatic ...
     ```
 3. Mount it with:
     ```sh
-    borgmatic mount --options=allow_root,uid=$UID --mount-point=/mnt/borg --archive=<archive_name>
+    borgmatic mount --options=allow_root,uid=$UID,umask=007 --mount-point=/mnt/borg --archive=<archive_name>
     ```
 4. When you are done, unmount it with:
     ```sh
