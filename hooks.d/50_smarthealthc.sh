@@ -27,7 +27,7 @@ loop_disks() {
   grep -v \
     -e '^\s*$' `# Skip empty or whitespace-only lines` \
     -e '^#'    `# Skip comments` \
-    ../config/smarthealthc.cfg |
+    ../config/smarthealthc.cfg || true |
       while read -r hc_url dev; do
 
     if [[ ! $dev ]]; then

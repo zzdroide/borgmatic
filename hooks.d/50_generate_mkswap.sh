@@ -3,7 +3,7 @@ set -euo pipefail
 source helpers/common.py
 
 filter_comments() {
-  grep -v '^\s*#'
+  grep -v '^\s*#' || true
 }
 
 filter_swap_print_col1() {
