@@ -61,7 +61,7 @@ ssh_command: /etc/borgmatic/scripts/ssh_command.sh
 
 # Backup to a temporary archive first, and rename it to a full name only if successful.
 # Otherwise, archives kept by prune could be ones with errors!
-archive_name_format: "{server_user}[temp]"
+archive_name_format: "{server_user}(temp)"
 # Borgmatic tries to be helpful and applies a default filter that matches the format above.
 # Revert it:
 match_archives: "*"
