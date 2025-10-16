@@ -13,7 +13,7 @@ source_directories:
     - /mnt/tamborgmatic/merged/./
 
 exclude_patterns:
-    # The following assumes "linux_root" name is used in bupsrcs.cfg
+    # Assume "linux_root" name is used in bupsrcs.cfg
     - pf:/mnt/tamborgmatic/merged/./linux_root/swapfile
     - pf:/mnt/tamborgmatic/merged/./linux_root/swap.img
     - pf:/mnt/tamborgmatic/merged/./linux_root/tmp
@@ -21,6 +21,23 @@ exclude_patterns:
     - pf:/mnt/tamborgmatic/merged/./linux_root/var/tmp
     - pf:/mnt/tamborgmatic/merged/./linux_root/root/.cache
     # cdrom, dev, media, mnt, proc, run and sys: only the empty dirs will be stored.
+
+    # Assume that /home/ is in the same partition as /
+    - sh:mnt/tamborgmatic/merged/./linux_root/home/*/.android/build-cache
+    - sh:mnt/tamborgmatic/merged/./linux_root/home/*/.ansible/tmp
+    - sh:mnt/tamborgmatic/merged/./linux_root/home/*/.cache
+    - sh:mnt/tamborgmatic/merged/./linux_root/home/*/.cinnamon/spices.cache
+    - sh:mnt/tamborgmatic/merged/./linux_root/home/*/.config/*/*Cache*  # crappy Electron apps which don't use .cache/
+    - sh:mnt/tamborgmatic/merged/./linux_root/home/*/.config/chromium/*/GPUCache
+    - sh:mnt/tamborgmatic/merged/./linux_root/home/*/.config/chromium/*/Service Worker/CacheStorage
+    - sh:mnt/tamborgmatic/merged/./linux_root/home/*/.gvfs
+    - sh:mnt/tamborgmatic/merged/./linux_root/home/*/.ICEauthority
+    - sh:mnt/tamborgmatic/merged/./linux_root/home/*/.local/share/virtualenvs
+    - sh:mnt/tamborgmatic/merged/./linux_root/home/*/.mozilla/firefox/Crash Reports
+    - sh:mnt/tamborgmatic/merged/./linux_root/home/*/.mozilla/firefox/*/datareporting
+    - sh:mnt/tamborgmatic/merged/./linux_root/home/*/.npm/_cacache
+    - sh:mnt/tamborgmatic/merged/./linux_root/home/*/.local/share/TelegramDesktop/tdata/*/*cache*
+    - sh:mnt/tamborgmatic/merged/./linux_root/home/*/.Xauthority
 
     - fm:*.py[cod]
     # fm:*/node_modules/ not excluded, as not all of them were created with "npm install"
@@ -32,23 +49,6 @@ exclude_patterns:
     - fm:*/app/build/kotlin/
     - fm:*/app/build/tmp/
     - fm:*/app/build/generated/
-
-    # The following assumes that /home/ is in the same partition as /
-    - sh:linux_root/home/*/.android/build-cache
-    - sh:linux_root/home/*/.ansible/tmp
-    - sh:linux_root/home/*/.cache
-    - sh:linux_root/home/*/.cinnamon/spices.cache
-    - sh:linux_root/home/*/.config/*/*Cache*  # crappy Electron apps which don't use .cache/
-    - sh:linux_root/home/*/.config/chromium/*/GPUCache
-    - sh:linux_root/home/*/.config/chromium/*/Service Worker/CacheStorage
-    - sh:linux_root/home/*/.gvfs
-    - sh:linux_root/home/*/.ICEauthority
-    - sh:linux_root/home/*/.local/share/virtualenvs
-    - sh:linux_root/home/*/.mozilla/firefox/Crash Reports
-    - sh:linux_root/home/*/.mozilla/firefox/*/datareporting
-    - sh:linux_root/home/*/.npm/_cacache
-    - sh:linux_root/home/*/.local/share/TelegramDesktop/tdata/*/*cache*
-    - sh:linux_root/home/*/.Xauthority
 
 verbosity: 1
 encryption_passphrase: "{encryption_passphrase}"
@@ -65,7 +65,6 @@ archive_name_format: "{server_user}(temp)"
 # Borgmatic tries to be helpful and applies a default filter that matches the format above.
 # Revert it:
 match_archives: "*"
-
 
 commands:
     # Dummy placeholder for keyscan_server() in setup.sh
