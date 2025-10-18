@@ -47,6 +47,29 @@ delete_windows_excluded_files() {
   fi
 }
 
+filter_progress() {
+  # shellcheck disable=SC2016
+  tr '\r' '\n' | awk '
+    /percent completed/ {  # Filter " percent completed"
+      if (match($0, /([0-9]+(\.[0-9]+)?) percent completed/, m)) {
+        pct = m[1] + 0
+        # Print every 16.7% (6 times per 100%)
+        if (pct < 100) {
+          bucket = int(pct / 16.6667)
+        } else {
+          bucket = 6
+        }
+        if (bucket != last_bucket) {
+          print
+          last_bucket = bucket
+        }
+      }
+      next
+    }
+    { print }  # Don"t filter others
+  '
+}
+
 do_ntfsclone() {
   local img_path=$1 ntfsclone_rc_path=$2
 
@@ -65,7 +88,7 @@ do_ntfsclone() {
     ntfsclone $extra_args --output - "${bupsrc[devpart]}" >"$img_path" || rc=$?
     # Write to file only if it still exists: (we're not on cleanup)
     [[ -e "$ntfsclone_rc_path" ]] && echo $rc >"$ntfsclone_rc_path"
-  } >&- 2>"$STDERR_ABOVE_BORGMATIC" &
+  } >&- 2> >(filter_progress >"$STDERR_ABOVE_BORGMATIC") &
   # Redirection so that output bypasses borgmatic and reaches the terminal.
 }
 
