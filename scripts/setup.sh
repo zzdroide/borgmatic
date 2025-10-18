@@ -117,9 +117,12 @@ sudo apt update
 sudo apt install -y $common_packages $extra_packages
 
 set_pix_global_vars="PIPX_HOME=/opt/pipx PIPX_BIN_DIR=/usr/local/bin"
-borgmatic_version=2.0.9  # Exact version because the project doesn't follow semver  https://torsion.org/borgmatic/docs/how-to/upgrade/#versioning-and-breaking-changes
+
+borgmatic_version=2.0.7  # Exact version because the project doesn't follow semver  https://torsion.org/borgmatic/docs/how-to/upgrade/#versioning-and-breaking-changes
+# Use < 2.0.8 while the mandatory check exists  https://projects.torsion.org/borgmatic-collective/borgmatic/pulls/1144#user-content-considerations
 # shellcheck disable=SC2086
 sudo $set_pix_global_vars pipx install borgmatic==$borgmatic_version
+
 # shellcheck disable=SC2086
 (( is_ubuntu )) || sudo $set_pix_global_vars pipx install "borgbackup~=1.4"
 
