@@ -67,7 +67,7 @@ archive_name_format: "{server_user}(temp)"
 match_archives: "*"
 
 commands:
-    # Dummy placeholder for keyscan_server() in setup.sh
+    # commands[0] is hardcoded as a dummy placeholder for keyscan_server()
     - after: error
       run: [/bin/true]  # (full path because even `"true"` is parsed to boolean 😵‍💫)
 

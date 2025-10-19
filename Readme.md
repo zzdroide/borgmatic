@@ -243,6 +243,8 @@ Double-check the device you are about to write to!
     ```
     And configure:
 
+    - `constants.yaml`: see comments.
+
     - `bupsrcs.cfg`: &lt;type> &lt;name> &lt;path>
 
       Where &lt;type> is:
@@ -254,7 +256,6 @@ Double-check the device you are about to write to!
 
       One line for every mechanical HDD worth preventative replacement.
 
-    - `constants.yaml` and `env`: these files support comments, so see instructions there.
 
     > Note: *.cfg files can have comments by starting lines with `#`
 
@@ -263,7 +264,7 @@ Double-check the device you are about to write to!
     /etc/borgmatic/scripts/setup.sh
     ```
 
-1. Configure `$SERVER_USER` on server.
+1. Configure `server_user` on server.
 
 
 ### Development setup
