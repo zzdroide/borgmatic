@@ -3,6 +3,62 @@ set -euo pipefail
 cd "$(dirname "$0")/../"
 
 
+install_packages() {
+  if (source /etc/os-release && [[ "$ID" == "ubuntu" || "${ID_LIKE:-}" == *ubuntu* ]]); then
+    local is_ubuntu=1
+  else
+    local is_ubuntu=0
+  fi
+
+  if (source /etc/os-release && [[
+    "$VERSION_CODENAME" == "focal" || "${UBUNTU_CODENAME:-}" == "focal"
+  ]]); then
+    echo "20.04 setup is not automated. Please install deadsnakes PPA and" \
+        "pipx, and run setup.sh commands manually."
+    exit 1
+  fi
+
+  local common_packages; common_packages="\
+    hpnssh-client \
+    wakeonlan \
+    smartmontools \
+    jq \
+    pipx \
+    gawk \
+    `# To build specialfile:` \
+    build-essential \
+    libfuse-dev"
+  local extra_packages=""
+
+  if (( is_ubuntu )); then
+    sudo add-apt-repository -y ppa:rapier1/hpnssh
+    sudo add-apt-repository -y ppa:costamagnagianfranco/borgbackup
+    extra_packages="borgbackup"
+  else
+    manually_add_ppa_to_debian rapier1/hpnssh
+    # Doesn't work:
+    # manually_add_ppa_to_debian costamagnagianfranco/borgbackup
+
+    # To build Borg  https://borgbackup.readthedocs.io/en/stable/installation.html#debian-ubuntu
+    extra_packages="python3 python3-dev python3-pip python3-virtualenv libacl1-dev libssl-dev liblz4-dev libzstd-dev libxxhash-dev build-essential pkg-config libfuse3-dev fuse3"
+  fi
+
+  sudo apt update
+  # shellcheck disable=SC2086
+  sudo apt install -y $common_packages $extra_packages
+
+  local set_pix_global_vars="PIPX_HOME=/opt/pipx PIPX_BIN_DIR=/usr/local/bin"
+
+  local borgmatic_version=2.0.7  # Exact version because the project doesn't follow semver  https://torsion.org/borgmatic/docs/how-to/upgrade/#versioning-and-breaking-changes
+  # Use < 2.0.8 while the mandatory check exists  https://projects.torsion.org/borgmatic-collective/borgmatic/pulls/1144#user-content-considerations
+  # shellcheck disable=SC2086
+  sudo $set_pix_global_vars pipx install borgmatic==$borgmatic_version
+
+  # shellcheck disable=SC2086
+  (( is_ubuntu )) || sudo $set_pix_global_vars pipx install "borgbackup~=1.4"
+  true
+}
+
 manually_add_ppa_to_debian () {
   local name=$1
   local user="${name%%/*}"
@@ -35,22 +91,10 @@ get_ubuntu_compatible_codename() {
   )
 }
 
-install_specialfile() {
-  local tmpdir; tmpdir=$(mktemp --directory --tmpdir specialfile.XXXX)
-  pushd "$tmpdir" >/dev/null
-
-  git clone --depth 1 https://github.com/zzdroide/specialfile .
-  make
-  sudo make install
-
-  popd >/dev/null
-  rm -rf "$tmpdir"
-}
-
 keyscan_server() {
   echo -n "Running keyscan_server... "
-  # This is like "ssh-keyscan {server_ip} >>~/.ssh/known_hosts"
-  # but using borgmatic to obtain {server_ip} and wakeup_server.
+  # This is like "ssh-keyscan {server_ip} >>~/.ssh/known_hosts" but also testing borgmatic,
+  # and using it to obtain {server_ip} and wakeup_server.
 
   local output; output=$(
     borgmatic --verbosity=-1 \
@@ -72,60 +116,32 @@ keyscan_server() {
   fi
 }
 
+install_specialfile() {
+  local tmpdir; tmpdir=$(mktemp --directory --tmpdir specialfile.XXXX)
+  pushd "$tmpdir" >/dev/null
+
+  git clone --depth 1 https://github.com/zzdroide/specialfile .
+  make
+  sudo make install
+
+  popd >/dev/null
+  rm -rf "$tmpdir"
+}
+
+download_yq() {
+  # I don't want to install yq globally, because there are two competing projects.
+  local path="/etc/borgmatic/.bin"   # Not the nicest place though
+  sudo mkdir -p "$path"
+
+  local platform; platform="linux_$(dpkg --print-architecture)"
+  curl -fsSL "https://github.com/mikefarah/yq/releases/latest/download/yq_$platform.tar.gz" |
+    sudo tar xz -C $path "./yq_$platform"
+  sudo mv "$path/yq_$platform" "$path/yq"
+}
 
 
-if (source /etc/os-release && [[ "$ID" == "ubuntu" || "${ID_LIKE:-}" == *ubuntu* ]]); then
-  is_ubuntu=1
-else
-  is_ubuntu=0
-fi
 
-if (source /etc/os-release && [[
-  "$VERSION_CODENAME" == "focal" || "${UBUNTU_CODENAME:-}" == "focal"
-]]); then
-  echo "20.04 setup is not automated. Please install deadsnakes PPA and" \
-       "pipx, and run setup.sh commands manually."
-  exit 1
-fi
-
-common_packages="\
-  hpnssh-client \
-  wakeonlan \
-  smartmontools \
-  jq \
-  pipx \
-  gawk \
-  `# To build specialfile:` \
-  build-essential \
-  libfuse-dev"
-extra_packages=""
-
-if (( is_ubuntu )); then
-  sudo add-apt-repository -y ppa:rapier1/hpnssh
-  sudo add-apt-repository -y ppa:costamagnagianfranco/borgbackup
-  extra_packages="borgbackup"
-else
-  manually_add_ppa_to_debian rapier1/hpnssh
-  # Doesn't work:
-  # manually_add_ppa_to_debian costamagnagianfranco/borgbackup
-
-  # To build Borg  https://borgbackup.readthedocs.io/en/stable/installation.html#debian-ubuntu
-  extra_packages="python3 python3-dev python3-pip python3-virtualenv libacl1-dev libssl-dev liblz4-dev libzstd-dev libxxhash-dev build-essential pkg-config libfuse3-dev fuse3"
-fi
-
-sudo apt update
-# shellcheck disable=SC2086
-sudo apt install -y $common_packages $extra_packages
-
-set_pix_global_vars="PIPX_HOME=/opt/pipx PIPX_BIN_DIR=/usr/local/bin"
-
-borgmatic_version=2.0.7  # Exact version because the project doesn't follow semver  https://torsion.org/borgmatic/docs/how-to/upgrade/#versioning-and-breaking-changes
-# Use < 2.0.8 while the mandatory check exists  https://projects.torsion.org/borgmatic-collective/borgmatic/pulls/1144#user-content-considerations
-# shellcheck disable=SC2086
-sudo $set_pix_global_vars pipx install borgmatic==$borgmatic_version
-
-# shellcheck disable=SC2086
-(( is_ubuntu )) || sudo $set_pix_global_vars pipx install "borgbackup~=1.4"
-
+install_packages
 keyscan_server
 install_specialfile
+download_yq
