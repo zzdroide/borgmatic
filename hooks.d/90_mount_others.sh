@@ -51,7 +51,8 @@ filter_progress() {
   # shellcheck disable=SC2016
   tr '\r' '\n' | gawk '
     /percent completed/ {  # Filter " percent completed"
-      if (match($0, /([0-9]+(\.[0-9]+)?) percent completed/, m)) {
+      if (match($0, /([0-9]+([.,][0-9]+)?) percent completed/, m)) {
+        gsub(/,/, ".", m[1])  # Replace comma with dot
         pct = m[1] + 0
         # Print every 16.7% (6 times per 100%)
         if (pct < 100) {
