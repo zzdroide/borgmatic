@@ -73,6 +73,7 @@ subprocess.run(
     (
         'sudo'  # noqa: S607
             ' SSH_AUTH_SOCK="$SSH_AUTH_SOCK"'
+            ' BORG_PASSPHRASE="$BORG_PASSPHRASE"'
             ' STDERR_ABOVE_BORGMATIC="$(readlink /proc/self/fd/2)"'
             ' borgmatic create --progress --stats'
     ),
