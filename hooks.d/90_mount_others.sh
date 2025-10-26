@@ -49,7 +49,7 @@ delete_windows_excluded_files() {
 
 filter_progress() {
   # shellcheck disable=SC2016
-  tr '\r' '\n' | awk '
+  tr '\r' '\n' | gawk '
     /percent completed/ {  # Filter " percent completed"
       if (match($0, /([0-9]+(\.[0-9]+)?) percent completed/, m)) {
         pct = m[1] + 0

@@ -94,6 +94,7 @@ common_packages="\
   smartmontools \
   jq \
   pipx \
+  gawk \
   `# To build specialfile:` \
   build-essential \
   libfuse-dev"
