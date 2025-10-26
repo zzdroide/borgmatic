@@ -1,0 +1,12 @@
+[Unit]
+Description=Run tamborgmatic backup
+After=suspend.target
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=exec
+ExecStart=/etc/borgmatic/scripts/on_auto_backup.sh -gw
+
+[Install]
+WantedBy=suspend.target
