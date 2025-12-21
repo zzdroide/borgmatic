@@ -19,10 +19,10 @@ broadcast_ip="${server_ip%.*}.255"
 wakeonlan -i "$broadcast_ip" "$server_mac" >/dev/null
 
 # Wait until awake
-curl \
-  -fsS \
-  --max-time 1 \
-  --retry 20 \
-  --retry-delay 1 \
-  --retry-connrefused \
-  "$server_ip"
+for _attempt in {1..10}; do
+  if ssh-keyscan -T 2 -t ed25519 -p1701 "$server_ip" >/dev/null 2>&1; then
+    exit 0
+  fi
+done
+echo "Error: failed to wakeup/reach server."
+exit 1
