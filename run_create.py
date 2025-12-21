@@ -6,7 +6,7 @@ from pathlib import Path
 import dbus  # type: ignore[import]
 
 # Reference: https://gitlab.gnome.org/GNOME/gnome-settings-daemon/-/blob/master/gnome-settings-daemon/org.gnome.SessionManager.xml#L102
-INHIBIT_APP_ID = "Borgmatic"
+INHIBIT_APP_ID = "tamborgmatic"
 INHIBIT_REASON = "Running backup"
 INHIBIT_SUSPEND_FLAG = 4
 INHIBIT_TOPLEVEL_XID = 0
@@ -42,13 +42,14 @@ def inhibit_suspend():
     which works in Cinnamon so let's copy that.
     """
 
-    if subprocess.run(
+    is_gui = subprocess.run(
         ("systemctl", "is-enabled", "display-manager"),
         stdout=subprocess.DEVNULL,
         stderr=subprocess.DEVNULL,
         check=False,
-    ).returncode == 0:
+    ).returncode == 0
 
+    if is_gui:
         bus = dbus.SessionBus()
         applicable = "org.gnome.SessionManager" in bus.list_names()
 
@@ -69,15 +70,12 @@ def inhibit_suspend():
 
 inhibit_suspend()
 
-subprocess.run(
-    (
-        'sudo'  # noqa: S607
-            ' SSH_AUTH_SOCK="$SSH_AUTH_SOCK"'
-            ' BORG_PASSPHRASE="$BORG_PASSPHRASE"'
-            ' STDERR_ABOVE_BORGMATIC="$(readlink /proc/self/fd/2)"'
-            ' borgmatic create --progress --stats'
-    ),
-    cwd=Path(__file__).parent,
-    shell=True,
-    check=True,
+cmd = (
+    'sudo'
+        ' SSH_AUTH_SOCK="$SSH_AUTH_SOCK"'
+        ' BORG_PASSPHRASE="$BORG_PASSPHRASE"'
+        ' STDERR_ABOVE_BORGMATIC="$(readlink /proc/self/fd/2)"'
+        ' borgmatic create --progress --stats'
 )
+
+subprocess.run(cmd, cwd=Path(__file__).parent, shell=True, check=True)

@@ -2,7 +2,14 @@
 set -euo pipefail
 
 server_ip=$1
-server_mac=$2
+server_mac=${2:-}
+
+
+if [[ -z "$server_mac" ]]; then
+  # No WOL
+  exit 0
+fi
+
 
 # Fixes WOL for a server infested with docker networks.
 # Assumes a /24 netmask.

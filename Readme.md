@@ -264,6 +264,15 @@ Double-check the device you are about to write to!
     /etc/borgmatic/scripts/setup.sh
     ```
 
+1. (Optional) If you want automatic backups triggered by the server:
+
+    - Install and enable openssh-server
+    - Add the following line to `~/.ssh/authorized_keys`
+      ```
+      command="systemctl --user start tamborgmatic-auto.service",restrict ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAA... tamborgcont
+      ```
+    - Symlink a service from `automation/` to `~/.config/systemd/user/tamborgmatic-auto.service` (or copy+edit if you need a mix).
+
 1. Configure `server_user` on server.
 
 

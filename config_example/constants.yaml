@@ -1,4 +1,4 @@
-server_ip: 192.168.0.63         # or hostname instead of ip if this client is not in server's LAN
+server_ip: 10.0.0.20            # or hostname instead of ip if this client is not in server's LAN
 server_mac: 11:22:33:44:55:66   # or empty if this client is not in server's LAN
 server_user: TAM_2009           # [a-zA-Z0-9_]+ (no dashes)
 server_repo: TAM

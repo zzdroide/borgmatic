@@ -19,6 +19,7 @@ install_packages() {
   fi
 
   local common_packages; common_packages="\
+    curl \
     hpnssh-client \
     wakeonlan \
     smartmontools \
@@ -139,9 +140,40 @@ download_yq() {
   sudo mv "$path/yq_$platform" "$path/yq"
 }
 
+diagnose_ssh_server() {
+  local BLUE='\033[1;34m'
+  local NO_COLOR='\033[0m'
+  echo -e "$BLUE"
+
+  local installed=1
+  case "$(systemctl is-enabled ssh 2>&1 || true)" in
+    "Failed to get unit file state for ssh.service: No such file or directory")
+      echo ""
+      echo "If you want automatic backups, you should run:"
+      echo "  sudo apt install openssh-server"
+      installed=0
+      ;;
+    disabled)
+      echo ""
+      echo "If you want automatic backups, you should run:"
+      echo "  sudo systemctl enable --now ssh"
+      ;;
+  esac
+
+  if (( installed )); then
+    if ! sudo grep -REq "^\s*PasswordAuthentication\s+no\s*" /etc/ssh/; then
+      echo ""
+      echo "Note that sshd is defaulting to allow password authentication."
+    fi
+  fi
+
+  echo -e "$NO_COLOR"
+}
+
 
 
 install_packages
 keyscan_server
 install_specialfile
 download_yq
+diagnose_ssh_server
