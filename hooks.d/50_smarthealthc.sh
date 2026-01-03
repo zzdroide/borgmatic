@@ -39,11 +39,19 @@ loop_disks() {
     local rc=0
     local output; output=$(helpers/smart_check_disk.sh "$dev") || rc=$?
 
-    # On 16, just log. No success or failure.
-    local last_path
-    (( rc == 16)) && last_path=log || last_path=$rc
+    # rc=0: success
+    # rc=1: failure
+    # rc>1: just log. No success or failure.
+    local action
+    if (( rc == 1 )); then
+      action=fail
+    elif (( rc > 1 )); then
+      action=log
+    else
+      action=""
+    fi
 
-    local url=$hc_url/$last_path
+    local url=$hc_url/$action
     curl -fsS -m 10 --retry 5 -o /dev/null --data-raw "$output" "$url" || true
   done
 }

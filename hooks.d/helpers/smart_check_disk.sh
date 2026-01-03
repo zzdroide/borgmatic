@@ -4,7 +4,7 @@ set -euo pipefail
 
 
 [[ -b "$1" ]] ||
-    { echo "Disk is not present"; exit 16; }
+    { echo "Disk is not present"; exit 2; }
 
 
 json=$(smartctl -HA --json=c "$1" || true)
@@ -28,4 +28,4 @@ echo "$json" | >/dev/null jq -e "\
   " &&
     { echo "A relevant attribute is greater than 0"; exit 1; }
 
-true
+exit 0
