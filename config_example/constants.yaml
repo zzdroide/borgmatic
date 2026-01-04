@@ -1,5 +1,5 @@
 server_ip: 10.0.0.20            # or hostname instead of ip if this client is not in server's LAN
-server_mac: 11:22:33:44:55:66   # or empty if this client is not in server's LAN
+server_mac: 11:22:33:44:55:66   # or "" if this client is not in server's LAN
 server_user: TAM_2009           # [a-zA-Z0-9_]+ (no dashes)
 server_repo: TAM
 repo_id: 0123456789abcdef       # Obtain this with "grep id ~/TAM/config" in server, or from the config in another computer.
