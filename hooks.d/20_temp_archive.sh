@@ -30,6 +30,7 @@ case "$1" in
 
   "$hook_after")
     # Only after all other $hook_after hooks have succeeded, mark this archive as valid.
-    borgmatic --commands="[]" borg -- rename "::$server_user(temp)" "$server_user-$(date +"%Y-%m-%d_%H:%M")"
+    borgmatic --commands="[]" --verbosity=-1 `# verbosity=0 prints a "Running arbitrary Borg command" line` \
+      borg -- rename "::$server_user(temp)" "$server_user-$(date +"%Y-%m-%d_%H:%M")"
     ;;
 esac
