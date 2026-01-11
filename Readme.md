@@ -1,5 +1,7 @@
 # Borgmatic config
 
+This is what I use to backup my computers and servers. Unlike the traditional Borg model, here the server is more trusted than clients. The goal is to [achieve enlightenment](http://www.taobackup.com) and survive Ransomware.
+
 - [Running](#running)
 - [Mounting archives](#mounting-archives)
 - [Restoring partitions](#restoring-partitions)
