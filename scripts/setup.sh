@@ -172,8 +172,16 @@ diagnose_ssh_server() {
 
 
 
-install_packages
-keyscan_server
-install_specialfile
-download_yq
-diagnose_ssh_server
+if [[ -n "${1:-}" ]]; then
+  # Example: scripts/setup.sh keyscan_server diagnose_ssh_server
+  for arg in "$@"; do
+    "$arg"
+  done
+else
+  # __main__
+  install_packages
+  keyscan_server
+  install_specialfile
+  download_yq
+  diagnose_ssh_server
+fi
