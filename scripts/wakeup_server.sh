@@ -19,7 +19,7 @@ broadcast_ip="${server_ip%.*}.255"
 wakeonlan -i "$broadcast_ip" "$server_mac" >/dev/null
 
 # Wait until awake
-for attempt in {1..15}; do
+for attempt in {1..20}; do
   if ssh-keyscan -T 1 -t ed25519 -p1701 "$server_ip" >/dev/null 2>&1; then
     exit 0
   fi

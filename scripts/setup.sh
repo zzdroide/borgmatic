@@ -105,10 +105,13 @@ keyscan_server() {
         -oBatchMode=yes \
         -oPreferredAuthentications=null"    `# Fail authentication on purpose and close connection` \
       `# Check if the entry got written into ~/.ssh/known_hosts:` \
-      "--commands[0].run[0]=ssh-keygen -F '[{server_ip}]:1701' >/dev/null && echo ok_known_host_found" \
+      "--commands[0].run[0]=ssh-keygen -F '[{server_ip}]:1701' >/dev/null && echo ok_known_host_found | md5sum" \
       info 2>&1 || true)
 
-  if [[ "$output" == *ok_known_host_found* ]]; then
+  # Hashed so that finding execution result is considered a success
+  # (instead of searching for literal "ok_known_host_found" and finding
+  # "... && echo ok_known_host_found' returned non-zero exit status 1.")
+  if [[ "$output" == *$(echo ok_known_host_found | md5sum)* ]]; then
     echo "ok"
   else
     echo -e "\nkeyscan_server failed:"
