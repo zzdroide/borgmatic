@@ -278,6 +278,14 @@ Double-check the device you are about to write to!
 1. Configure `server_user` on server.
 
 
+### Forget old host keys when server is reinstalled
+```sh
+ssh-keygen -f ~/.ssh/known_hosts -R 10.0.0.20
+ssh-keygen -f ~/.ssh/known_hosts -R "[10.0.0.20]:1701"
+/etc/borgmatic/scripts/setup.sh keyscan_server
+grep tamborgmatic-auto.service ~/.ssh/authorized_keys && nano ~/.ssh/authorized_keys
+```
+
 ### Development setup
 
 ```sh
