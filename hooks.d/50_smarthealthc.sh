@@ -24,11 +24,12 @@ source helpers/common.py
 
 
 loop_disks() {
-  grep -v \
+  {
+    grep -v \
     -e '^\s*$' `# Skip empty or whitespace-only lines` \
     -e '^#'    `# Skip comments` \
-    ../config/smarthealthc.cfg || true |
-      while read -r hc_url dev; do
+    ../config/smarthealthc.cfg || true;
+  } | while read -r hc_url dev; do
 
     if [[ ! $dev ]]; then
       echo "Bad line in smarthealthc.cfg:"
