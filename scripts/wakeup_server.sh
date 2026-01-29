@@ -1,7 +1,7 @@
 #!/bin/bash
 set -euo pipefail
 
-server_ip=$1
+export server_ip=$1  # `export` for bash -c below
 server_mac=${2:-}
 
 
@@ -19,14 +19,16 @@ broadcast_ip="${server_ip%.*}.255"
 wakeonlan -i "$broadcast_ip" "$server_mac" >/dev/null
 
 # Wait until awake
-for attempt in {1..20}; do
-  if ssh-keyscan -T 1 -t ed25519 -p1701 "$server_ip" >/dev/null 2>&1; then
-    exit 0
-  fi
-  # Output is line-buffered:
-  printf '%.0s.' $(seq 1 "$attempt")
-  echo ""
-done
-
-echo "Error: failed to wakeup/reach server."
-exit 1
+# shellcheck disable=SC2016
+if ! timeout 20s bash -c '
+  attempt=1
+  while ! ssh-keyscan -T 1 -t ed25519 -p1701 "$server_ip" >/dev/null 2>&1; do
+    # Output is line-buffered, so print dots in different lines instead of single line:
+    printf "%.0s." $(seq 1 "$attempt")
+    echo ""
+    attempt=$((attempt + 1))
+  done
+'; then
+  echo "Error: failed to wakeup/reach server."
+  exit 1
+fi
