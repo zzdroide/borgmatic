@@ -61,7 +61,12 @@ ssh_command: /etc/borgmatic/scripts/ssh_command.sh
 
 # Backup to a temporary archive first, and rename it to a full name only if successful.
 # Otherwise, archives kept by prune could be ones with errors!
-archive_name_format: "{server_user}(temp)"
+#
+# Same as {now}, but with underscore which is more readable than T.
+# I would prefer not including %S, but because there are two `borg create` (for "dummy temp archive to sync chunks cache"),
+# the second one fails with "Archive TAM_2009(temp)-2026-01-02_03:04 already exists".
+archive_name_format: "{server_user}(temp)-{now:%Y-%m-%d_%H:%M:%S}"
+#
 # Borgmatic tries to be helpful and applies a default filter that matches the format above.
 # Revert it:
 match_archives: "*"
