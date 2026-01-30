@@ -8,9 +8,12 @@ exclude_caches: true
 keep_exclude_tags: true
 bootstrap:
     store_config_files: false
-source_directories_must_exist: true
 source_directories:
     - /mnt/tamborgmatic/merged/./
+source_directories_must_exist: false
+# Having the setting above as true causes more harm than good.
+# It complains on every `borgmatic` invocation whose command is not "create",
+# because the hook that creates the directory only runs on "create".
 
 exclude_patterns:
     # Assume "linux_root" name is used in bupsrcs.cfg

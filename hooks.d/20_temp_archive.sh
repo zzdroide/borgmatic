@@ -16,7 +16,7 @@ case "$1" in
   "$hook_before")
     # Create a dummy temp archive to sync chunks cache now. This way it doesn't fill the snapshot later.
     borgmatic --commands="[]" --verbosity=1 \
-      --source-directories="[/nonexistent]" --no-source-directories-must-exist --healthchecks.states="[]" \
+      --source-directories="[/nonexistent]" --healthchecks.states="[]" \
       create | grep_chunks_cache_lines
     ;;
 
