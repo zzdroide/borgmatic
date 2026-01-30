@@ -49,7 +49,7 @@ loop_disks() {
     elif (( rc > 1 )); then
       action=log
     else
-      action=""
+      action="0"
     fi
 
     local url=$hc_url/$action
