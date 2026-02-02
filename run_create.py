@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 import subprocess
+import sys
 from pathlib import Path
 
 import dbus  # type: ignore[import]
@@ -77,5 +78,8 @@ cmd = (
         ' STDERR_ABOVE_BORGMATIC="$(readlink /proc/self/fd/2)"'
         ' borgmatic create --progress --stats'
 )
+
+if len(sys.argv) > 1:
+    cmd += " " + " ".join(sys.argv[1:])
 
 subprocess.run(cmd, cwd=Path(__file__).parent, shell=True, check=True)
