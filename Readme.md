@@ -232,10 +232,7 @@ Double-check the device you are about to write to!
     sudo apt install git
 
     sudo SSH_AUTH_SOCK="$SSH_AUTH_SOCK" GIT_SSH_COMMAND="sudo -u $USER ssh" git clone git@github.com:zzdroide/borgmatic.git /etc/borgmatic
-    ```
-    For ease of usage, also run:
-    ```sh
-    sudo chown -R $USER:$USER /etc/borgmatic
+    sudo chown -R $USER:$USER /etc/borgmatic  # For ease of usage, and because of root/non-root invocations
     ```
 
 1.
