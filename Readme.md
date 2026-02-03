@@ -300,6 +300,11 @@ pre-commit install
 
 This is most likely the ssh hook rejecting the connection. Confirm this by running again but adding `-v2`. Now the output will contain: _Got unexpected RPC data format from server: Repo is NOT OK_
 
+### Watching tamborgmatic-auto.service logs
+```sh
+journalctl --user-unit=tamborgmatic-auto.service -e
+```
+
 ### Windows can't mount NTFS partition
 
 If the restored partition can't be mounted (Disk Manager shows it as healthy, but most options are greyed out, and `DISKPART> list volume` doesn't show it), check the partition type with `sudo fdisk -l /dev/sdX`.
