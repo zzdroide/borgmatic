@@ -6,3 +6,5 @@ Wants=network-online.target
 [Service]
 Type=exec
 ExecStart=/etc/borgmatic/scripts/on_auto_backup.sh -ho
+User=#user#
+Group=#group#

@@ -7,6 +7,9 @@ Wants=network-online.target
 [Service]
 Type=exec
 ExecStart=/etc/borgmatic/scripts/on_auto_backup.sh -gw
+User=#user#
+Group=#group#
 
 [Install]
 WantedBy=suspend.target
+# suspend.target doesn't exist as a user systemd target. That's why this is not a user service.

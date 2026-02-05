@@ -268,9 +268,13 @@ Double-check the device you are about to write to!
     - Install and enable openssh-server
     - Add the following line to `~/.ssh/authorized_keys`
       ```
-      command="systemctl --user start tamborgmatic-auto.service",restrict ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAA... tamborgcont
+      command="sudo systemctl start tamborgmatic-auto.service",restrict ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAA... tamborgcont
       ```
-    - Symlink a service from `automation/` to `~/.config/systemd/user/tamborgmatic-auto.service` (or copy+edit if you need a mix).
+    - Choose one:
+      ```sh
+      scripts/install_tamborgmatic_auto.sh gui+wol
+      scripts/install_tamborgmatic_auto.sh headless+alwayson
+      ```
 
 1. Configure `server_user` on server.
 
@@ -302,7 +306,7 @@ This is most likely the ssh hook rejecting the connection. Confirm this by runni
 
 ### Watching tamborgmatic-auto.service logs
 ```sh
-journalctl --user-unit=tamborgmatic-auto.service -e
+sudo journalctl -eu tamborgmatic-auto.service
 ```
 
 ### Windows can't mount NTFS partition
