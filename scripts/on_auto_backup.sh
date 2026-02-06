@@ -14,18 +14,23 @@ server_ip=$(  yq .server_ip   /etc/borgmatic/config/constants.yaml)
 server_user=$(yq .server_user /etc/borgmatic/config/constants.yaml)
 server_repo=$(yq .server_repo /etc/borgmatic/config/constants.yaml)
 
-# Wait for network connectivity after resume from suspend
-for _ in $(seq 1 30); do
-  ip route get "$server_ip" &>/dev/null && break
-  sleep 1
-done
-# Note: nm-online didn't work
+# The check only works over LAN, so perform it only if $server_ip is an IPv4.
+# Computers with tamborgmatic-auto installed and configured to backup over internet instead of LAN
+# are assumed to be servers which don't sleep.
+if [[ "$server_ip" =~ ^[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+  # Wait for network connectivity after resume from suspend
+  for _ in $(seq 1 30); do
+    ip route get "$server_ip" &>/dev/null && break
+    sleep 1
+  done
+  # Note: nm-online didn't work
 
-waiting_for=$(curl -fs --max-time 5 "http://$server_ip:8087/$server_repo" || true)
+  waiting_for=$(curl -fs --max-time 5 "http://$server_ip:8087/$server_repo" || true)
 
-if [[ "$waiting_for" != "$server_user" ]]; then
-  # Nope, just a regular wakeup.
-  exit 0
+  if [[ "$waiting_for" != "$server_user" ]]; then
+    # Nope, just a regular wakeup.
+    exit 0
+  fi
 fi
 
 ### waiting_for me: signal borg_daily that we're up ###
