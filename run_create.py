@@ -43,14 +43,12 @@ def inhibit_suspend():
     which works in Cinnamon so let's copy that.
     """
 
-    is_gui = subprocess.run(
-        ("systemctl", "is-enabled", "display-manager"),
-        stdout=subprocess.DEVNULL,
-        stderr=subprocess.DEVNULL,
+    is_running_gui = subprocess.run(
+        ("systemctl", "--quiet", "is-active", "display-manager"),
         check=False,
     ).returncode == 0
 
-    if is_gui:
+    if is_running_gui:
         bus = dbus.SessionBus()
         applicable = "org.gnome.SessionManager" in bus.list_names()
 

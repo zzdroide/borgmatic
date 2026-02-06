@@ -1,12 +1,11 @@
 [Unit]
 Description=Run tamborgmatic backup
 After=suspend.target
-After=network-online.target
-Wants=network-online.target
+# Note: After/Wants=network-online.target does nothing on wakeup, only on boot.
 
 [Service]
 Type=exec
-ExecStart=/etc/borgmatic/scripts/on_auto_backup.sh -gw
+ExecStart=/etc/borgmatic/scripts/on_auto_backup.sh
 User=#user#
 Group=#group#
 
