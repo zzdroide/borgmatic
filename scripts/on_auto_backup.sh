@@ -47,6 +47,7 @@ if systemctl is-active --quiet display-manager; then
 
   export DISPLAY=:0
   export XAUTHORITY="$HOME/.Xauthority"
+  export DBUS_SESSION_BUS_ADDRESS="unix:path=/run/user/$UID/bus"
   cmd="/etc/borgmatic/run_create.py; printf '\n[Finished - Press Enter to close]'; read _"
   gnome-terminal --wait --maximize --title="tamborgmatic run_create" -- sh -c "$cmd"
 
