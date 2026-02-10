@@ -53,8 +53,21 @@ if systemctl is-active --quiet display-manager; then
   export DISPLAY=:0
   export XAUTHORITY="$HOME/.Xauthority"
   export DBUS_SESSION_BUS_ADDRESS="unix:path=/run/user/$UID/bus"
-  cmd="/etc/borgmatic/run_create.py; printf '\n[Finished - Press Enter to close]'; read _"
-  gnome-terminal --wait --maximize --title="tamborgmatic run_create" -- sh -c "$cmd"
+  run_create="/etc/borgmatic/run_create.py"
+  cmd="$run_create; printf '\n[Finished - Press Enter to close]'; read _"
+  gnome-terminal --maximize --title="tamborgmatic run_create" -- sh -c "$cmd"  # No --wait
+  sleep 30  # Let $run_create spawn
+  # Wait just for $run_create:
+  while pgrep --full --exact --quiet "python3 $run_create"; do sleep 30; done
+  # This way:
+  # - The terminal stays open so that user can see logs
+  # - systemd considers the service active because this script is waiting for $run_create
+  # - When $run_create finishes, this script exits, the service becomes inactive,
+  #   and it can start again even if gnome-terminal hasn't been closed.
+  # Note: normally this wouldn't work,
+  # because systemd kills remaining processes when service exits (KillMode=control-group).
+  # But gnome-terminal just sends a D-Bus message and exits,
+  # so `sh -c` and children are outside this service's cgroup.
 
   # Leave computer on after run_create finishes,
   # because user could be using it, and shouldn't sleep unexpectedly.

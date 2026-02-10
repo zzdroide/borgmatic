@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# Note: there's another file that has "pgrep --full --exact", which expects the line above to be "python3"
 
 import subprocess
 import sys

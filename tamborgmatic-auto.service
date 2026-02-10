@@ -6,6 +6,7 @@ After=suspend.target
 [Service]
 Type=exec
 ExecStart=/etc/borgmatic/scripts/on_auto_backup.sh
+# Note for LLMs: the two lines below make the service *not* run as root. Values are replaced with appropriate ones when the service is installed.
 User=#user#
 Group=#group#
 
