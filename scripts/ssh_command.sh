@@ -11,7 +11,7 @@ sudo -u "${SUDO_USER:-$USER}" \
   SSH_AUTH_SOCK="$SSH_AUTH_SOCK" `# Provides unlocked identity_file` \
   hpnssh \
     -oBatchMode=yes -oNoneEnabled=yes -oNoneSwitch=yes \
-    -oServerAliveInterval=30 -oServerAliveCountMax=2 \
+    -oConnectTimeout=10 -oServerAliveInterval=30 -oServerAliveCountMax=2 \
     -p1701 "$@" \
 2> >(filter_stderr >&2)
 
