@@ -58,7 +58,7 @@ if systemctl is-active --quiet display-manager; then
   gnome-terminal --maximize --title="tamborgmatic run_create" -- sh -c "$cmd"  # No --wait
   sleep 30  # Let $run_create spawn
   # Wait just for $run_create:
-  while pgrep --full --exact --quiet "python3 $run_create"; do sleep 30; done
+  while pgrep --full --exact "python3 $run_create" >/dev/null; do sleep 30; done
   # This way:
   # - The terminal stays open so that user can see logs
   # - systemd considers the service active because this script is waiting for $run_create
