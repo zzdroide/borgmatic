@@ -26,7 +26,7 @@ borgmatic ...
 
 1. Create a target directory:
     ```sh
-    sudo mkdir /mnt/borg
+    sudo mkdir -p /mnt/borg
     sudo chown $USER:$USER /mnt/borg
     ```
 2. Find the archive to mount, for example with:
@@ -50,7 +50,7 @@ borgmatic ...
 2. Right-click the image file and click _Open With Disk Image Mounter_
 3. Open _Disks_ (`gnome-disks`)
 4. Click the loop device in the left pane, and then click the Play button to mount.
-5. When you are done, unmount with the Stop button, and detach the loop device with the `–` button in the title bar (next to the Minimize button).
+5. When you are done, unmount with the Stop button, and detach the loop device with the `⏏` button in the title bar (next to the Minimize button).
 
 
 
@@ -66,16 +66,16 @@ Double-check the device you are about to write to!
 
 2. Add helper scripts to PATH:
     ```sh
-    export PATH="/etc/borgmatic.d/restore:$PATH"
+    export PATH="/etc/borgmatic/restore:$PATH"
     ```
 
-3. Run `3-backed_up_disk_structure.sh` to visualize data from `realdev_*.txt` and `sd?_header.bin` (how devices were at backup time).
+3. Run `3-backed_up_disk_structure.sh` to visualize data from `part_*.txt` and `sd?_header.bin` (how devices were at backup time).
 
     Use `sudo parted -l` to figure out about current target restore disks.
 
 4. For each disk, restore its header (includes partition table) with:
     ```sh
-    <sdA_header.bin sudo tee /dev/sdX >/dev/null
+    <structure/sdA_header.bin sudo tee /dev/sdX >/dev/null
     ```
 
     After restoring for all disks, run:
@@ -120,22 +120,26 @@ Double-check the device you are about to write to!
 
 5.  Find raw images with:
     ```sh
-    ll *.img
+    stat --format="%n %s" *.raw.img
     ```
 
-    Restore them with:
+    `umount` the archive (to release the repo lock for the next commands)
+
+    And restore images with:
     ```sh
-    5-extract-file-pv.sh <archive name> PART.img | sudo tee /dev/sdXY >/dev/null
+    5-extract-file-pv.sh <archive name> <part>.raw.img <size> | sudo tee /dev/sdXY >/dev/null
     ```
 
     > Note: use `borg extract` instead of ./PART.img, because reading from the mounted filesystem is slow.
 
-    However if they are NTFS and not too full and you don't care that empty space is not wiped with zeros, it may be faster to write only used data, even if reading from `./` is slower:
-    ```sh
-    ntfsclone --save-image --output - PART_NTFS.img |
-      sudo ntfsclone --restore-image --overwrite /dev/sdXY -
-    ```
+    Remount the archive to continue with the next steps.
 
+    > However if they are NTFS and not too full and you don't care that empty space is not wiped with zeros, it may be > faster to write only used data, even if reading from `./` is slower:
+    > ```sh
+    > ntfsclone --save-image --output - PART.raw.img |
+    >   sudo ntfsclone --restore-image --overwrite /dev/sdXY -
+    > ```
+    >
     > Unfortunately `borg extract` can't be used with `--restore-image`, because the image is raw and not special-image (so it can be mounted), and _Only special images can be read from standard input_.
 
 6.  Restore Linux root LVM partition:
@@ -178,7 +182,7 @@ Double-check the device you are about to write to!
         (umask 022; mkdir var/cache/apt)
         # No need to mess with `tmp` and `var/tmp` as they are automatically created.
 
-        for s in etc/borgmatic.d/restore/machine_specific/*.generated.sh; do $s; done
+        for s in etc/borgmatic/restore/machine_specific/*.generated.sh; do $s; done
         exit
         ```
 

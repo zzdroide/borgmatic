@@ -1,17 +1,23 @@
 #!/bin/bash
 set -euo pipefail
 
-print_realdevs() {
+print_part_files() {
   {
-    for realdev in realdev_*.txt; do
-      # Example: realdev_HDD_NTFS.txt contains "/dev/sdc1".
+    for part_file in structure/part_*.txt; do
+      # Example: part_HDD_NTFS.txt contains "/dev/sdc1".
       # This prints "/dev/sdc1 HDD_NTFS"
-      < "$realdev" tr -d "\n"
-      echo " $realdev" | sed 's/realdev_//; s/.txt//'
+      <"$part_file" tr -d "\n"
+      echo " $(basename "$part_file")" | sed 's/part_//; s/.txt//'
     done
   } | sort
   echo
   echo
+}
+
+part_path2disk_name() {
+  # /dev/nvme0n1p1 -> nvme0n1
+  # /dev/sda1 -> sda
+  sed -E 's|/dev/(nvme[0-9]+n[0-9]+)p[0-9]+|\1|; s|/dev/([a-z]+)[0-9]+|\1|'
 }
 
 print_last_paragraph() {
@@ -42,12 +48,17 @@ list_header_partitions() {
 }
 
 list_partitions() {
-  local header_files; header_files=$(cat realdev_*.txt | cut -c 6-8 | sort -u | sed 's/$/_header.bin/')
+  local header_files; header_files=$(
+    cat structure/part_*.txt |
+      part_path2disk_name |
+      sort -u |
+      sed 's|^|structure/|; s|$|_header.bin|'
+  )
   for header in $header_files; do
     list_header_partitions "$header"
   done
 }
 
 
-print_realdevs
+print_part_files
 list_partitions
