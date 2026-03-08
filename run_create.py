@@ -42,6 +42,8 @@ def inhibit_suspend():
     but while searching for an existing app, I got to
     https://codeberg.org/WhyNotHugo/caffeine-ng/src/tag/v4.0.2/caffeine/inhibitors.py#L66
     which works in Cinnamon so let's copy that.
+
+    Alternative: https://wakepy.readthedocs.io
     """
 
     is_running_gui = subprocess.run(
