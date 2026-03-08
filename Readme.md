@@ -1,4 +1,4 @@
-# Borgmatic config
+# tamborgmatic (borgmatic config)
 
 This is what I use to backup my computers and servers. Unlike the traditional Borg model, here the server is more trusted than clients. The goal is to [achieve enlightenment](http://www.taobackup.com) and survive Ransomware.
 
@@ -26,7 +26,7 @@ borgmatic ...
 
 1. Create a target directory:
     ```sh
-    sudo mkdir /mnt/borg
+    sudo mkdir -p /mnt/borg
     sudo chown $USER:$USER /mnt/borg
     ```
 2. Find the archive to mount, for example with:
@@ -50,7 +50,7 @@ borgmatic ...
 2. Right-click the image file and click _Open With Disk Image Mounter_
 3. Open _Disks_ (`gnome-disks`)
 4. Click the loop device in the left pane, and then click the Play button to mount.
-5. When you are done, unmount with the Stop button, and detach the loop device with the `–` button in the title bar (next to the Minimize button).
+5. When you are done, unmount with the Stop button, and detach the loop device with the `⏏` button in the title bar (next to the Minimize button).
 
 
 
@@ -62,20 +62,35 @@ This section is mostly manual work because it shouldn't be used often, overwriti
 
 Double-check the device you are about to write to!
 
-1. Mount the archive (see previous section) and `cd` to that folder.
-
-2. Add helper scripts to PATH:
+1. Prepare:
     ```sh
-    export PATH="/etc/borgmatic.d/restore:$PATH"
+    # Mount the archive (see previous section)
+    borgmatic mount ...
+    cd /mnt/borg
+
+    # Take a reference of the archive content
+    # (This is needed because `borg extract` fails while the archive is mounted, because the repo lock is held)
+    rm -rf /tmp/borg_reference
+    mkdir /tmp/borg_reference
+    cd /tmp/borg_reference
+    find /mnt/borg -mindepth 1 -maxdepth 1 -type d -printf "%f\n" | xargs mkdir
+    find /mnt/borg -mindepth 1 -maxdepth 1 -type f -printf "%f\n" | xargs touch
+    cp -r /mnt/borg/structure .
+    # Print sizes output now to reference it later:
+    (cd /mnt/borg && stat --format="%n %s" *.raw.img)
+    umount /mnt/borg
+
+    # Add helper scripts to PATH:
+    export PATH="/etc/borgmatic/restore:$PATH"
     ```
 
-3. Run `3-backed_up_disk_structure.sh` to visualize data from `realdev_*.txt` and `sd?_header.bin` (how devices were at backup time).
+2. Run `2-backed_up_disk_structure.sh` to visualize data from `part_*.txt` and `sd?_header.bin` (how devices were at backup time).
 
     Use `sudo parted -l` to figure out about current target restore disks.
 
-4. For each disk, restore its header (includes partition table) with:
+3. For each disk, restore its header (includes partition table) with:
     ```sh
-    <sdA_header.bin sudo tee /dev/sdX >/dev/null
+    <structure/sdA_header.bin sudo tee /dev/sdX >/dev/null
     ```
 
     After restoring for all disks, run:
@@ -118,31 +133,29 @@ Double-check the device you are about to write to!
     6. Write and exit with `w`.
     </details>
 
-5.  Find raw images with:
+4.  Restore raw images
     ```sh
-    ll *.img
+    # Refer to the previous run of `stat` in step 1 to get sizes
+
+    4-extract-file-pv.sh <archive name> PART.raw.img <size> | sudo tee /dev/sdXY >/dev/null
     ```
 
-    Restore them with:
-    ```sh
-    5-extract-file-pv.sh <archive name> PART.img | sudo tee /dev/sdXY >/dev/null
-    ```
+    > Note: use `borg extract` instead of ./PART.raw.img, because reading from the mounted filesystem is slow.
 
-    > Note: use `borg extract` instead of ./PART.img, because reading from the mounted filesystem is slow.
-
-    However if they are NTFS and not too full and you don't care that empty space is not wiped with zeros, it may be faster to write only used data, even if reading from `./` is slower:
-    ```sh
-    ntfsclone --save-image --output - PART_NTFS.img |
-      sudo ntfsclone --restore-image --overwrite /dev/sdXY -
-    ```
-
+    > However if the partitions are NTFS, and not too full, and you don't care that empty space is not wiped with zeros, it may be faster to write only used data, even if reading from `./` is slower:
+    > ```sh
+    > ntfsclone --save-image --output - PART.raw.img |
+    >   sudo ntfsclone --restore-image --overwrite /dev/sdXY -
+    > ```
+    >
     > Unfortunately `borg extract` can't be used with `--restore-image`, because the image is raw and not special-image (so it can be mounted), and _Only special images can be read from standard input_.
 
-6.  Restore Linux root LVM partition:
+5.  Restore Linux LVM partitions: (example for root)
 
     - Format and mount:
         ```sh
         sudo vgcreate machine_name /dev/sdXY
+        # Exact name in structure/lvdev_linux_root.txt
 
         # Get available space in VG in GiB:
         sudo vgs --noheadings -o vg_size /dev/machine_name
@@ -155,20 +168,13 @@ Double-check the device you are about to write to!
         sudo mount /dev/machine_name/root /mnt/borg_linux_target
         ```
 
-    - Find the matching Linux archive name in Borg repository
-
     - Extract:
         ```sh
         pushd /mnt/borg_linux_target
-        sudo tamborg -pv extract --numeric-owner --sparse ::<archive name>
 
-        # FIXME(extract): handle this with borgmatic instead (when tamborg alias is deleted)
-        # "sudo tamborg" is failing SSH.
-        # So currently tamborg and borgmatic have to be manually merged:
-        sudo BORG_REPO=borg@192.168.0.64:TAM BORG_PASSCOMMAND='yq -r .encryption_passphrase /etc/borgmatic.d/config/config_storage.yaml' BORG_RSH='sh -c '\''sudo -u $SUDO_USER SSH_AUTH_SOCK="$SSH_AUTH_SOCK" /usr/local/bin/hpnssh -oBatchMode=yes -oNoneEnabled=yes -oNoneSwitch=yes "$@"'\'' 0' borg -pv extract --numeric-owner --sparse ::<archive name>
-        # And permissions and dirs be fixed with:
-        sudo chown -R $USER:$USER ~/{.config,.cache}/borg/
-        sudo rm -rf /root/{.config,.cache}/borg/
+        sudo SSH_AUTH_SOCK="$SSH_AUTH_SOCK" borgmatic borg extract \
+          --progress --numeric-ids --sparse --strip-components=1 \
+          ::<archive name> linux_root/
         ```
 
     - Restore stuff:
@@ -178,8 +184,15 @@ Double-check the device you are about to write to!
         (umask 022; mkdir var/cache/apt)
         # No need to mess with `tmp` and `var/tmp` as they are automatically created.
 
-        for s in etc/borgmatic.d/restore/machine_specific/*.generated.sh; do $s; done
+        for s in etc/borgmatic/restore/machine_specific/*.generated.sh; do "$s"; done
         exit
+        ```
+
+    - List CACHEDIR.TAG files for reference:
+        ```sh
+        find . -name "CACHEDIR.TAG" -exec sh -c \
+          '[ "$(head -c 43 "$1" 2>/dev/null)" = "Signature: 8a477f597d28d172789f06886806bc55" ] && echo "$1"' \
+          _ {} \;
         ```
 
     - Finalize:
@@ -188,9 +201,7 @@ Double-check the device you are about to write to!
         sudo umount /mnt/borg_linux_target
         ```
 
-    > Try to remember what has to be regenerated :s. For example, the Poetry virtualenv (in ~/.cache/) for a project run by cron. Dockerized apps shouldn't have this problem.
-
-7. Restore data:
+6. Restore data:
     - Boot into restored Linux to have GUI
     - Format partition with its previous filesystem
     - Restore its serial from `structure/serial_xxxx.txt`:
@@ -199,29 +210,21 @@ Double-check the device you are about to write to!
     - Mount
     - Open a terminal at mount point and run:
         ```sh
-        tamborg extract --strip-components 1 ::<archive name> PART/
+        borgmatic extract --progress --strip-components=1 --archive=<archive name> --path=PART/
         ```
         This assumes backup uid matches restore uid.
-    - If you then realize that some important NTFS metadata is missing, you may try recovering it by converting the `.metadata.simg` to VHD with https://github.com/yirkha/ntfsclone2vhd/#metadata-only-images, and mounting it in Windows.
-
-    > However, after restoring special files:
-    > - Hardlinks work fine
-    > - Relative symlinks work on Linux
-    > - Absolute symlinks and junctions are broken on Linux but could be restored:
-    >   ```
-    >   /media/user/ntfs_test_restored $ ll
-    >   ... 'Junction of folder' -> /mnt/borg_pata/ntfs_test/folder
-    >   ```
-    > - Symlinks and junctions are screwed on Windows. They are regular files, with some prefix and then text with the Linux's target path :(
-    >
-    > TODO(extract): same with ntfs3?
+    - If you then realize that some important NTFS metadata is missing, you may try recovering it by converting the `.metadata.nc.img` to VHD with https://github.com/yirkha/ntfsclone2vhd/#metadata-only-images, and mounting it in Windows.
+    - NTFS symlinks and junctions are not being correctly restored from Linux at this time. Workaround:
+      - Mount the archive
+      - Run `6-ntfs-symlinks.sh <folder_junctions|folder_symlinks> /mnt/borg/NTFS_PART /media/user/NTFS_PART`
+      - Reboot to Windows, and from there run X:\tamborgmatic_restore_symlinks.bat
 
 
 
 ## Setup
 
 0. Requirements:
-    - Debian / Linux Mint / Ubuntu 20.04+, installed on LVM
+    - Debian / Linux Mint / Ubuntu 20.04+, **installed on LVM**
     - Encrypted filesystems are currently unsupported
     - sudo [NOPASSWD](https://xkcd.com/1200/)
 
@@ -231,7 +234,8 @@ Double-check the device you are about to write to!
     ```sh
     sudo apt install git
 
-    sudo SSH_AUTH_SOCK="$SSH_AUTH_SOCK" GIT_SSH_COMMAND="sudo -u $USER ssh" git clone git@github.com:zzdroide/borgmatic.git /etc/borgmatic
+    sudo SSH_AUTH_SOCK="$SSH_AUTH_SOCK" GIT_SSH_COMMAND="sudo -u $USER ssh" git clone git@github.com:zzdroide/tamborgmatic.git /etc/borgmatic
+    # For machine with no write access: sudo git clone https://github.com/zzdroide/tamborgmatic /etc/borgmatic
     sudo chown -R $USER:$USER /etc/borgmatic  # For ease of usage, and because of root/non-root invocations
     ```
 
@@ -247,14 +251,13 @@ Double-check the device you are about to write to!
     - `bupsrcs.cfg`: &lt;type> &lt;name> &lt;path>
 
       Where &lt;type> is:
-      - `linux` for an ext4 linux root or data partition. Must be a LV and have free space in the VG for a snapshot, to backup while in use.
-      - `part` to backup the raw partition
+      - `linux` for a Linux root or data partition, that can remain mounted while backing up. Must be a LV and have free space in the VG for a snapshot.
+      - `part` to backup the raw partition (for example Ext4 /boot, or Windows' NTFS partition)
       - `data` to backup file data only (exFAT-style)
 
     - `smarthealthc.cfg`: &lt;hc_url> &lt;dev>
 
       One line for every mechanical HDD worth preventative replacement.
-
 
     > Note: *.cfg files can have comments by starting lines with `#`
 

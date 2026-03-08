@@ -19,8 +19,10 @@ get_disk_name_from_part_path() {
 stream_disk_header() {
   local disk_name=$1
 
-  local header_size; header_size=$(sfdisk -l --output Start --json "/dev/$disk_name" \
-                | jq '.partitiontable.partitions[0].start')
+  local header_size; header_size=$(
+    sfdisk -l --output Start --json "/dev/$disk_name" |
+      jq '.partitiontable.partitions[0].start'
+  )
 
   dd if="/dev/$disk_name" count="$header_size" status=none
 }
@@ -49,8 +51,8 @@ generate_ext4_reserved_space() {
     s/%e4_serial%/$e4_serial/
     s/%reserved_blocks%/$reserved_blocks/
   " \
-    < $template_path \
-    > "$generated_path"
+    <$template_path \
+    >"$generated_path"
   chmod 744 "$generated_path"
 }
 

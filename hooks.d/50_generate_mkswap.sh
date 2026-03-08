@@ -38,8 +38,8 @@ generate_mkswap() {
     s|%relative_file%|$relative_file|
     s|%megabytes%|$megabytes|
   " \
-    < $template_path \
-    > $generated_path
+    <$template_path \
+    >$generated_path
   chmod 744 $generated_path
 }
 
