@@ -94,11 +94,14 @@ do_bupsrc() {
 
 
 
-[[ "$hook_type" == "$hook_before" ]] && mkdir $struct_dir/
+if [[ "$hook_type" == "$hook_before" ]]; then
+  mkdir $struct_dir/
+fi
 
 while next_bupsrc; do
   do_bupsrc
 done
 
-[[ "$hook_type" == "$hook_after" ]] && rmdir $struct_dir/
-true
+if [[ "$hook_type" == "$hook_after" ]]; then
+  rmdir $struct_dir/
+fi
